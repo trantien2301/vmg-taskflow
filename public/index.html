@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskFlow Pro - Quản Lý Công Việc & Báo Cáo Realtime</title>
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Chart.js for interactive analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <!-- ========================================================
+       EMAIL LOGIN SCREEN
+       ======================================================== -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">⚡</div>
+        <h2>TaskFlow Pro</h2>
+        <p>Hệ thống Quản lý Công việc & Báo cáo Realtime</p>
+      </div>
+
+      <!-- Segmented Tabs for Login / Register -->
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab-btn active" id="tabLoginBtn">
+          <span>🔑 Đăng Nhập</span>
+        </button>
+        <button type="button" class="auth-tab-btn" id="tabRegisterBtn">
+          <span>✨ Đăng Ký (@vmg.edu.vn)</span>
+        </button>
+      </div>
+
+      <!-- Alert Message Box -->
+      <div class="login-alert" id="loginAlert" style="display: none;">
+        <span>⚠️</span>
+        <span id="loginAlertMsg">Thông tin không hợp lệ</span>
+      </div>
+
+      <!-- 1. LOGIN FORM CONTAINER -->
+      <div id="loginFormContainer">
+        <form id="loginForm">
+          <div class="form-group">
+            <label class="form-label">Email Đăng Nhập</label>
+            <div class="input-with-icon">
+              <span class="input-icon">✉️</span>
+              <input type="email" id="loginEmail" class="form-control" placeholder="admin@company.com" required autocomplete="email">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mật Khẩu</label>
+            <div class="input-with-icon">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+              <button type="button" class="btn-toggle-pwd" id="togglePasswordBtn" title="Hiện/Ẩn mật khẩu">👁️</button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block btn-lg" id="loginSubmitBtn" style="margin-top: 10px;">
+            <span>Đăng Nhập Vào Hệ Thống</span>
+            <span>➔</span>
+          </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 16px; font-size: 13px;">
+          Chưa có tài khoản? <a href="#" id="linkToRegister" style="color:var(--primary); font-weight:700; text-decoration:none;">Đăng ký bằng email @vmg.edu.vn ➔</a>
+        </div>
+
+        <!-- Quick Demo Account Pills -->
+        <div class="login-demo-section">
+          <div class="demo-section-title">
+            <span>⚡ Hoặc chọn nhanh tài khoản mẫu:</span>
+          </div>
+          <div class="demo-buttons-grid">
+            <button type="button" class="demo-account-btn" data-email="admin@company.com" data-pass="123456" title="Đăng nhập Admin">
+              <span class="demo-badge admin">ADMIN</span>
+              <div class="demo-name">👑 Trần Quản Trị</div>
+              <div class="demo-dept">Ban Giám Đốc</div>
+            </button>
+
+            <button type="button" class="demo-account-btn" data-email="lan.nguyen@company.com" data-pass="123456" title="Đăng nhập Kỹ Thuật">
+              <span class="demo-badge user">USER</span>
+              <div class="demo-name">👩‍💻 Nguyễn Thị Lan</div>
+              <div class="demo-dept">Phòng Kỹ Thuật</div>
+            </button>
+
+            <button type="button" class="demo-account-btn" data-email="tuan.tran@company.com" data-pass="123456" title="Đăng nhập Marketing">
+              <span class="demo-badge user">USER</span>
+              <div class="demo-name">👨‍🎨 Trần Anh Tuấn</div>
+              <div class="demo-dept">Phòng Marketing</div>
+            </button>
+
+            <button type="button" class="demo-account-btn" data-email="mai.le@company.com" data-pass="123456" title="Đăng nhập Kinh Doanh">
+              <span class="demo-badge user">USER</span>
+              <div class="demo-name">👩‍💼 Lê Tuyết Mai</div>
+              <div class="demo-dept">Phòng Kinh Doanh</div>
+            </button>
+
+            <button type="button" class="demo-account-btn" data-email="hoang.pham@company.com" data-pass="123456" title="Đăng nhập Vận Hành">
+              <span class="demo-badge user">USER</span>
+              <div class="demo-name">👨‍🔧 Phạm Minh Hoàng</div>
+              <div class="demo-dept">Phòng Vận Hành</div>
+            </button>
+          </div>
+          <div class="demo-note">
+            💡 Mật khẩu mặc định cho các tài khoản là: <code>123456</code>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. REGISTER FORM CONTAINER (@vmg.edu.vn ONLY) -->
+      <div id="registerFormContainer" style="display: none;">
+        <!-- Domain policy notice -->
+        <div class="domain-notice-banner">
+          <span style="font-size:20px;">🛡️</span>
+          <div>
+            <strong>Yêu cầu Email Nội Bộ VMG:</strong>
+            <div>Hệ thống chỉ cho phép đăng ký tài khoản với email có đuôi <code>@vmg.edu.vn</code> (Ví dụ: <code>nhanvien@vmg.edu.vn</code>).</div>
+          </div>
+        </div>
+
+        <form id="registerForm">
+          <div class="form-group">
+            <label class="form-label">Họ và Tên *</label>
+            <div class="input-with-icon">
+              <span class="input-icon">👤</span>
+              <input type="text" id="regName" class="form-control" placeholder="Ví dụ: Nguyễn Văn A" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email Nội Bộ (@vmg.edu.vn) *</label>
+            <div class="input-with-icon">
+              <span class="input-icon">✉️</span>
+              <input type="email" id="regEmail" class="form-control" placeholder="ten.nv@vmg.edu.vn" required>
+            </div>
+            <div id="regEmailHint" class="email-domain-hint">
+              * Bắt buộc có đuôi <strong>@vmg.edu.vn</strong>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Phòng Ban *</label>
+              <select id="regDept" class="form-control" required>
+                <option value="Phòng Kỹ Thuật">Phòng Kỹ Thuật</option>
+                <option value="Phòng Marketing">Phòng Marketing</option>
+                <option value="Phòng Kinh Doanh">Phòng Kinh Doanh</option>
+                <option value="Phòng Vận Hành">Phòng Vận Hành</option>
+                <option value="Ban Giám Đốc">Ban Giám Đốc</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Chức Danh / Vị Trí</label>
+              <input type="text" id="regPosition" class="form-control" placeholder="Ví dụ: Lập trình viên, Chuyên viên...">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Mật Khẩu *</label>
+              <div class="input-with-icon">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="regPassword" class="form-control" placeholder="Tối thiểu 6 ký tự" minlength="6" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Nhập Lại Mật Khẩu *</label>
+              <div class="input-with-icon">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="regConfirmPassword" class="form-control" placeholder="Xác nhận lại mật khẩu" minlength="6" required>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block btn-lg" id="regSubmitBtn" style="margin-top: 10px;">
+            <span>Đăng Ký Tài Khoản Ngay</span>
+            <span>➔</span>
+          </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 18px; font-size: 13px; color: var(--text-secondary);">
+          Đã có tài khoản? <a href="#" id="linkToLogin" style="color:var(--primary); font-weight:700; text-decoration:none;">Quay lại đăng nhập</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP CONTAINER -->
+  <div class="app-container" id="appContainer" style="display: none;">
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-badge">⚡</div>
+        <div>
+          <div class="logo-text">TaskFlow Pro</div>
+          <span class="logo-sub">Realtime Workspace</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Không Gian Làm Việc</div>
+        <a class="nav-item active" data-view="kanban">
+          <span class="icon">📋</span>
+          <span>Bảng Kanban</span>
+        </a>
+        <a class="nav-item" data-view="table">
+          <span class="icon">📑</span>
+          <span>Danh Sách Việc</span>
+        </a>
+        <a class="nav-item" data-view="calendar">
+          <span class="icon">📅</span>
+          <span>Lịch & Thời Hạn</span>
+        </a>
+
+        <div class="nav-section-title">Cảnh Báo & Giám Sát</div>
+        <a class="nav-item" data-view="alerts">
+          <span class="icon">🚨</span>
+          <span>Trung Tâm Cảnh Báo</span>
+          <span class="nav-badge danger" id="sidebarOverdueBadge" style="display:none;">0</span>
+        </a>
+        <a class="nav-item" data-view="reports">
+          <span class="icon">📈</span>
+          <span>Báo Cáo & Thống Kê</span>
+        </a>
+
+        <div class="nav-section-title">Quản Trị Hệ Thống</div>
+        <a class="nav-item" data-view="users" id="adminUsersNavItem">
+          <span class="icon">👥</span>
+          <span>Quản Lý Nhân Sự</span>
+        </a>
+        <a class="nav-item" data-view="activities">
+          <span class="icon">📜</span>
+          <span>Nhật Ký Hoạt Động</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-summary">
+          <div class="user-avatar" id="sidebarUserAvatar">👑</div>
+          <div class="user-info">
+            <div class="user-name" id="sidebarUserName">Đang tải...</div>
+            <span class="user-role-tag admin" id="sidebarUserRole">ADMIN</span>
+          </div>
+        </div>
+        <button class="btn-logout" id="btnLogoutSidebar">
+          <span>🚪</span>
+          <span>Đăng Xuất</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT WRAPPER -->
+    <div class="main-wrapper">
+      <!-- TOP HEADER -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="mobile-menu-toggle" id="mobileMenuToggle">☰</button>
+          <h1 class="current-view-title" id="currentViewTitle">📋 Bảng Công Việc (Kanban Board)</h1>
+        </div>
+
+        <div class="header-right">
+          <!-- Realtime status indicator -->
+          <div class="realtime-status-pill">
+            <div class="status-dot" id="statusDot"></div>
+            <span id="statusText">Trực tuyến: 1 người</span>
+          </div>
+
+          <!-- Quick Demo User Switcher -->
+          <div class="demo-switcher">
+            <span>👤 Đổi vai trò:</span>
+            <select id="demoUserSelect">
+              <option value="usr-1">👑 Trần Quản Trị (Admin)</option>
+              <option value="usr-2">👩‍💻 Nguyễn Thị Lan (Kỹ Thuật)</option>
+              <option value="usr-3">👨‍🎨 Trần Anh Tuấn (Marketing)</option>
+              <option value="usr-4">👩‍💼 Lê Tuyết Mai (Kinh Doanh)</option>
+              <option value="usr-5">👨‍🔧 Phạm Minh Hoàng (Vận Hành)</option>
+            </select>
+          </div>
+
+          <!-- Scan Alerts Now button -->
+          <button class="btn btn-outline btn-sm" id="scanAlertsBtn" title="Kiểm tra hạn chót ngay tức thì">
+            ⚡ Quét Cảnh Báo
+          </button>
+
+          <!-- Notification Bell -->
+          <div class="notif-btn-wrapper">
+            <button class="btn-icon-badge" id="notifBtn" title="Thông báo & Cảnh báo">
+              🔔
+              <span class="notif-bubble" id="notifBubble" style="display:none;">0</span>
+            </button>
+
+            <!-- Dropdown List -->
+            <div class="notif-dropdown" id="notifDropdown">
+              <div class="notif-header">
+                <span>Thông Báo & Cảnh Báo Mới</span>
+                <button class="btn btn-outline btn-sm" onclick="App.markAllNotificationsRead()" style="padding:2px 8px; font-size:11px;">
+                  Đã đọc tất cả
+                </button>
+              </div>
+              <div class="notif-list" id="notifList"></div>
+              <div class="notif-footer">
+                <a href="#" onclick="App.switchView('alerts'); document.getElementById('notifDropdown').classList.remove('show'); return false;" style="font-size:12px; color:var(--primary); text-decoration:none; font-weight:600;">
+                  Xem toàn bộ trung tâm cảnh báo →
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dark/Light Theme Toggle -->
+          <button class="btn-icon-badge" id="themeToggleBtn" title="Đổi giao diện Sáng/Tối">
+            🌙
+          </button>
+
+          <!-- Logout Button -->
+          <button class="btn btn-outline btn-sm" id="btnLogoutHeader" title="Đăng xuất khỏi hệ thống" style="color:var(--danger); border-color:#fca5a5;">
+            🚪 Đăng Xuất
+          </button>
+        </div>
+      </header>
+
+      <!-- SCROLLABLE CONTENT AREA -->
+      <main class="content-area">
+        <!-- GLOBAL KPI STATS BAR (Appears across views) -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon blue">📊</div>
+            <div class="kpi-info">
+              <div class="kpi-value" id="kpiTotalTasks">0</div>
+              <div class="kpi-label">Tổng số công việc</div>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon green">🎯</div>
+            <div class="kpi-info">
+              <div class="kpi-value" id="kpiCompletedRate">0%</div>
+              <div class="kpi-label">Tỷ lệ hoàn thành</div>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon yellow">⏳</div>
+            <div class="kpi-info">
+              <div class="kpi-value" id="kpiInProgress">0</div>
+              <div class="kpi-label">Đang triển khai</div>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon red">🚨</div>
+            <div class="kpi-info">
+              <div class="kpi-value" id="kpiOverdue" style="color:var(--danger)">0</div>
+              <div class="kpi-label">Bị trễ hạn chót</div>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon purple">🔥</div>
+            <div class="kpi-info">
+              <div class="kpi-value" id="kpiUrgent">0</div>
+              <div class="kpi-label">Ưu tiên khẩn cấp</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FILTER & ACTION BAR -->
+        <div class="filter-bar">
+          <div class="filter-input-group">
+            <span>🔍</span>
+            <input type="text" id="filterSearch" placeholder="Tìm kiếm công việc, mã ID...">
+          </div>
+
+          <div class="filter-input-group">
+            <span>🎯</span>
+            <select id="filterPriority">
+              <option value="all">Tất cả độ ưu tiên</option>
+              <option value="urgent">🚨 Khẩn cấp</option>
+              <option value="high">🔥 Cao</option>
+              <option value="medium">⚡ Trung bình</option>
+              <option value="low">🌱 Thấp</option>
+            </select>
+          </div>
+
+          <div class="filter-input-group">
+            <span>🏢</span>
+            <select id="filterDepartment">
+              <option value="all">Tất cả phòng ban</option>
+            </select>
+          </div>
+
+          <div class="filter-input-group">
+            <span>👤</span>
+            <select id="filterAssignee">
+              <option value="all">Tất cả người phụ trách</option>
+            </select>
+          </div>
+
+          <div style="margin-left: auto;">
+            <button class="btn btn-primary" id="btnOpenAddTaskModal">
+              <span>+</span>
+              <span>Giao Công Việc Mới</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- VIEW 1: KANBAN BOARD -->
+        <section class="view-panel active" id="view-kanban">
+          <div class="kanban-board">
+            <!-- Col 1: Todo -->
+            <div class="kanban-col">
+              <div class="kanban-col-header todo">
+                <div class="col-title">
+                  <span>📌</span>
+                  <span>Cần Làm (To Do)</span>
+                </div>
+                <span class="col-count" id="kanbanCount_todo">0</span>
+              </div>
+              <div class="kanban-cards" id="kanbanCards_todo" data-status="todo"></div>
+            </div>
+
+            <!-- Col 2: In Progress -->
+            <div class="kanban-col">
+              <div class="kanban-col-header in_progress">
+                <div class="col-title">
+                  <span>⚡</span>
+                  <span>Đang Làm (In Progress)</span>
+                </div>
+                <span class="col-count" id="kanbanCount_in_progress">0</span>
+              </div>
+              <div class="kanban-cards" id="kanbanCards_in_progress" data-status="in_progress"></div>
+            </div>
+
+            <!-- Col 3: Review -->
+            <div class="kanban-col">
+              <div class="kanban-col-header review">
+                <div class="col-title">
+                  <span>👀</span>
+                  <span>Chờ Duyệt (Review)</span>
+                </div>
+                <span class="col-count" id="kanbanCount_review">0</span>
+              </div>
+              <div class="kanban-cards" id="kanbanCards_review" data-status="review"></div>
+            </div>
+
+            <!-- Col 4: Completed -->
+            <div class="kanban-col">
+              <div class="kanban-col-header completed">
+                <div class="col-title">
+                  <span>✅</span>
+                  <span>Hoàn Thành (Done)</span>
+                </div>
+                <span class="col-count" id="kanbanCount_completed">0</span>
+              </div>
+              <div class="kanban-cards" id="kanbanCards_completed" data-status="completed"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 2: DATA TABLE VIEW -->
+        <section class="view-panel" id="view-table">
+          <div class="table-card">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 80px;">Mã CV</th>
+                  <th>Tên Công Việc</th>
+                  <th>Phụ Trách</th>
+                  <th>Độ Ưu Tiên</th>
+                  <th>Trạng Thái</th>
+                  <th>Tiến Độ</th>
+                  <th>Hạn Chót</th>
+                </tr>
+              </thead>
+              <tbody id="taskTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- VIEW 3: CALENDAR / TIMELINE -->
+        <section class="view-panel" id="view-calendar">
+          <div id="calendarTimelineList"></div>
+        </section>
+
+        <!-- VIEW 4: ALERTS CENTER -->
+        <section class="view-panel" id="view-alerts">
+          <div class="alert-banner danger">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <span style="font-size:26px;">🚨</span>
+              <div>
+                <strong style="font-size:15px;">Hệ Thống Giám Sát Cảnh Báo Thời Hạn Tự Động</strong>
+                <div style="font-size:12px; margin-top:2px;">
+                  Hệ thống tự động quét liên tục mỗi phút và gửi thông báo Realtime ngay khi công việc trễ hạn hoặc đến hạn chót!
+                </div>
+              </div>
+            </div>
+            <div style="font-weight:700; font-size:18px;">
+              <span id="alertTotalCount">0</span> Mục Cần Chú Ý
+            </div>
+          </div>
+
+          <h3 style="font-size:16px; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+            <span>🔴</span>
+            <span>Công Việc Đã Quá Hạn (Trễ Deadline)</span>
+          </h3>
+          <div class="alert-cards-grid" id="alertsOverdueGrid" style="margin-bottom:28px;"></div>
+
+          <h3 style="font-size:16px; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+            <span>🟠</span>
+            <span>Công Việc Sắp Đến Hạn (Trong Vòng 24 Giờ Tới)</span>
+          </h3>
+          <div class="alert-cards-grid" id="alertsDueSoonGrid"></div>
+        </section>
+
+        <!-- VIEW 5: REPORTS & ANALYTICS -->
+        <section class="view-panel" id="view-reports">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+            <h2 style="font-size:18px; font-weight:700;">Biểu Đồ Phân Tích & Báo Cáo Hiệu Suất</h2>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-outline btn-sm" onclick="App.exportCsvReport()">📥 Xuất File Excel (CSV)</button>
+              <button class="btn btn-primary btn-sm" onclick="App.printReport()">🖨️ In Báo Cáo</button>
+            </div>
+          </div>
+
+          <!-- Charts Grid -->
+          <div class="charts-grid">
+            <div class="chart-card">
+              <div class="chart-title">
+                <span>🥧 Phân Bổ Trạng Thái Công Việc</span>
+              </div>
+              <div class="chart-canvas-container">
+                <canvas id="chartStatus"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-title">
+                <span>🏢 Khối Lượng Theo Phòng Ban</span>
+              </div>
+              <div class="chart-canvas-container">
+                <canvas id="chartDept"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-title">
+                <span>📈 Xu Hướng Hoàn Thành 7 Ngày Qua</span>
+              </div>
+              <div class="chart-canvas-container">
+                <canvas id="chartTrend"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-title">
+                <span>👥 Hiệu Suất Từng Nhân Viên</span>
+              </div>
+              <div class="chart-canvas-container">
+                <canvas id="chartMember"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Member Performance Table -->
+          <div class="table-card">
+            <div style="padding:16px 20px; font-weight:700; border-bottom:1px solid var(--border-color);">
+              Bảng Tổng Hợp Chỉ Số KPI Nhân Sự
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nhân Viên</th>
+                  <th>Tổng Việc</th>
+                  <th>Đã Xong</th>
+                  <th>Đang Làm</th>
+                  <th>Quá Hạn</th>
+                  <th>Tỷ Lệ Hoàn Thành</th>
+                </tr>
+              </thead>
+              <tbody id="reportMemberTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- VIEW 6: USERS MANAGEMENT (Admin) -->
+        <section class="view-panel" id="view-users">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+            <h2 style="font-size:18px; font-weight:700;">Quản Lý Thành Viên & Phân Quyền</h2>
+            <button class="btn btn-primary" onclick="App.openAddUserModal()">+ Thêm Thành Viên</button>
+          </div>
+
+          <div class="table-card">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Họ Tên & Vị Trí</th>
+                  <th>Email Đăng Nhập</th>
+                  <th>Phòng Ban</th>
+                  <th>Vai Trò (Role)</th>
+                  <th>Số Việc Đang Giữ</th>
+                  <th>Trạng Thái</th>
+                  <th>Hành Động</th>
+                </tr>
+              </thead>
+              <tbody id="userTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- VIEW 7: ACTIVITIES AUDIT LOG -->
+        <section class="view-panel" id="view-activities">
+          <div class="table-card">
+            <div style="padding:16px 20px; font-weight:700; border-bottom:1px solid var(--border-color);">
+              Lịch Sử Nhật Ký Hoạt Động Hệ Thống Realtime
+            </div>
+            <div id="activityLogContainer"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT TASK -->
+  <div class="modal-overlay" id="taskModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="taskModalTitle">Thêm Công Việc Mới</h3>
+        <button class="modal-close-btn" data-close-modal="taskModal">&times;</button>
+      </div>
+      <form id="taskForm">
+        <input type="hidden" id="taskFormId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Tiêu Đề Công Việc *</label>
+            <input type="text" class="form-control" id="taskFormTitle" required placeholder="Nhập tiêu đề công việc...">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mô Tả Chi Tiết / Tiêu Chí Nghiệm Thu</label>
+            <textarea class="form-control" id="taskFormDesc" rows="3" placeholder="Mô tả cụ thể yêu cầu và kết quả cần đạt..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Mức Độ Ưu Tiên</label>
+              <select class="form-control" id="taskFormPriority">
+                <option value="urgent">🚨 Khẩn cấp</option>
+                <option value="high">🔥 Cao</option>
+                <option value="medium" selected>⚡ Trung bình</option>
+                <option value="low">🌱 Thấp</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Hạn Chót (Deadline)</label>
+              <input type="date" class="form-control" id="taskFormDueDate" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Phòng Ban Phụ Trách</label>
+              <select class="form-control" id="taskFormDept"></select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Phân Công Cho Nhân Viên</label>
+              <select class="form-control" id="taskFormAssignee"></select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" data-close-modal="taskModal">Hủy bỏ</button>
+          <button type="submit" class="btn btn-primary">Lưu Công Việc</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: TASK DETAIL & REALTIME COMMENTS -->
+  <div class="modal-overlay" id="taskDetailModal">
+    <div class="modal-content" style="max-width: 680px;">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="task-id" id="detailTaskId" style="font-size:14px;"></span>
+          <span class="badge-priority" id="detailTaskPriority"></span>
+        </div>
+        <button class="modal-close-btn" data-close-modal="taskDetailModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h2 id="detailTaskTitle" style="font-size:18px; font-weight:700; margin-bottom:8px;"></h2>
+        <div id="detailTaskDesc" style="color:var(--text-secondary); line-height:1.5; font-size:13px; margin-bottom:18px; background:var(--bg-main); padding:12px; border-radius:var(--radius-sm);"></div>
+
+        <div class="form-row" style="margin-bottom:16px;">
+          <div>
+            <span style="font-size:12px; color:var(--text-muted); display:block;">Người Phụ Trách:</span>
+            <strong id="detailTaskAssignee" style="font-size:13px;"></strong>
+          </div>
+          <div>
+            <span style="font-size:12px; color:var(--text-muted); display:block;">Phòng Ban:</span>
+            <strong id="detailTaskDept" style="font-size:13px;"></strong>
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-bottom:16px;">
+          <div>
+            <span style="font-size:12px; color:var(--text-muted); display:block;">Hạn Chót Hoàn Thành:</span>
+            <strong id="detailTaskDueDate" style="font-size:14px;"></strong>
+          </div>
+          <div>
+            <span style="font-size:12px; color:var(--text-muted); display:block;">Trạng Thái Hiện Tại:</span>
+            <select class="form-control" id="detailStatusSelect" style="margin-top:4px;">
+              <option value="todo">📌 Cần làm (To Do)</option>
+              <option value="in_progress">⚡ Đang làm (In Progress)</option>
+              <option value="review">👀 Chờ duyệt (Review)</option>
+              <option value="completed">✅ Hoàn thành (Done)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; margin-bottom:4px;">
+            <span>Tiến độ thực tế:</span>
+            <span id="detailProgressVal" style="color:var(--primary); font-weight:700;">0%</span>
+          </div>
+          <input type="range" id="detailProgressRange" min="0" max="100" step="5" style="width:100%; cursor:pointer;">
+        </div>
+
+        <!-- REALTIME COMMENTS SECTION -->
+        <div class="comment-box">
+          <div style="font-weight:700; font-size:14px; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+            <span>💬</span>
+            <span>Trao Đổi Trực Tuyến Realtime</span>
+          </div>
+          <div class="comment-list" id="detailCommentList"></div>
+
+          <form id="commentForm" style="display:flex; gap:8px;">
+            <input type="text" class="form-control" id="commentInput" placeholder="Nhập tin nhắn / báo cáo tiến độ..." required>
+            <button type="submit" class="btn btn-primary btn-sm" style="flex-shrink:0;">Gửi</button>
+          </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" style="color:var(--danger); margin-right:auto;" id="detailDeleteTaskBtn">
+          🗑️ Xóa việc (Admin)
+        </button>
+        <button class="btn btn-outline" id="detailEditTaskBtn">Chỉnh Sửa</button>
+        <button class="btn btn-primary" data-close-modal="taskDetailModal">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT USER -->
+  <div class="modal-overlay" id="userModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="userModalTitle">Thêm Thành Viên Mới</h3>
+        <button class="modal-close-btn" data-close-modal="userModal">&times;</button>
+      </div>
+      <form id="userForm">
+        <input type="hidden" id="userFormId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Họ Và Tên *</label>
+            <input type="text" class="form-control" id="userFormName" required placeholder="Ví dụ: Nguyễn Văn A">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email Đăng Nhập *</label>
+            <input type="email" class="form-control" id="userFormEmail" required placeholder="ten@company.com">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mật Khẩu (Mặc định: 123456)</label>
+            <input type="password" class="form-control" id="userFormPassword" placeholder="Nhập để đổi mật khẩu mới...">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Phân Quyền (Role) *</label>
+              <select class="form-control" id="userFormRole">
+                <option value="user">USER (Nhân viên thông thường)</option>
+                <option value="admin">ADMIN (Quản trị viên toàn quyền)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Phòng Ban *</label>
+              <select class="form-control" id="userFormDept">
+                <option value="Phòng Kỹ Thuật">Phòng Kỹ Thuật</option>
+                <option value="Phòng Marketing">Phòng Marketing</option>
+                <option value="Phòng Kinh Doanh">Phòng Kinh Doanh</option>
+                <option value="Phòng Vận Hành">Phòng Vận Hành</option>
+                <option value="Ban Giám Đốc">Ban Giám Đốc</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Chức Danh / Vị Trí Công Việc</label>
+            <input type="text" class="form-control" id="userFormPosition" placeholder="Ví dụ: Lập trình viên, Chuyên viên Content...">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" data-close-modal="userModal">Hủy bỏ</button>
+          <button type="submit" class="btn btn-primary">Lưu Thành Viên</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION POPUPS CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- APPLICATION SCRIPTS -->
+  <script src="js/api.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

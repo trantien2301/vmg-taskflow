@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: vmg-taskflow
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_VERSION
+        value: 20
