@@ -48,7 +48,10 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Mật Khẩu</label>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <label class="form-label" style="margin-bottom:0;">Mật Khẩu</label>
+              <a href="#" id="linkToForgot" style="font-size:12px; color:var(--primary); text-decoration:none; font-weight:600;">Quên mật khẩu?</a>
+            </div>
             <div class="input-with-icon">
               <span class="input-icon">🔒</span>
               <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required autocomplete="current-password">
@@ -62,49 +65,78 @@
           </button>
         </form>
 
-        <div style="text-align: center; margin-top: 16px; font-size: 13px;">
+        <div style="text-align: center; margin-top: 18px; font-size: 13px;">
           Chưa có tài khoản? <a href="#" id="linkToRegister" style="color:var(--primary); font-weight:700; text-decoration:none;">Đăng ký bằng email @vmg.edu.vn ➔</a>
         </div>
+      </div>
 
-        <!-- Quick Demo Account Pills -->
-        <div class="login-demo-section">
-          <div class="demo-section-title">
-            <span>⚡ Hoặc chọn nhanh tài khoản mẫu:</span>
+      <!-- 2. FORGOT PASSWORD CONTAINER -->
+      <div id="forgotPasswordContainer" style="display: none;">
+        <div class="domain-notice-banner" style="background:#eff6ff; border-color:#bfdbfe; color:#1e40af;">
+          <span style="font-size:20px;">🔑</span>
+          <div>
+            <strong>Khôi Phục Mật Khẩu:</strong>
+            <div>Nhập email tài khoản của bạn. Hệ thống sẽ xác nhận và hỗ trợ đặt lại mật khẩu mới ngay lập tức.</div>
           </div>
-          <div class="demo-buttons-grid">
-            <button type="button" class="demo-account-btn" data-email="admin@company.com" data-pass="123456" title="Đăng nhập Admin">
-              <span class="demo-badge admin">ADMIN</span>
-              <div class="demo-name">👑 Trần Quản Trị</div>
-              <div class="demo-dept">Ban Giám Đốc</div>
-            </button>
+        </div>
 
-            <button type="button" class="demo-account-btn" data-email="lan.nguyen@company.com" data-pass="123456" title="Đăng nhập Kỹ Thuật">
-              <span class="demo-badge user">USER</span>
-              <div class="demo-name">👩‍💻 Nguyễn Thị Lan</div>
-              <div class="demo-dept">Phòng Kỹ Thuật</div>
-            </button>
-
-            <button type="button" class="demo-account-btn" data-email="tuan.tran@company.com" data-pass="123456" title="Đăng nhập Marketing">
-              <span class="demo-badge user">USER</span>
-              <div class="demo-name">👨‍🎨 Trần Anh Tuấn</div>
-              <div class="demo-dept">Phòng Marketing</div>
-            </button>
-
-            <button type="button" class="demo-account-btn" data-email="mai.le@company.com" data-pass="123456" title="Đăng nhập Kinh Doanh">
-              <span class="demo-badge user">USER</span>
-              <div class="demo-name">👩‍💼 Lê Tuyết Mai</div>
-              <div class="demo-dept">Phòng Kinh Doanh</div>
-            </button>
-
-            <button type="button" class="demo-account-btn" data-email="hoang.pham@company.com" data-pass="123456" title="Đăng nhập Vận Hành">
-              <span class="demo-badge user">USER</span>
-              <div class="demo-name">👨‍🔧 Phạm Minh Hoàng</div>
-              <div class="demo-dept">Phòng Vận Hành</div>
-            </button>
+        <!-- Step 1: Input Email -->
+        <form id="forgotPasswordForm">
+          <div class="form-group">
+            <label class="form-label">Email Tài Khoản Của Bạn *</label>
+            <div class="input-with-icon">
+              <span class="input-icon">✉️</span>
+              <input type="email" id="forgotEmail" class="form-control" placeholder="ten.nv@vmg.edu.vn" required>
+            </div>
           </div>
-          <div class="demo-note">
-            💡 Mật khẩu mặc định cho các tài khoản là: <code>123456</code>
+
+          <button type="submit" class="btn btn-primary btn-block btn-lg" id="btnForgotSubmit" style="margin-top: 10px;">
+            <span>Tiếp Tục ➔</span>
+          </button>
+        </form>
+
+        <!-- Step 2: Input OTP & New Password (shows after email verified) -->
+        <form id="resetPasswordForm" style="display: none; margin-top: 16px;">
+          <div class="domain-notice-banner" style="background:#ecfdf5; border-color:#a7f3d0; color:#065f46;">
+            <span style="font-size:20px;">🛡️</span>
+            <div>
+              <strong>Mã xác minh bảo mật của bạn:</strong>
+              <div style="font-size:20px; font-weight:800; letter-spacing:3px; margin:4px 0;" id="displayOtpCode">------</div>
+              <div style="font-size:11px; color:#047857;">Mã xác minh hợp lệ trong 10 phút.</div>
+            </div>
           </div>
+
+          <div class="form-group">
+            <label class="form-label">Nhập Mã Xác Minh (6 số) *</label>
+            <div class="input-with-icon">
+              <span class="input-icon">🔢</span>
+              <input type="text" id="resetOtp" class="form-control" placeholder="Nhập 6 số mã xác minh" maxlength="6" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mật Khẩu Mới *</label>
+            <div class="input-with-icon">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="resetNewPass" class="form-control" placeholder="Tối thiểu 6 ký tự" minlength="6" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Nhập Lại Mật Khẩu Mới *</label>
+            <div class="input-with-icon">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="resetConfirmPass" class="form-control" placeholder="Xác nhận mật khẩu" minlength="6" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block btn-lg" id="btnResetSubmit" style="margin-top: 10px;">
+            <span>Cập Nhật Mật Khẩu Mới ➔</span>
+          </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 18px; font-size: 13px;">
+          <a href="#" id="linkBackFromForgot" style="color:var(--primary); font-weight:700; text-decoration:none;">⬅ Quay lại đăng nhập</a>
         </div>
       </div>
 
@@ -266,18 +298,6 @@
           <div class="realtime-status-pill">
             <div class="status-dot" id="statusDot"></div>
             <span id="statusText">Trực tuyến: 1 người</span>
-          </div>
-
-          <!-- Quick Demo User Switcher -->
-          <div class="demo-switcher">
-            <span>👤 Đổi vai trò:</span>
-            <select id="demoUserSelect">
-              <option value="usr-1">👑 Trần Quản Trị (Admin)</option>
-              <option value="usr-2">👩‍💻 Nguyễn Thị Lan (Kỹ Thuật)</option>
-              <option value="usr-3">👨‍🎨 Trần Anh Tuấn (Marketing)</option>
-              <option value="usr-4">👩‍💼 Lê Tuyết Mai (Kinh Doanh)</option>
-              <option value="usr-5">👨‍🔧 Phạm Minh Hoàng (Vận Hành)</option>
-            </select>
           </div>
 
           <!-- Scan Alerts Now button -->

@@ -328,6 +328,82 @@ app.post('/api/auth/register', (req, res) => {
   });
 });
 
+// -------------------------------------------------------------
+// FORGOT & RESET PASSWORD ENDPOINTS
+// -------------------------------------------------------------
+const passwordResetOTPs = new Map(); // email -> { otp, expiresAt }
+
+app.post('/api/auth/forgot-password', (req, res) => {
+  const { email } = req.body;
+  if (!email || !email.trim()) {
+    return res.status(400).json({ error: 'Vui lòng nhập email của bạn' });
+  }
+
+  const cleanEmail = email.trim().toLowerCase();
+  const user = db.getUserByEmail(cleanEmail);
+  if (!user) {
+    return res.status(404).json({ error: 'Không tìm thấy tài khoản nào khớp với email này trong hệ thống!' });
+  }
+
+  // Generate 6-digit verification code
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  passwordResetOTPs.set(cleanEmail, {
+    otp,
+    expiresAt: Date.now() + 10 * 60 * 1000 // 10 minutes
+  });
+
+  res.json({
+    success: true,
+    message: 'Mã xác minh khôi phục mật khẩu đã được tạo!',
+    email: cleanEmail,
+    otp
+  });
+});
+
+app.post('/api/auth/reset-password', (req, res) => {
+  const { email, otp, newPassword } = req.body;
+  if (!email || !otp || !newPassword) {
+    return res.status(400).json({ error: 'Vui lòng nhập đầy đủ email, mã xác minh và mật khẩu mới' });
+  }
+
+  const cleanEmail = email.trim().toLowerCase();
+  const record = passwordResetOTPs.get(cleanEmail);
+
+  if (!record || record.otp !== otp.trim()) {
+    return res.status(400).json({ error: 'Mã xác minh không chính xác hoặc đã hết hiệu lực!' });
+  }
+
+  if (Date.now() > record.expiresAt) {
+    passwordResetOTPs.delete(cleanEmail);
+    return res.status(400).json({ error: 'Mã xác minh đã hết hạn. Vui lòng gửi lại yêu cầu!' });
+  }
+
+  if (newPassword.length < 6) {
+    return res.status(400).json({ error: 'Mật khẩu mới phải có ít nhất 6 ký tự' });
+  }
+
+  const user = db.getUserByEmail(cleanEmail);
+  if (!user) {
+    return res.status(404).json({ error: 'Tài khoản không tồn tại!' });
+  }
+
+  // Update user password in database
+  db.updateUser(user.id, { password: newPassword });
+  passwordResetOTPs.delete(cleanEmail);
+
+  db.logActivity({
+    userId: user.id,
+    userName: user.name,
+    action: 'reset_password',
+    details: 'Đã đặt lại mật khẩu mới thành công'
+  });
+
+  res.json({
+    success: true,
+    message: 'Đặt lại mật khẩu thành công! Bạn có thể sử dụng mật khẩu mới để đăng nhập ngay.'
+  });
+});
+
 // Quick switch demo user for testing convenience
 app.post('/api/auth/switch-demo', (req, res) => {
   const { userId } = req.body;

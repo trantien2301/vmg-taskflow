@@ -75,6 +75,20 @@ const API = {
     return data;
   },
 
+  async forgotPassword(email) {
+    return this.request('/api/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email })
+    });
+  },
+
+  async resetPassword(email, otp, newPassword) {
+    return this.request('/api/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ email, otp, newPassword })
+    });
+  },
+
   async switchDemo(userId) {
     const data = await this.request('/api/auth/switch-demo', {
       method: 'POST',

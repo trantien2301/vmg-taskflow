@@ -122,6 +122,7 @@ const App = {
     const tabRegister = document.getElementById('tabRegisterBtn');
     const loginContainer = document.getElementById('loginFormContainer');
     const registerContainer = document.getElementById('registerFormContainer');
+    const forgotContainer = document.getElementById('forgotPasswordContainer');
     const alertBox = document.getElementById('loginAlert');
 
     if (alertBox) alertBox.style.display = 'none';
@@ -131,11 +132,25 @@ const App = {
       if (tabRegister) tabRegister.classList.add('active');
       if (loginContainer) loginContainer.style.display = 'none';
       if (registerContainer) registerContainer.style.display = 'block';
+      if (forgotContainer) forgotContainer.style.display = 'none';
+    } else if (tab === 'forgot') {
+      if (tabLogin) tabLogin.classList.remove('active');
+      if (tabRegister) tabRegister.classList.remove('active');
+      if (loginContainer) loginContainer.style.display = 'none';
+      if (registerContainer) registerContainer.style.display = 'none';
+      if (forgotContainer) {
+        forgotContainer.style.display = 'block';
+        const fForm = document.getElementById('forgotPasswordForm');
+        const rForm = document.getElementById('resetPasswordForm');
+        if (fForm) fForm.style.display = 'block';
+        if (rForm) rForm.style.display = 'none';
+      }
     } else {
       if (tabLogin) tabLogin.classList.add('active');
       if (tabRegister) tabRegister.classList.remove('active');
       if (loginContainer) loginContainer.style.display = 'block';
       if (registerContainer) registerContainer.style.display = 'none';
+      if (forgotContainer) forgotContainer.style.display = 'none';
     }
   },
 
@@ -581,20 +596,131 @@ const App = {
       });
     }
 
-    // Quick demo buttons click on Login screen
-    document.querySelectorAll('.demo-account-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const email = btn.getAttribute('data-email');
-        const pass = btn.getAttribute('data-pass');
-        const emailInput = document.getElementById('loginEmail');
-        const pwdInput = document.getElementById('loginPassword');
-        if (emailInput && pwdInput) {
-          emailInput.value = email;
-          pwdInput.value = pass;
-          this.performLogin(email, pass);
+    // ========================================================
+    // FORGOT & RESET PASSWORD LISTENERS
+    // ========================================================
+    const linkToForgot = document.getElementById('linkToForgot');
+    if (linkToForgot) {
+      linkToForgot.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.switchAuthTab('forgot');
+      });
+    }
+
+    const linkBackFromForgot = document.getElementById('linkBackFromForgot');
+    if (linkBackFromForgot) {
+      linkBackFromForgot.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.switchAuthTab('login');
+      });
+    }
+
+    const forgotForm = document.getElementById('forgotPasswordForm');
+    if (forgotForm) {
+      forgotForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const alertBox = document.getElementById('loginAlert');
+        const alertMsg = document.getElementById('loginAlertMsg');
+        const submitBtn = document.getElementById('btnForgotSubmit');
+        const email = document.getElementById('forgotEmail').value.trim();
+
+        if (!email) return;
+
+        if (alertBox) alertBox.style.display = 'none';
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<span>Đang xác nhận email...</span>';
+        }
+
+        try {
+          const res = await API.forgotPassword(email);
+          this.state.resetEmail = res.email;
+
+          // Switch to Step 2
+          document.getElementById('forgotPasswordForm').style.display = 'none';
+          document.getElementById('resetPasswordForm').style.display = 'block';
+          document.getElementById('displayOtpCode').innerText = res.otp;
+          document.getElementById('resetOtp').value = res.otp;
+
+          this.showToast(`🔑 Mã xác minh của bạn: ${res.otp}`, 'info');
+          this.playSound('info');
+        } catch (err) {
+          if (alertBox && alertMsg) {
+            alertMsg.innerText = err.message || 'Không tìm thấy tài khoản với email này!';
+            alertBox.style.display = 'flex';
+          }
+          this.playSound('danger');
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>Tiếp Tục ➔</span>';
+          }
         }
       });
-    });
+    }
+
+    const resetForm = document.getElementById('resetPasswordForm');
+    if (resetForm) {
+      resetForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const alertBox = document.getElementById('loginAlert');
+        const alertMsg = document.getElementById('loginAlertMsg');
+        const submitBtn = document.getElementById('btnResetSubmit');
+
+        const email = this.state.resetEmail || document.getElementById('forgotEmail').value.trim();
+        const otp = document.getElementById('resetOtp').value.trim();
+        const newPass = document.getElementById('resetNewPass').value;
+        const confirmPass = document.getElementById('resetConfirmPass').value;
+
+        if (newPass.length < 6) {
+          if (alertBox && alertMsg) {
+            alertMsg.innerText = 'Mật khẩu mới phải có tối thiểu 6 ký tự!';
+            alertBox.style.display = 'flex';
+          }
+          return;
+        }
+
+        if (newPass !== confirmPass) {
+          if (alertBox && alertMsg) {
+            alertMsg.innerText = 'Mật khẩu xác nhận không khớp!';
+            alertBox.style.display = 'flex';
+          }
+          return;
+        }
+
+        if (alertBox) alertBox.style.display = 'none';
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<span>Đang lưu mật khẩu...</span>';
+        }
+
+        try {
+          await API.resetPassword(email, otp, newPass);
+          this.showToast('✅ Đặt lại mật khẩu thành công! Bạn có thể đăng nhập ngay.', 'success');
+          this.playSound('success');
+
+          // Prefill login form
+          const loginEmail = document.getElementById('loginEmail');
+          const loginPass = document.getElementById('loginPassword');
+          if (loginEmail) loginEmail.value = email;
+          if (loginPass) loginPass.value = newPass;
+
+          // Switch back to login
+          this.switchAuthTab('login');
+        } catch (err) {
+          if (alertBox && alertMsg) {
+            alertMsg.innerText = err.message || 'Không thể đặt lại mật khẩu!';
+            alertBox.style.display = 'flex';
+          }
+          this.playSound('danger');
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>Cập Nhật Mật Khẩu Mới ➔</span>';
+          }
+        }
+      });
+    }
 
     // Logout buttons
     const btnLogoutSidebar = document.getElementById('btnLogoutSidebar');
