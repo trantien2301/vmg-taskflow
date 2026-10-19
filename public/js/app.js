@@ -965,30 +965,17 @@ const App = {
     // ========================================================
     const btnSsoLogin = document.getElementById('btnSsoLogin');
     if (btnSsoLogin) {
-      btnSsoLogin.addEventListener('click', () => {
-        const loginEmail = document.getElementById('loginEmail')?.value.trim();
-        const ssoInput = document.getElementById('ssoEmailInput');
-        if (ssoInput && loginEmail && loginEmail.endsWith('@vmg.edu.vn')) {
-          ssoInput.value = loginEmail;
-        }
-        this.openModal('ssoModal');
+      btnSsoLogin.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.openSsoModal();
       });
     }
 
     const btnSsoRegister = document.getElementById('btnSsoRegister');
     if (btnSsoRegister) {
-      btnSsoRegister.addEventListener('click', () => {
-        const regEmail = document.getElementById('regEmail')?.value.trim();
-        const regName = document.getElementById('regName')?.value.trim();
-        const ssoInput = document.getElementById('ssoEmailInput');
-        const ssoName = document.getElementById('ssoNameInput');
-        if (ssoInput && regEmail && regEmail.endsWith('@vmg.edu.vn')) {
-          ssoInput.value = regEmail;
-        }
-        if (ssoName && regName) {
-          ssoName.value = regName;
-        }
-        this.openModal('ssoModal');
+      btnSsoRegister.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.openSsoModal();
       });
     }
 
@@ -2326,6 +2313,19 @@ const App = {
   // -------------------------------------------------------------
   // MODALS & TOAST UTILITIES
   // -------------------------------------------------------------
+  openSsoModal() {
+    const loginEmail = document.getElementById('loginEmail')?.value.trim();
+    const regEmail = document.getElementById('regEmail')?.value.trim();
+    const ssoInput = document.getElementById('ssoEmailInput');
+
+    const emailToUse = (loginEmail && loginEmail.endsWith('@vmg.edu.vn')) ? loginEmail : (regEmail && regEmail.endsWith('@vmg.edu.vn') ? regEmail : '');
+    if (ssoInput && emailToUse) {
+      ssoInput.value = emailToUse;
+    }
+
+    this.openModal('ssoModal');
+  },
+
   openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) modal.classList.add('show');
