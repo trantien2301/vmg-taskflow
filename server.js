@@ -338,6 +338,92 @@ app.post('/api/auth/register', (req, res) => {
 });
 
 // -------------------------------------------------------------
+// SINGLE SIGN-ON (SSO) ENDPOINT (@vmg.edu.vn Google Workspace)
+// -------------------------------------------------------------
+app.post('/api/auth/sso', (req, res) => {
+  const { email, name, avatar, provider = 'Google Workspace' } = req.body;
+
+  if (!email || !email.trim()) {
+    return res.status(400).json({ error: 'Địa chỉ email SSO là bắt buộc' });
+  }
+
+  const cleanEmail = email.trim().toLowerCase();
+  const REQUIRED_DOMAIN = '@vmg.edu.vn';
+
+  // Strict domain enforcement: Only @vmg.edu.vn accounts can SSO
+  if (!cleanEmail.endsWith(REQUIRED_DOMAIN)) {
+    return res.status(400).json({
+      error: `Chính sách SSO nội bộ: Hệ thống chỉ chấp nhận đăng nhập SSO bằng tài khoản có đuôi "${REQUIRED_DOMAIN}"!`
+    });
+  }
+
+  let user = db.getUserByEmail(cleanEmail);
+  let isNewUser = false;
+
+  if (!user) {
+    // Auto provision new account for valid @vmg.edu.vn SSO user
+    isNewUser = true;
+    const defaultName = (name && name.trim()) ? name.trim() : cleanEmail.split('@')[0].replace(/\./g, ' ');
+    const formattedName = defaultName.split(' ')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
+
+    const departments = db.getDepartments();
+    const defaultDept = departments.length > 0 ? departments[0].name : 'Phòng Kỹ Thuật';
+
+    user = db.createUser({
+      name: formattedName,
+      email: cleanEmail,
+      password: `SSO-${Date.now()}-${Math.random().toString(36).substring(7)}`,
+      role: 'user',
+      department: defaultDept,
+      position: 'Cán bộ / Nhân viên',
+      avatar: avatar || '🌐',
+      phone: ''
+    });
+
+    db.logActivity({
+      userId: user.id,
+      userName: user.name,
+      action: 'sso_register',
+      details: `Đăng ký tài khoản mới tự động qua SSO ${provider} (${cleanEmail})`
+    });
+
+    broadcast('user:created', { user });
+  } else {
+    if (!user.active) {
+      return res.status(403).json({ error: 'Tài khoản của bạn đã bị khóa bởi Quản trị viên' });
+    }
+
+    db.logActivity({
+      userId: user.id,
+      userName: user.name,
+      action: 'sso_login',
+      details: `Đăng nhập thành công qua SSO ${provider} (${cleanEmail})`
+    });
+  }
+
+  const token = jwt.sign(
+    { id: user.id, email: user.email, role: user.role, name: user.name },
+    JWT_SECRET,
+    { expiresIn: '7d' }
+  );
+
+  const safeUser = { ...user };
+  delete safeUser.password;
+
+  res.json({
+    success: true,
+    message: isNewUser
+      ? `Chào mừng ${safeUser.name}! Tài khoản của bạn đã được khởi tạo qua SSO ${provider}.`
+      : `Đăng nhập SSO thành công! Chào mừng ${safeUser.name}.`,
+    token,
+    user: safeUser,
+    isNewUser
+  });
+});
+
+// -------------------------------------------------------------
 // FORGOT & RESET PASSWORD ENDPOINTS
 // -------------------------------------------------------------
 const passwordResetOTPs = new Map(); // email -> { otp, expiresAt }

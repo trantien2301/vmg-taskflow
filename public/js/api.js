@@ -75,6 +75,15 @@ const API = {
     return data;
   },
 
+  async ssoLogin(ssoData) {
+    const data = await this.request('/api/auth/sso', {
+      method: 'POST',
+      body: JSON.stringify(ssoData)
+    });
+    this.setAuth(data.token, data.user);
+    return data;
+  },
+
   async forgotPassword(email) {
     return this.request('/api/auth/forgot-password', {
       method: 'POST',

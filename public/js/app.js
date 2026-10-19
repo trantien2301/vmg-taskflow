@@ -199,6 +199,48 @@ const App = {
     }
   },
 
+  async performSsoLogin(email, name = '') {
+    const alertBox = document.getElementById('loginAlert');
+    const alertMsg = document.getElementById('loginAlertMsg');
+    const ssoBtn = document.getElementById('btnSsoSubmit');
+
+    if (alertBox) alertBox.style.display = 'none';
+    if (ssoBtn) {
+      ssoBtn.disabled = true;
+      ssoBtn.innerHTML = '<span>Đang xác thực Google SSO...</span>';
+    }
+
+    try {
+      const data = await API.ssoLogin({ email, name });
+      this.closeModal('ssoModal');
+      this.state.user = data.user;
+      this.showAppView();
+      this.initWebSocket();
+      await this.loadInitialData();
+      this.renderHeader();
+      this.renderView();
+
+      const welcomeMsg = data.isNewUser
+        ? `🎉 Đăng ký SSO thành công! Tài khoản mới đã được kích hoạt: ${data.user.name}`
+        : `👋 Chào mừng bạn quay trở lại, ${data.user.name}!`;
+
+      this.showToast(welcomeMsg, 'success');
+      this.playSound('success');
+    } catch (err) {
+      if (alertBox && alertMsg) {
+        alertMsg.innerText = err.message || 'Xác thực SSO thất bại!';
+        alertBox.style.display = 'flex';
+      }
+      this.showToast(`❌ Lỗi SSO: ${err.message}`, 'danger');
+      this.playSound('danger');
+    } finally {
+      if (ssoBtn) {
+        ssoBtn.disabled = false;
+        ssoBtn.innerHTML = '<span>Xác Thực SSO & Đăng Nhập Ngay ➔</span>';
+      }
+    }
+  },
+
   logout() {
     API.clearAuth();
     if (this.ws) {
@@ -906,6 +948,91 @@ const App = {
             submitBtn.innerHTML = '<span>Đăng Ký Tài Khoản Ngay</span><span>➔</span>';
           }
         }
+      });
+    }
+
+    // ========================================================
+    // SSO GOOGLE WORKSPACE LISTENERS (@vmg.edu.vn)
+    // ========================================================
+    const btnSsoLogin = document.getElementById('btnSsoLogin');
+    if (btnSsoLogin) {
+      btnSsoLogin.addEventListener('click', () => {
+        const loginEmail = document.getElementById('loginEmail')?.value.trim();
+        const ssoInput = document.getElementById('ssoEmailInput');
+        if (ssoInput && loginEmail && loginEmail.endsWith('@vmg.edu.vn')) {
+          ssoInput.value = loginEmail;
+        }
+        this.openModal('ssoModal');
+      });
+    }
+
+    const btnSsoRegister = document.getElementById('btnSsoRegister');
+    if (btnSsoRegister) {
+      btnSsoRegister.addEventListener('click', () => {
+        const regEmail = document.getElementById('regEmail')?.value.trim();
+        const regName = document.getElementById('regName')?.value.trim();
+        const ssoInput = document.getElementById('ssoEmailInput');
+        const ssoName = document.getElementById('ssoNameInput');
+        if (ssoInput && regEmail && regEmail.endsWith('@vmg.edu.vn')) {
+          ssoInput.value = regEmail;
+        }
+        if (ssoName && regName) {
+          ssoName.value = regName;
+        }
+        this.openModal('ssoModal');
+      });
+    }
+
+    // Quick SSO account selection
+    document.querySelectorAll('.sso-account-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const email = card.getAttribute('data-sso-email');
+        const name = card.getAttribute('data-sso-name') || '';
+        if (email) {
+          this.performSsoLogin(email, name);
+        }
+      });
+    });
+
+    // Realtime domain validator on ssoEmailInput
+    const ssoEmailInput = document.getElementById('ssoEmailInput');
+    const ssoEmailHint = document.getElementById('ssoEmailHint');
+    if (ssoEmailInput && ssoEmailHint) {
+      ssoEmailInput.addEventListener('input', () => {
+        const val = ssoEmailInput.value.trim().toLowerCase();
+        if (!val) {
+          ssoEmailHint.innerHTML = '* Bắt buộc có đuôi <strong>@vmg.edu.vn</strong>';
+          ssoEmailHint.className = 'email-domain-hint';
+        } else if (val.endsWith('@vmg.edu.vn')) {
+          ssoEmailHint.innerHTML = '✅ Email nội bộ VMG hợp lệ!';
+          ssoEmailHint.className = 'email-domain-hint valid';
+        } else if (val.includes('@')) {
+          ssoEmailHint.innerHTML = '❌ Email không hợp lệ! Chỉ chấp nhận đuôi <strong>@vmg.edu.vn</strong>';
+          ssoEmailHint.className = 'email-domain-hint invalid';
+        } else {
+          ssoEmailHint.innerHTML = 'Đang nhập... Cần kết thúc bằng <strong>@vmg.edu.vn</strong>';
+          ssoEmailHint.className = 'email-domain-hint';
+        }
+      });
+    }
+
+    // SSO custom form submit
+    const ssoCustomForm = document.getElementById('ssoCustomForm');
+    if (ssoCustomForm) {
+      ssoCustomForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('ssoEmailInput')?.value.trim().toLowerCase();
+        const name = document.getElementById('ssoNameInput')?.value.trim();
+
+        if (!email) return;
+
+        if (!email.endsWith('@vmg.edu.vn')) {
+          this.showToast('Chính sách SSO: Chỉ chấp nhận email có đuôi @vmg.edu.vn!', 'danger');
+          this.playSound('danger');
+          return;
+        }
+
+        this.performSsoLogin(email, name);
       });
     }
   },
