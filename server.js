@@ -850,6 +850,63 @@ app.post('/api/system/reset-demo', authenticate, requireAdmin, (req, res) => {
   res.json({ success: true, message: 'Đã hoàn tất đặt lại dữ liệu mẫu' });
 });
 
+// -------------------------------------------------------------
+// DEPARTMENTS ROUTES
+// -------------------------------------------------------------
+app.get('/api/departments', (req, res) => {
+  const departments = db.getDepartments();
+  res.json({ departments });
+});
+
+app.post('/api/departments', authenticate, (req, res) => {
+  const { name } = req.body;
+  if (!name || !name.trim()) {
+    return res.status(400).json({ error: 'Tên phòng ban không được để trống' });
+  }
+
+  try {
+    const department = db.createDepartment(name);
+    
+    db.logActivity({
+      userId: req.user.id,
+      userName: req.user.name,
+      action: 'create_department',
+      details: `Đã tạo thêm phòng ban mới: "${department.name}"`
+    });
+
+    // Realtime WS broadcast
+    broadcast('department:created', { department, createdBy: req.user.name });
+
+    res.status(201).json({ success: true, department });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.delete('/api/departments/:id', authenticate, requireAdmin, (req, res) => {
+  const { id } = req.params;
+  const depts = db.getDepartments();
+  const dept = depts.find(d => d.id === id || d.name === id);
+  if (!dept) {
+    return res.status(404).json({ error: 'Không tìm thấy phòng ban cần xóa' });
+  }
+
+  const success = db.deleteDepartment(dept.id);
+  if (success) {
+    db.logActivity({
+      userId: req.user.id,
+      userName: req.user.name,
+      action: 'delete_department',
+      details: `Đã xóa phòng ban: "${dept.name}"`
+    });
+
+    broadcast('department:deleted', { departmentId: dept.id, name: dept.name, deletedBy: req.user.name });
+    res.json({ success: true, message: `Đã xóa phòng ban "${dept.name}"` });
+  } else {
+    res.status(400).json({ error: 'Không thể xóa phòng ban' });
+  }
+});
+
 // SPA catch-all
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

@@ -614,9 +614,12 @@
 
         <!-- VIEW 6: USERS MANAGEMENT (Admin) -->
         <section class="view-panel" id="view-users">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
             <h2 style="font-size:18px; font-weight:700;">Quản Lý Thành Viên & Phân Quyền</h2>
-            <button class="btn btn-primary" onclick="App.openAddUserModal()">+ Thêm Thành Viên</button>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-outline" id="btnOpenDeptModal" onclick="App.openDeptModal()">🏢 Quản Lý Phòng Ban</button>
+              <button class="btn btn-primary" onclick="App.openAddUserModal()">+ Thêm Thành Viên</button>
+            </div>
           </div>
 
           <div class="table-card">
@@ -689,7 +692,12 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Phòng Ban Phụ Trách</label>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <label class="form-label" style="margin-bottom:0;">Phòng Ban Phụ Trách</label>
+                <button type="button" class="btn-link-action" onclick="App.quickAddDepartment('taskFormDept')" style="background:none; border:none; color:var(--primary); font-size:12px; font-weight:600; cursor:pointer;" title="Thêm phòng ban mới">
+                  + Thêm phòng ban
+                </button>
+              </div>
               <select class="form-control" id="taskFormDept"></select>
             </div>
 
@@ -815,14 +823,13 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label">Phòng Ban *</label>
-              <select class="form-control" id="userFormDept">
-                <option value="Phòng Kỹ Thuật">Phòng Kỹ Thuật</option>
-                <option value="Phòng Marketing">Phòng Marketing</option>
-                <option value="Phòng Kinh Doanh">Phòng Kinh Doanh</option>
-                <option value="Phòng Vận Hành">Phòng Vận Hành</option>
-                <option value="Ban Giám Đốc">Ban Giám Đốc</option>
-              </select>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <label class="form-label" style="margin-bottom:0;">Phòng Ban *</label>
+                <button type="button" class="btn-link-action" onclick="App.quickAddDepartment('userFormDept')" style="background:none; border:none; color:var(--primary); font-size:12px; font-weight:600; cursor:pointer;" title="Thêm phòng ban mới">
+                  + Thêm phòng ban
+                </button>
+              </div>
+              <select class="form-control" id="userFormDept" required></select>
             </div>
           </div>
 
@@ -836,6 +843,40 @@
           <button type="submit" class="btn btn-primary">Lưu Thành Viên</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- MODAL: MANAGE DEPARTMENTS -->
+  <div class="modal-overlay" id="departmentModal">
+    <div class="modal-content" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 class="modal-title">🏢 Quản Lý Danh Sách Phòng Ban</h3>
+        <button class="modal-close-btn" data-close-modal="departmentModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- Add new department form -->
+        <form id="departmentForm" style="margin-bottom: 20px;">
+          <label class="form-label">Thêm Phòng Ban Mới Vào Hệ Thống</label>
+          <div style="display:flex; gap:8px;">
+            <input type="text" class="form-control" id="newDeptInput" placeholder="Ví dụ: Phòng Kế Toán, Ban R&D..." required>
+            <button type="submit" class="btn btn-primary" style="white-space:nowrap; flex-shrink:0;" id="btnAddDeptSubmit">
+              + Thêm Mới
+            </button>
+          </div>
+        </form>
+
+        <!-- Existing departments list -->
+        <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+          <span>Danh Sách Phòng Ban Đang Áp Dụng</span>
+          <span id="deptCountBadge" style="font-weight:700; color:var(--primary);">0 phòng ban</span>
+        </label>
+        <div id="deptListContainer" style="display:flex; flex-direction:column; gap:8px; max-height:260px; overflow-y:auto; padding-right:2px;">
+          <!-- dynamic department items rendered here -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" data-close-modal="departmentModal">Đóng</button>
+      </div>
     </div>
   </div>
 

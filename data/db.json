@@ -43,7 +43,7 @@
       "id": "usr-1792209027761",
       "name": "Trần Tiến",
       "email": "trantien.dni@vmg.edu.vn",
-      "password": "$2b$10$DptrO054HzqxXMiSZlaHKOmTqyW0jJnBHFFrJ/66Uv8YUOJB7ixdW",
+      "password": "$2b$10$0kmUfbY7CfzyvczWs5XB1ubDN46JFzjdxikZGx4pC2df5zP5PPTp.",
       "role": "user",
       "department": "Phòng Kỹ Thuật",
       "position": "Trưởng Nhóm",
@@ -289,6 +289,369 @@
     }
   ],
   "notifications": [
+    {
+      "id": "ntf-1792382709263-799",
+      "userId": "usr-1",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 Nhân viên trễ hạn: Lê Tuyết Mai",
+      "message": "Công việc \"Thu hồi công nợ quá hạn quý 2 các đại lý cấp 2\" phụ trách bởi Lê Tuyết Mai đã trễ hạn!",
+      "taskId": "TSK-108",
+      "read": false,
+      "createdAt": "2026-10-19T04:05:09.263Z"
+    },
+    {
+      "id": "ntf-1792382709262-188",
+      "userId": "usr-4",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 CÔNG VIỆC ĐÃ QUÁ HẠN!",
+      "message": "Công việc \"Thu hồi công nợ quá hạn quý 2 các đại lý cấp 2\" đã quá hạn 3 ngày (Hạn: 16/10/2026)! Vui lòng hoàn tất ngay.",
+      "taskId": "TSK-108",
+      "read": false,
+      "createdAt": "2026-10-19T04:05:09.262Z"
+    },
+    {
+      "id": "ntf-1792382709260-993",
+      "userId": "usr-1",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 Nhân viên trễ hạn: Chưa gán",
+      "message": "Công việc \"Tối ưu hóa tốc độ tải trang ứng dụng Webapp\" phụ trách bởi N/A đã trễ hạn!",
+      "taskId": "TSK-106",
+      "read": false,
+      "createdAt": "2026-10-19T04:05:09.260Z"
+    },
+    {
+      "id": "ntf-1792382709259-112",
+      "userId": "usr-2",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 CÔNG VIỆC ĐÃ QUÁ HẠN!",
+      "message": "Công việc \"Tối ưu hóa tốc độ tải trang ứng dụng Webapp\" đã quá hạn 1 ngày (Hạn: 19/10/2026)! Vui lòng hoàn tất ngay.",
+      "taskId": "TSK-106",
+      "read": false,
+      "createdAt": "2026-10-19T04:05:09.259Z"
+    },
+    {
+      "id": "ntf-1792382709258-693",
+      "userId": "usr-5",
+      "type": "alert",
+      "level": "warning",
+      "title": "⏰ CẢNH BÁO SẮP ĐẾN HẠN",
+      "message": "Công việc \"Kiểm toán kho hàng chi nhánh Bình Dương\" chỉ còn 23 giờ nữa là đến hạn chót!",
+      "taskId": "TSK-105",
+      "read": false,
+      "createdAt": "2026-10-19T04:05:09.258Z"
+    },
+    {
+      "id": "ntf-1792382709257-644",
+      "userId": "usr-1",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 Nhân viên trễ hạn: Lê Tuyết Mai",
+      "message": "Công việc \"Ký kết hợp đồng phân phối độc quyền với Đối tác VinaCorp\" phụ trách bởi Lê Tuyết Mai đã trễ hạn!",
+      "taskId": "TSK-103",
+      "read": false,
+      "createdAt": "2026-10-19T04:05:09.257Z"
+    },
+    {
+      "id": "ntf-1792382709255-321",
+      "userId": "usr-4",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 CÔNG VIỆC ĐÃ QUÁ HẠN!",
+      "message": "Công việc \"Ký kết hợp đồng phân phối độc quyền với Đối tác VinaCorp\" đã quá hạn 2 ngày (Hạn: 18/10/2026)! Vui lòng hoàn tất ngay.",
+      "taskId": "TSK-103",
+      "read": false,
+      "createdAt": "2026-10-19T04:05:09.255Z"
+    },
+    {
+      "id": "ntf-1792382709254-806",
+      "userId": "usr-1",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 Nhân viên trễ hạn: Chưa gán",
+      "message": "Công việc \"Hoàn thiện slide đề xuất chiến dịch Marketing Quý 4\" phụ trách bởi N/A đã trễ hạn!",
+      "taskId": "TSK-102",
+      "read": false,
+      "createdAt": "2026-10-19T04:05:09.254Z"
+    },
+    {
+      "id": "ntf-1792382709252-123",
+      "userId": "usr-3",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 CÔNG VIỆC ĐÃ QUÁ HẠN!",
+      "message": "Công việc \"Hoàn thiện slide đề xuất chiến dịch Marketing Quý 4\" đã quá hạn 2 ngày (Hạn: 17/10/2026)! Vui lòng hoàn tất ngay.",
+      "taskId": "TSK-102",
+      "read": false,
+      "createdAt": "2026-10-19T04:05:09.252Z"
+    },
+    {
+      "id": "ntf-1792382709251-522",
+      "userId": "usr-1",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 Nhân viên trễ hạn: Chưa gán",
+      "message": "Công việc \"Khắc phục sự cố sập cổng thanh toán VNPAY\" phụ trách bởi N/A đã trễ hạn!",
+      "taskId": "TSK-101",
+      "read": false,
+      "createdAt": "2026-10-19T04:05:09.251Z"
+    },
+    {
+      "id": "ntf-1792382709249-806",
+      "userId": "usr-2",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 CÔNG VIỆC ĐÃ QUÁ HẠN!",
+      "message": "Công việc \"Khắc phục sự cố sập cổng thanh toán VNPAY\" đã quá hạn 4 ngày (Hạn: 16/10/2026)! Vui lòng hoàn tất ngay.",
+      "taskId": "TSK-101",
+      "read": false,
+      "createdAt": "2026-10-19T04:05:09.249Z"
+    },
+    {
+      "id": "ntf-1792382709220-489",
+      "userId": "usr-1",
+      "type": "alert",
+      "level": "warning",
+      "title": "⏰ CẢNH BÁO SẮP ĐẾN HẠN",
+      "message": "Công việc \"Kiểm tra đồng bộ Realtime\" chỉ còn 23 giờ nữa là đến hạn chót!",
+      "taskId": "TSK-109",
+      "read": false,
+      "createdAt": "2026-10-19T04:05:09.220Z"
+    },
+    {
+      "id": "ntf-1792380356065-306",
+      "userId": "usr-1",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 Nhân viên trễ hạn: Lê Tuyết Mai",
+      "message": "Công việc \"Thu hồi công nợ quá hạn quý 2 các đại lý cấp 2\" phụ trách bởi Lê Tuyết Mai đã trễ hạn!",
+      "taskId": "TSK-108",
+      "read": false,
+      "createdAt": "2026-10-19T03:25:56.065Z"
+    },
+    {
+      "id": "ntf-1792380356064-183",
+      "userId": "usr-4",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 CÔNG VIỆC ĐÃ QUÁ HẠN!",
+      "message": "Công việc \"Thu hồi công nợ quá hạn quý 2 các đại lý cấp 2\" đã quá hạn 3 ngày (Hạn: 16/10/2026)! Vui lòng hoàn tất ngay.",
+      "taskId": "TSK-108",
+      "read": false,
+      "createdAt": "2026-10-19T03:25:56.064Z"
+    },
+    {
+      "id": "ntf-1792380356063-532",
+      "userId": "usr-1",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 Nhân viên trễ hạn: Chưa gán",
+      "message": "Công việc \"Tối ưu hóa tốc độ tải trang ứng dụng Webapp\" phụ trách bởi N/A đã trễ hạn!",
+      "taskId": "TSK-106",
+      "read": false,
+      "createdAt": "2026-10-19T03:25:56.063Z"
+    },
+    {
+      "id": "ntf-1792380356061-696",
+      "userId": "usr-2",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 CÔNG VIỆC ĐÃ QUÁ HẠN!",
+      "message": "Công việc \"Tối ưu hóa tốc độ tải trang ứng dụng Webapp\" đã quá hạn 1 ngày (Hạn: 19/10/2026)! Vui lòng hoàn tất ngay.",
+      "taskId": "TSK-106",
+      "read": false,
+      "createdAt": "2026-10-19T03:25:56.061Z"
+    },
+    {
+      "id": "ntf-1792380356060-201",
+      "userId": "usr-5",
+      "type": "alert",
+      "level": "warning",
+      "title": "⏰ CẢNH BÁO SẮP ĐẾN HẠN",
+      "message": "Công việc \"Kiểm toán kho hàng chi nhánh Bình Dương\" chỉ còn 23 giờ nữa là đến hạn chót!",
+      "taskId": "TSK-105",
+      "read": false,
+      "createdAt": "2026-10-19T03:25:56.060Z"
+    },
+    {
+      "id": "ntf-1792380356059-245",
+      "userId": "usr-1",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 Nhân viên trễ hạn: Lê Tuyết Mai",
+      "message": "Công việc \"Ký kết hợp đồng phân phối độc quyền với Đối tác VinaCorp\" phụ trách bởi Lê Tuyết Mai đã trễ hạn!",
+      "taskId": "TSK-103",
+      "read": false,
+      "createdAt": "2026-10-19T03:25:56.059Z"
+    },
+    {
+      "id": "ntf-1792380356058-603",
+      "userId": "usr-4",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 CÔNG VIỆC ĐÃ QUÁ HẠN!",
+      "message": "Công việc \"Ký kết hợp đồng phân phối độc quyền với Đối tác VinaCorp\" đã quá hạn 2 ngày (Hạn: 18/10/2026)! Vui lòng hoàn tất ngay.",
+      "taskId": "TSK-103",
+      "read": false,
+      "createdAt": "2026-10-19T03:25:56.058Z"
+    },
+    {
+      "id": "ntf-1792380356057-766",
+      "userId": "usr-1",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 Nhân viên trễ hạn: Chưa gán",
+      "message": "Công việc \"Hoàn thiện slide đề xuất chiến dịch Marketing Quý 4\" phụ trách bởi N/A đã trễ hạn!",
+      "taskId": "TSK-102",
+      "read": false,
+      "createdAt": "2026-10-19T03:25:56.057Z"
+    },
+    {
+      "id": "ntf-1792380356056-861",
+      "userId": "usr-3",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 CÔNG VIỆC ĐÃ QUÁ HẠN!",
+      "message": "Công việc \"Hoàn thiện slide đề xuất chiến dịch Marketing Quý 4\" đã quá hạn 2 ngày (Hạn: 17/10/2026)! Vui lòng hoàn tất ngay.",
+      "taskId": "TSK-102",
+      "read": false,
+      "createdAt": "2026-10-19T03:25:56.056Z"
+    },
+    {
+      "id": "ntf-1792380356055-84",
+      "userId": "usr-1",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 Nhân viên trễ hạn: Chưa gán",
+      "message": "Công việc \"Khắc phục sự cố sập cổng thanh toán VNPAY\" phụ trách bởi N/A đã trễ hạn!",
+      "taskId": "TSK-101",
+      "read": false,
+      "createdAt": "2026-10-19T03:25:56.055Z"
+    },
+    {
+      "id": "ntf-1792380356054-991",
+      "userId": "usr-2",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 CÔNG VIỆC ĐÃ QUÁ HẠN!",
+      "message": "Công việc \"Khắc phục sự cố sập cổng thanh toán VNPAY\" đã quá hạn 4 ngày (Hạn: 16/10/2026)! Vui lòng hoàn tất ngay.",
+      "taskId": "TSK-101",
+      "read": false,
+      "createdAt": "2026-10-19T03:25:56.054Z"
+    },
+    {
+      "id": "ntf-1792380355879-441",
+      "userId": "usr-1",
+      "type": "alert",
+      "level": "warning",
+      "title": "⏰ CẢNH BÁO SẮP ĐẾN HẠN",
+      "message": "Công việc \"Kiểm tra đồng bộ Realtime\" chỉ còn 23 giờ nữa là đến hạn chót!",
+      "taskId": "TSK-109",
+      "read": false,
+      "createdAt": "2026-10-19T03:25:55.882Z"
+    },
+    {
+      "id": "ntf-1792336462712-170",
+      "userId": "usr-1",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 Nhân viên trễ hạn: Lê Tuyết Mai",
+      "message": "Công việc \"Thu hồi công nợ quá hạn quý 2 các đại lý cấp 2\" phụ trách bởi Lê Tuyết Mai đã trễ hạn!",
+      "taskId": "TSK-108",
+      "read": false,
+      "createdAt": "2026-10-18T15:14:22.712Z"
+    },
+    {
+      "id": "ntf-1792336462711-786",
+      "userId": "usr-4",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 CÔNG VIỆC ĐÃ QUÁ HẠN!",
+      "message": "Công việc \"Thu hồi công nợ quá hạn quý 2 các đại lý cấp 2\" đã quá hạn 3 ngày (Hạn: 16/10/2026)! Vui lòng hoàn tất ngay.",
+      "taskId": "TSK-108",
+      "read": false,
+      "createdAt": "2026-10-18T15:14:22.711Z"
+    },
+    {
+      "id": "ntf-1792336462710-425",
+      "userId": "usr-2",
+      "type": "alert",
+      "level": "warning",
+      "title": "⏰ CẢNH BÁO SẮP ĐẾN HẠN",
+      "message": "Công việc \"Tối ưu hóa tốc độ tải trang ứng dụng Webapp\" chỉ còn 11 giờ nữa là đến hạn chót!",
+      "taskId": "TSK-106",
+      "read": false,
+      "createdAt": "2026-10-18T15:14:22.710Z"
+    },
+    {
+      "id": "ntf-1792336462709-320",
+      "userId": "usr-1",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 Nhân viên trễ hạn: Lê Tuyết Mai",
+      "message": "Công việc \"Ký kết hợp đồng phân phối độc quyền với Đối tác VinaCorp\" phụ trách bởi Lê Tuyết Mai đã trễ hạn!",
+      "taskId": "TSK-103",
+      "read": false,
+      "createdAt": "2026-10-18T15:14:22.709Z"
+    },
+    {
+      "id": "ntf-1792336462708-363",
+      "userId": "usr-4",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 CÔNG VIỆC ĐÃ QUÁ HẠN!",
+      "message": "Công việc \"Ký kết hợp đồng phân phối độc quyền với Đối tác VinaCorp\" đã quá hạn 1 ngày (Hạn: 18/10/2026)! Vui lòng hoàn tất ngay.",
+      "taskId": "TSK-103",
+      "read": false,
+      "createdAt": "2026-10-18T15:14:22.708Z"
+    },
+    {
+      "id": "ntf-1792336462707-413",
+      "userId": "usr-1",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 Nhân viên trễ hạn: Chưa gán",
+      "message": "Công việc \"Hoàn thiện slide đề xuất chiến dịch Marketing Quý 4\" phụ trách bởi N/A đã trễ hạn!",
+      "taskId": "TSK-102",
+      "read": false,
+      "createdAt": "2026-10-18T15:14:22.707Z"
+    },
+    {
+      "id": "ntf-1792336462706-450",
+      "userId": "usr-3",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 CÔNG VIỆC ĐÃ QUÁ HẠN!",
+      "message": "Công việc \"Hoàn thiện slide đề xuất chiến dịch Marketing Quý 4\" đã quá hạn 2 ngày (Hạn: 17/10/2026)! Vui lòng hoàn tất ngay.",
+      "taskId": "TSK-102",
+      "read": false,
+      "createdAt": "2026-10-18T15:14:22.706Z"
+    },
+    {
+      "id": "ntf-1792336462705-935",
+      "userId": "usr-1",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 Nhân viên trễ hạn: Chưa gán",
+      "message": "Công việc \"Khắc phục sự cố sập cổng thanh toán VNPAY\" phụ trách bởi N/A đã trễ hạn!",
+      "taskId": "TSK-101",
+      "read": false,
+      "createdAt": "2026-10-18T15:14:22.705Z"
+    },
+    {
+      "id": "ntf-1792336462703-827",
+      "userId": "usr-2",
+      "type": "alert",
+      "level": "danger",
+      "title": "🚨 CÔNG VIỆC ĐÃ QUÁ HẠN!",
+      "message": "Công việc \"Khắc phục sự cố sập cổng thanh toán VNPAY\" đã quá hạn 3 ngày (Hạn: 16/10/2026)! Vui lòng hoàn tất ngay.",
+      "taskId": "TSK-101",
+      "read": false,
+      "createdAt": "2026-10-18T15:14:22.703Z"
+    },
     {
       "id": "ntf-1792331599793-953",
       "userId": "usr-1",
@@ -655,6 +1018,14 @@
   ],
   "activities": [
     {
+      "id": "act-1792336768218",
+      "userId": "usr-1792209027761",
+      "userName": "Trần Tiến",
+      "action": "reset_password",
+      "details": "Đã đặt lại mật khẩu mới thành công",
+      "timestamp": "2026-10-18T15:19:28.218Z"
+    },
+    {
       "id": "act-1792209027854",
       "userId": "usr-1792209027761",
       "userName": "Trần Tiến",
@@ -736,5 +1107,32 @@
     "urgentThresholdHours": 6,
     "allowUserCreateTask": true,
     "companyName": "Công Ty CP Công Nghệ & Dịch Vụ TaskFlow"
-  }
+  },
+  "departments": [
+    {
+      "id": "dept-1",
+      "name": "Phòng Kỹ Thuật"
+    },
+    {
+      "id": "dept-2",
+      "name": "Phòng Marketing"
+    },
+    {
+      "id": "dept-3",
+      "name": "Phòng Kinh Doanh"
+    },
+    {
+      "id": "dept-4",
+      "name": "Phòng Vận Hành"
+    },
+    {
+      "id": "dept-5",
+      "name": "Ban Giám Đốc"
+    },
+    {
+      "id": "dept-1792385773407",
+      "name": "Ph�ng K? To�n - T�i Ch�nh",
+      "createdAt": "2026-10-19T04:56:13.407Z"
+    }
+  ]
 }

@@ -336,7 +336,15 @@ function getDefaultData() {
     companyName: 'Công Ty CP Công Nghệ & Dịch Vụ TaskFlow'
   };
 
-  return { users, tasks, comments, notifications, activities, settings };
+  const departments = [
+    { id: 'dept-1', name: 'Phòng Kỹ Thuật' },
+    { id: 'dept-2', name: 'Phòng Marketing' },
+    { id: 'dept-3', name: 'Phòng Kinh Doanh' },
+    { id: 'dept-4', name: 'Phòng Vận Hành' },
+    { id: 'dept-5', name: 'Ban Giám Đốc' }
+  ];
+
+  return { users, tasks, comments, notifications, activities, settings, departments };
 }
 
 class Database {
@@ -350,6 +358,16 @@ class Database {
       if (fs.existsSync(DB_PATH)) {
         const raw = fs.readFileSync(DB_PATH, 'utf8');
         this.data = JSON.parse(raw);
+        if (!this.data.departments || !Array.isArray(this.data.departments)) {
+          this.data.departments = [
+            { id: 'dept-1', name: 'Phòng Kỹ Thuật' },
+            { id: 'dept-2', name: 'Phòng Marketing' },
+            { id: 'dept-3', name: 'Phòng Kinh Doanh' },
+            { id: 'dept-4', name: 'Phòng Vận Hành' },
+            { id: 'dept-5', name: 'Ban Giám Đốc' }
+          ];
+          this.save();
+        }
       } else {
         this.data = getDefaultData();
         this.save();
@@ -664,6 +682,51 @@ class Database {
     this.data.settings = { ...this.data.settings, ...newSettings };
     this.save();
     return this.data.settings;
+  }
+
+  // --- Departments ---
+  getDepartments() {
+    if (!this.data.departments || !Array.isArray(this.data.departments)) {
+      this.data.departments = [
+        { id: 'dept-1', name: 'Phòng Kỹ Thuật' },
+        { id: 'dept-2', name: 'Phòng Marketing' },
+        { id: 'dept-3', name: 'Phòng Kinh Doanh' },
+        { id: 'dept-4', name: 'Phòng Vận Hành' },
+        { id: 'dept-5', name: 'Ban Giám Đốc' }
+      ];
+      this.save();
+    }
+    return this.data.departments;
+  }
+
+  createDepartment(name) {
+    this.getDepartments();
+    const cleanName = (name || '').trim();
+    if (!cleanName) {
+      throw new Error('Tên phòng ban không được để trống!');
+    }
+    const exists = this.data.departments.some(d => d.name.toLowerCase() === cleanName.toLowerCase());
+    if (exists) {
+      throw new Error(`Phòng ban "${cleanName}" đã tồn tại trên hệ thống!`);
+    }
+
+    const newDept = {
+      id: `dept-${Date.now()}`,
+      name: cleanName,
+      createdAt: new Date().toISOString()
+    };
+    this.data.departments.push(newDept);
+    this.save();
+    return newDept;
+  }
+
+  deleteDepartment(idOrName) {
+    this.getDepartments();
+    const idx = this.data.departments.findIndex(d => d.id === idOrName || d.name.toLowerCase() === idOrName.toLowerCase());
+    if (idx === -1) return false;
+    this.data.departments.splice(idx, 1);
+    this.save();
+    return true;
   }
 
   // Reset database to initial seed data

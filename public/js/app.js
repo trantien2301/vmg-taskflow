@@ -5,6 +5,7 @@ const App = {
   state: {
     user: null,
     users: [],
+    departments: [],
     tasks: [],
     notifications: [],
     activities: [],
@@ -70,6 +71,15 @@ const App = {
   async init() {
     this.initTheme();
     this.setupEventListeners();
+
+    // Fetch initial departments for registration / app dropdowns
+    try {
+      const deptsRes = await API.getDepartments();
+      this.state.departments = deptsRes.departments || [];
+      this.populateDepartmentDropdowns();
+    } catch (e) {
+      console.warn('Could not load departments initially', e);
+    }
 
     // Check if already authenticated
     const token = API.getToken();
@@ -368,6 +378,22 @@ const App = {
         this.refreshUsersList();
         break;
 
+      case 'department:created':
+        this.showToast(`🏢 ${data.createdBy} vừa thêm phòng ban mới: "${data.department.name}"`, 'info');
+        this.refreshDepartments();
+        if (document.getElementById('departmentModal')?.classList.contains('show')) {
+          this.renderDepartmentList();
+        }
+        break;
+
+      case 'department:deleted':
+        this.showToast(`🗑️ ${data.deletedBy} đã xóa phòng ban "${data.name}"`, 'info');
+        this.refreshDepartments();
+        if (document.getElementById('departmentModal')?.classList.contains('show')) {
+          this.renderDepartmentList();
+        }
+        break;
+
       case 'system:reset':
         this.showToast(`♻️ ${data.message}`, 'warning');
         this.loadInitialData().then(() => this.renderView());
@@ -377,15 +403,18 @@ const App = {
 
   async loadInitialData() {
     try {
-      const [tasksRes, usersRes, notifsRes] = await Promise.all([
+      const [tasksRes, usersRes, notifsRes, deptsRes] = await Promise.all([
         API.getTasks(),
         API.getUsers(),
-        API.getNotifications()
+        API.getNotifications(),
+        API.getDepartments()
       ]);
       this.state.tasks = tasksRes.tasks || [];
       this.state.users = usersRes.users || [];
       this.state.notifications = notifsRes.notifications || [];
+      this.state.departments = (deptsRes && deptsRes.departments) ? deptsRes.departments : [];
       this.populateFilterDropdowns();
+      this.populateDepartmentDropdowns();
       this.updateNotificationBadge();
     } catch (err) {
       console.error('Failed to load initial data', err);
@@ -575,6 +604,12 @@ const App = {
     const userForm = document.getElementById('userForm');
     if (userForm) {
       userForm.addEventListener('submit', (e) => this.handleUserFormSubmit(e));
+    }
+
+    // Add / Manage Department Form Submit
+    const deptForm = document.getElementById('departmentForm');
+    if (deptForm) {
+      deptForm.addEventListener('submit', (e) => this.handleDepartmentFormSubmit(e));
     }
 
     // Setup Drag and Drop for Kanban Columns
@@ -969,6 +1004,51 @@ const App = {
     }
   },
 
+  populateDepartmentDropdowns() {
+    const depts = (this.state.departments && this.state.departments.length > 0)
+      ? this.state.departments.map(d => typeof d === 'string' ? d : d.name)
+      : ['Phòng Kỹ Thuật', 'Phòng Marketing', 'Phòng Kinh Doanh', 'Phòng Vận Hành', 'Ban Giám Đốc'];
+
+    // 1. Filter Department dropdown
+    const deptSelect = document.getElementById('filterDepartment');
+    if (deptSelect) {
+      const currentVal = deptSelect.value;
+      deptSelect.innerHTML = '<option value="all">Tất cả phòng ban</option>' +
+        depts.map(d => `<option value="${d}">${d}</option>`).join('');
+      deptSelect.value = currentVal || 'all';
+    }
+
+    // 2. Task Form Department dropdown
+    const taskDeptSelect = document.getElementById('taskFormDept');
+    if (taskDeptSelect) {
+      const currentVal = taskDeptSelect.value;
+      taskDeptSelect.innerHTML = depts.map(d => `<option value="${d}">${d}</option>`).join('');
+      if (currentVal && depts.includes(currentVal)) {
+        taskDeptSelect.value = currentVal;
+      }
+    }
+
+    // 3. User Form Department dropdown (in userModal)
+    const userDeptSelect = document.getElementById('userFormDept');
+    if (userDeptSelect) {
+      const currentVal = userDeptSelect.value;
+      userDeptSelect.innerHTML = depts.map(d => `<option value="${d}">${d}</option>`).join('');
+      if (currentVal && depts.includes(currentVal)) {
+        userDeptSelect.value = currentVal;
+      }
+    }
+
+    // 4. Registration Department dropdown
+    const regDeptSelect = document.getElementById('regDept');
+    if (regDeptSelect) {
+      const currentVal = regDeptSelect.value;
+      regDeptSelect.innerHTML = depts.map(d => `<option value="${d}">${d}</option>`).join('');
+      if (currentVal && depts.includes(currentVal)) {
+        regDeptSelect.value = currentVal;
+      }
+    }
+  },
+
   populateFilterDropdowns() {
     // Populate Assignee dropdown
     const assigneeSelect = document.getElementById('filterAssignee');
@@ -985,18 +1065,152 @@ const App = {
       ).join('');
     }
 
-    // Populate Department dropdown
-    const deptSelect = document.getElementById('filterDepartment');
-    const taskDeptSelect = document.getElementById('taskFormDept');
-    const departments = ['Phòng Kỹ Thuật', 'Phòng Marketing', 'Phòng Kinh Doanh', 'Phòng Vận Hành', 'Ban Giám Đốc'];
-    if (deptSelect) {
-      const currentVal = deptSelect.value;
-      deptSelect.innerHTML = '<option value="all">Tất cả phòng ban</option>' +
-        departments.map(d => `<option value="${d}">${d}</option>`).join('');
-      deptSelect.value = currentVal || 'all';
+    // Populate Department dropdowns dynamically
+    this.populateDepartmentDropdowns();
+  },
+
+  // -------------------------------------------------------------
+  // DEPARTMENT MANAGEMENT & QUICK ADD
+  // -------------------------------------------------------------
+  openDeptModal() {
+    this.renderDepartmentList();
+    this.openModal('departmentModal');
+    const input = document.getElementById('newDeptInput');
+    if (input) {
+      input.value = '';
+      setTimeout(() => input.focus(), 150);
     }
-    if (taskDeptSelect) {
-      taskDeptSelect.innerHTML = departments.map(d => `<option value="${d}">${d}</option>`).join('');
+  },
+
+  renderDepartmentList() {
+    const container = document.getElementById('deptListContainer');
+    const countBadge = document.getElementById('deptCountBadge');
+    if (!container) return;
+
+    const depts = this.state.departments || [];
+    if (countBadge) {
+      countBadge.innerText = `${depts.length} phòng ban`;
+    }
+
+    if (depts.length === 0) {
+      container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px;">Chưa có phòng ban nào trong hệ thống</div>';
+      return;
+    }
+
+    // Count active members per department
+    const users = this.state.users || [];
+    const deptMemberCount = {};
+    users.forEach(u => {
+      deptMemberCount[u.department] = (deptMemberCount[u.department] || 0) + 1;
+    });
+
+    container.innerHTML = depts.map(d => {
+      const name = typeof d === 'string' ? d : d.name;
+      const id = typeof d === 'string' ? d : d.id;
+      const count = deptMemberCount[name] || 0;
+
+      return `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:var(--bg-main); border:1px solid var(--border-color); border-radius:var(--radius-sm);">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:20px;">🏢</span>
+            <div>
+              <strong style="font-size:13.5px; color:var(--text-primary); display:block;">${this.escapeHtml(name)}</strong>
+              <span style="font-size:11.5px; color:var(--text-secondary);">${count} thành viên</span>
+            </div>
+          </div>
+          <div>
+            <button type="button" class="btn btn-outline btn-sm" onclick="App.deleteDepartment('${id}', '${this.escapeHtml(name)}', ${count})" style="color:var(--danger); border-color:#fca5a5; padding:4px 8px; font-size:11.5px;" title="Xóa phòng ban này">
+              🗑️ Xóa
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  },
+
+  async handleDepartmentFormSubmit(e) {
+    e.preventDefault();
+    const input = document.getElementById('newDeptInput');
+    const submitBtn = document.getElementById('btnAddDeptSubmit');
+    if (!input) return;
+
+    const name = input.value.trim();
+    if (!name) return;
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Đang thêm...';
+    }
+
+    try {
+      const res = await API.createDepartment(name);
+      this.showToast(`✅ Đã thêm phòng ban "${res.department.name}" thành công!`, 'success');
+      this.playSound('success');
+      input.value = '';
+      await this.refreshDepartments();
+      this.renderDepartmentList();
+    } catch (err) {
+      this.showToast(`Lỗi: ${err.message}`, 'danger');
+      this.playSound('danger');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerText = '+ Thêm Mới';
+      }
+    }
+  },
+
+  async deleteDepartment(id, name, memberCount) {
+    if (memberCount > 0) {
+      const ok = confirm(`Cảnh báo: Hiện đang có ${memberCount} nhân sự thuộc "${name}". Bạn có chắc chắn muốn xóa phòng ban này không?`);
+      if (!ok) return;
+    } else {
+      if (!confirm(`Bạn có chắc chắn muốn xóa phòng ban "${name}" khỏi hệ thống?`)) return;
+    }
+
+    try {
+      await API.deleteDepartment(id);
+      this.showToast(`🗑️ Đã xóa phòng ban "${name}"`, 'info');
+      await this.refreshDepartments();
+      this.renderDepartmentList();
+    } catch (err) {
+      this.showToast(`Lỗi xóa: ${err.message}`, 'danger');
+      this.playSound('danger');
+    }
+  },
+
+  async quickAddDepartment(targetSelectId) {
+    const name = prompt('Nhập tên phòng ban mới bạn muốn tạo (Ví dụ: Phòng Kế Toán, Ban R&D...):');
+    if (!name || !name.trim()) return;
+
+    try {
+      const res = await API.createDepartment(name.trim());
+      this.showToast(`✅ Đã thêm phòng ban "${res.department.name}" thành công!`, 'success');
+      this.playSound('success');
+
+      // Refresh list
+      await this.refreshDepartments();
+
+      // Auto select newly created department in the current open form!
+      if (targetSelectId) {
+        const select = document.getElementById(targetSelectId);
+        if (select) {
+          select.value = res.department.name;
+        }
+      }
+    } catch (err) {
+      alert(err.message || 'Lỗi khi thêm phòng ban');
+      this.playSound('danger');
+    }
+  },
+
+  async refreshDepartments() {
+    try {
+      const res = await API.getDepartments();
+      this.state.departments = res.departments || [];
+      this.populateDepartmentDropdowns();
+    } catch (e) {
+      console.error('Failed to refresh departments', e);
     }
   },
 
@@ -1513,18 +1727,23 @@ const App = {
   },
 
   openAddUserModal() {
+    this.populateDepartmentDropdowns();
     document.getElementById('userModalTitle').innerText = 'Thêm Thành Viên Mới';
     document.getElementById('userFormId').value = '';
     document.getElementById('userFormName').value = '';
     document.getElementById('userFormEmail').value = '';
     document.getElementById('userFormPassword').value = '123456';
     document.getElementById('userFormRole').value = 'user';
-    document.getElementById('userFormDept').value = 'Phòng Kỹ Thuật';
+    const firstDept = (this.state.departments && this.state.departments[0])
+      ? (typeof this.state.departments[0] === 'string' ? this.state.departments[0] : this.state.departments[0].name)
+      : 'Phòng Kỹ Thuật';
+    document.getElementById('userFormDept').value = firstDept;
     document.getElementById('userFormPosition').value = 'Chuyên viên';
     this.openModal('userModal');
   },
 
   openEditUserModal(userId) {
+    this.populateDepartmentDropdowns();
     const user = this.state.users.find(u => u.id === userId);
     if (!user) return;
 
@@ -1615,6 +1834,7 @@ const App = {
   // TASK CRUD & MODALS
   // -------------------------------------------------------------
   openTaskModal(taskToEdit = null) {
+    this.populateDepartmentDropdowns();
     const titleEl = document.getElementById('taskModalTitle');
     const form = document.getElementById('taskForm');
     form.reset();

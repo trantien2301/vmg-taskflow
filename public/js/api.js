@@ -198,6 +198,24 @@ const API = {
     });
   },
 
+  // Departments
+  async getDepartments() {
+    return this.request('/api/departments');
+  },
+
+  async createDepartment(name) {
+    return this.request('/api/departments', {
+      method: 'POST',
+      body: JSON.stringify({ name })
+    });
+  },
+
+  async deleteDepartment(id) {
+    return this.request(`/api/departments/${id}`, {
+      method: 'DELETE'
+    });
+  },
+
   // System
   async getActivities() {
     return this.request('/api/activities');
