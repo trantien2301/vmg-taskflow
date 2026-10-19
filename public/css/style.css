@@ -1159,34 +1159,28 @@ body {
 }
 
 .kanban-col {
-  background: #f1f5f9;
   border-radius: var(--radius-md);
-  padding: 14px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
   max-height: calc(100vh - 220px);
-}
-
-[data-theme="dark"] .kanban-col {
-  background: #111c2e;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 
 .kanban-col-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: 12px;
+  padding: 9px 12px;
   margin-bottom: 12px;
-  border-bottom: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
-.kanban-col-header.todo { border-color: #94a3b8; }
-.kanban-col-header.in_progress { border-color: #3b82f6; }
-.kanban-col-header.review { border-color: #f59e0b; }
-.kanban-col-header.completed { border-color: #10b981; }
-
 .col-title {
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -1194,12 +1188,182 @@ body {
 }
 
 .col-count {
-  background: var(--bg-card);
   padding: 2px 8px;
   border-radius: 12px;
-  font-size: 12px;
-  color: var(--text-secondary);
-  font-weight: 600;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+/* 1. Giai đoạn: Cần Làm (To Do) - Neutral Slate / Indigo */
+.kanban-col.col-todo {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  border-top: 4px solid #64748b;
+}
+
+.kanban-col.col-todo .kanban-col-header {
+  background: #edf2f7;
+  border-bottom: 2px solid #cbd5e1;
+}
+
+.kanban-col.col-todo .col-title {
+  color: #334155;
+}
+
+.kanban-col.col-todo .col-count {
+  background: #ffffff;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+[data-theme="dark"] .kanban-col.col-todo {
+  background: #0f172a;
+  border-color: #1e293b;
+  border-top-color: #94a3b8;
+}
+
+[data-theme="dark"] .kanban-col.col-todo .kanban-col-header {
+  background: #1e293b;
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .kanban-col.col-todo .col-title {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .kanban-col.col-todo .col-count {
+  background: #0f172a;
+  color: #cbd5e1;
+  border-color: #334155;
+}
+
+/* 2. Giai đoạn: Đang Làm (In Progress) - Energetic Blue / Sky */
+.kanban-col.col-in_progress {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  border-top: 4px solid #3b82f6;
+}
+
+.kanban-col.col-in_progress .kanban-col-header {
+  background: #dbeafe;
+  border-bottom: 2px solid #93c5fd;
+}
+
+.kanban-col.col-in_progress .col-title {
+  color: #1d4ed8;
+}
+
+.kanban-col.col-in_progress .col-count {
+  background: #ffffff;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+[data-theme="dark"] .kanban-col.col-in_progress {
+  background: #0c1a30;
+  border-color: #1e3a8a;
+  border-top-color: #3b82f6;
+}
+
+[data-theme="dark"] .kanban-col.col-in_progress .kanban-col-header {
+  background: #172a4c;
+  border-bottom-color: #1e40af;
+}
+
+[data-theme="dark"] .kanban-col.col-in_progress .col-title {
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .kanban-col.col-in_progress .col-count {
+  background: #0c1a30;
+  color: #bfdbfe;
+  border-color: #2563eb;
+}
+
+/* 3. Giai đoạn: Chờ Duyệt (Review) - Warm Amber / Orange */
+.kanban-col.col-review {
+  background: #fffbeb;
+  border-color: #fde68a;
+  border-top: 4px solid #f59e0b;
+}
+
+.kanban-col.col-review .kanban-col-header {
+  background: #fef3c7;
+  border-bottom: 2px solid #fcd34d;
+}
+
+.kanban-col.col-review .col-title {
+  color: #b45309;
+}
+
+.kanban-col.col-review .col-count {
+  background: #ffffff;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+[data-theme="dark"] .kanban-col.col-review {
+  background: #251806;
+  border-color: #78350f;
+  border-top-color: #f59e0b;
+}
+
+[data-theme="dark"] .kanban-col.col-review .kanban-col-header {
+  background: #3b240a;
+  border-bottom-color: #92400e;
+}
+
+[data-theme="dark"] .kanban-col.col-review .col-title {
+  color: #fde68a;
+}
+
+[data-theme="dark"] .kanban-col.col-review .col-count {
+  background: #251806;
+  color: #fef3c7;
+  border-color: #b45309;
+}
+
+/* 4. Giai đoạn: Hoàn Thành (Done / Completed) - Vibrant Emerald / Green */
+.kanban-col.col-completed {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  border-top: 4px solid #10b981;
+}
+
+.kanban-col.col-completed .kanban-col-header {
+  background: #dcfce7;
+  border-bottom: 2px solid #86efac;
+}
+
+.kanban-col.col-completed .col-title {
+  color: #047857;
+}
+
+.kanban-col.col-completed .col-count {
+  background: #ffffff;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+[data-theme="dark"] .kanban-col.col-completed {
+  background: #082115;
+  border-color: #065f46;
+  border-top-color: #10b981;
+}
+
+[data-theme="dark"] .kanban-col.col-completed .kanban-col-header {
+  background: #0e3422;
+  border-bottom-color: #047857;
+}
+
+[data-theme="dark"] .kanban-col.col-completed .col-title {
+  color: #a7f3d0;
+}
+
+[data-theme="dark"] .kanban-col.col-completed .col-count {
+  background: #082115;
+  color: #d1fae5;
+  border-color: #059669;
 }
 
 .kanban-cards {
@@ -1925,6 +2089,30 @@ body {
     color: #fff;
     border-color: var(--primary);
     box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+  }
+  .kanban-tab-btn[data-col="todo"].active {
+    background: #64748b;
+    border-color: #64748b;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(100, 116, 139, 0.4);
+  }
+  .kanban-tab-btn[data-col="in_progress"].active {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+  }
+  .kanban-tab-btn[data-col="review"].active {
+    background: #f59e0b;
+    border-color: #f59e0b;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);
+  }
+  .kanban-tab-btn[data-col="completed"].active {
+    background: #10b981;
+    border-color: #10b981;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
   }
 
   /* Kanban Board & Columns: Swipeable Carousel with smooth snap */
