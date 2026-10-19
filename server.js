@@ -969,6 +969,43 @@ app.post('/api/departments', authenticate, (req, res) => {
   }
 });
 
+app.put('/api/departments/:id', authenticate, requireAdmin, (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+
+  if (!name || !name.trim()) {
+    return res.status(400).json({ error: 'Tên phòng ban mới không được để trống' });
+  }
+
+  try {
+    const result = db.updateDepartment(id, name);
+
+    db.logActivity({
+      userId: req.user.id,
+      userName: req.user.name,
+      action: 'update_department',
+      details: `Đã đổi tên phòng ban từ "${result.oldName}" thành "${result.newName}" (${result.updatedUsersCount} nhân sự, ${result.updatedTasksCount} công việc được cập nhật)`
+    });
+
+    broadcast('department:updated', {
+      department: result.department,
+      oldName: result.oldName,
+      newName: result.newName,
+      updatedBy: req.user.name
+    });
+
+    res.json({
+      success: true,
+      department: result.department,
+      oldName: result.oldName,
+      newName: result.newName,
+      message: `Đã cập nhật phòng ban thành "${result.newName}"`
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 app.delete('/api/departments/:id', authenticate, requireAdmin, (req, res) => {
   const { id } = req.params;
   const depts = db.getDepartments();

@@ -32,7 +32,7 @@
       "email": "hoang.pham@company.com",
       "password": "$2b$10$uhT3k8V5nuiXs.f4uV8WaeokBuJ0PomZssM/pZAyqk1fAvCslEs8e",
       "role": "user",
-      "department": "Phòng Vận Hành",
+      "department": "Ph�ng V?n H�nh",
       "position": "Điều phối viên",
       "avatar": "👨‍🔧",
       "phone": "0945 678 901",
@@ -161,7 +161,7 @@
       "description": "Đối soát số liệu tồn kho thực tế so với phần mềm quản lý kho, lập biên bản chênh lệch hao hụt vật tư tháng trước.",
       "status": "todo",
       "priority": "medium",
-      "department": "Phòng Vận Hành",
+      "department": "Ph�ng V?n H�nh",
       "assignedTo": "usr-5",
       "createdBy": "usr-1",
       "startDate": "2026-10-17T02:40:51.382Z",
@@ -1269,6 +1269,14 @@
   ],
   "activities": [
     {
+      "id": "act-1792388346662",
+      "userId": "usr-1",
+      "userName": "Trần Quản Trị",
+      "action": "update_department",
+      "details": "Đã đổi tên phòng ban từ \"Phòng Vận Hành\" thành \"Ph�ng V?n H�nh & Khai Th�c\" (1 nhân sự, 1 công việc được cập nhật)",
+      "timestamp": "2026-10-19T05:39:06.662Z"
+    },
+    {
       "id": "act-1792387066648",
       "userId": "usr-1792209027761",
       "userName": "Trần Tiến",
@@ -1390,7 +1398,8 @@
     },
     {
       "id": "dept-4",
-      "name": "Phòng Vận Hành"
+      "name": "Ph�ng V?n H�nh",
+      "updatedAt": "2026-10-19T05:39:06.689Z"
     },
     {
       "id": "dept-5",

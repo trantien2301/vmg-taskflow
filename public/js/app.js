@@ -428,6 +428,15 @@ const App = {
         }
         break;
 
+      case 'department:updated':
+        this.showToast(`🏢 ${data.updatedBy} đã đổi tên phòng ban "${data.oldName}" thành "${data.department.name}"`, 'info');
+        this.refreshDepartments();
+        this.loadInitialData().then(() => this.renderView());
+        if (document.getElementById('departmentModal')?.classList.contains('show')) {
+          this.renderDepartmentList();
+        }
+        break;
+
       case 'department:deleted':
         this.showToast(`🗑️ ${data.deletedBy} đã xóa phòng ban "${data.name}"`, 'info');
         this.refreshDepartments();
@@ -1231,28 +1240,100 @@ const App = {
       deptMemberCount[u.department] = (deptMemberCount[u.department] || 0) + 1;
     });
 
+    const isAdmin = !this.state.user || this.state.user.role === 'admin';
+
     container.innerHTML = depts.map(d => {
       const name = typeof d === 'string' ? d : d.name;
       const id = typeof d === 'string' ? d : d.id;
       const count = deptMemberCount[name] || 0;
+      const isEditing = this.state.editingDeptId === id;
+
+      if (isEditing) {
+        return `
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 12px; background:var(--bg-main); border:2px solid var(--primary); border-radius:var(--radius-sm); box-shadow:0 0 0 3px rgba(79, 70, 229, 0.15);">
+            <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:0;">
+              <span style="font-size:18px;">🏢</span>
+              <input type="text" id="editDeptInput_${id}" class="form-control" value="${this.escapeHtml(name)}" style="font-size:13px; padding:6px 10px; height:auto; width:100%;" placeholder="Nhập tên phòng ban mới..." onkeydown="if(event.key==='Enter'){event.preventDefault(); App.saveEditDepartment('${id}', '${this.escapeHtml(name)}');} if(event.key==='Escape'){event.preventDefault(); App.cancelEditDepartment();}">
+            </div>
+            <div style="display:flex; gap:6px; flex-shrink:0;">
+              <button type="button" class="btn btn-primary btn-sm" onclick="App.saveEditDepartment('${id}', '${this.escapeHtml(name)}')" style="padding:6px 11px; font-size:11.5px; white-space:nowrap;">
+                💾 Lưu
+              </button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="App.cancelEditDepartment()" style="padding:6px 9px; font-size:11.5px; white-space:nowrap;">
+                ✕ Hủy
+              </button>
+            </div>
+          </div>
+        `;
+      }
 
       return `
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:var(--bg-main); border:1px solid var(--border-color); border-radius:var(--radius-sm);">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <span style="font-size:20px;">🏢</span>
-            <div>
-              <strong style="font-size:13.5px; color:var(--text-primary); display:block;">${this.escapeHtml(name)}</strong>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:var(--bg-main); border:1px solid var(--border-color); border-radius:var(--radius-sm); transition:all 0.2s;">
+          <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1;">
+            <span style="font-size:20px; flex-shrink:0;">🏢</span>
+            <div style="min-width:0;">
+              <strong style="font-size:13.5px; color:var(--text-primary); display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${this.escapeHtml(name)}</strong>
               <span style="font-size:11.5px; color:var(--text-secondary);">${count} thành viên</span>
             </div>
           </div>
-          <div>
-            <button type="button" class="btn btn-outline btn-sm" onclick="App.deleteDepartment('${id}', '${this.escapeHtml(name)}', ${count})" style="color:var(--danger); border-color:#fca5a5; padding:4px 8px; font-size:11.5px;" title="Xóa phòng ban này">
-              🗑️ Xóa
-            </button>
+          <div style="display:flex; gap:6px; flex-shrink:0;">
+            ${isAdmin ? `
+              <button type="button" class="btn btn-outline btn-sm" onclick="App.startEditDepartment('${id}')" style="color:var(--primary); border-color:#c7d2fe; padding:4px 8px; font-size:11.5px;" title="Chỉnh sửa tên phòng ban">
+                ✏️ Sửa
+              </button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="App.deleteDepartment('${id}', '${this.escapeHtml(name)}', ${count})" style="color:var(--danger); border-color:#fca5a5; padding:4px 8px; font-size:11.5px;" title="Xóa phòng ban này">
+                🗑️ Xóa
+              </button>
+            ` : ''}
           </div>
         </div>
       `;
     }).join('');
+  },
+
+  startEditDepartment(id) {
+    this.state.editingDeptId = id;
+    this.renderDepartmentList();
+    setTimeout(() => {
+      const inp = document.getElementById(`editDeptInput_${id}`);
+      if (inp) {
+        inp.focus();
+        inp.select();
+      }
+    }, 50);
+  },
+
+  cancelEditDepartment() {
+    this.state.editingDeptId = null;
+    this.renderDepartmentList();
+  },
+
+  async saveEditDepartment(id, oldName) {
+    const inp = document.getElementById(`editDeptInput_${id}`);
+    if (!inp) return;
+    const newName = inp.value.trim();
+    if (!newName) {
+      this.showToast('Tên phòng ban không được để trống!', 'warning');
+      return;
+    }
+    if (newName === oldName) {
+      this.cancelEditDepartment();
+      return;
+    }
+
+    try {
+      const res = await API.updateDepartment(id, newName);
+      this.state.editingDeptId = null;
+      this.showToast(`✅ Đã đổi tên phòng ban thành "${res.department.name}" thành công!`, 'success');
+      this.playSound('success');
+      await this.refreshDepartments();
+      await this.loadInitialData();
+      this.renderDepartmentList();
+      this.renderView();
+    } catch (err) {
+      this.showToast(`Lỗi điều chỉnh: ${err.message}`, 'danger');
+      this.playSound('danger');
+    }
   },
 
   async handleDepartmentFormSubmit(e) {

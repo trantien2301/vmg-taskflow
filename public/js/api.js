@@ -219,6 +219,13 @@ const API = {
     });
   },
 
+  async updateDepartment(id, name) {
+    return this.request(`/api/departments/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify({ name })
+    });
+  },
+
   async deleteDepartment(id) {
     return this.request(`/api/departments/${id}`, {
       method: 'DELETE'

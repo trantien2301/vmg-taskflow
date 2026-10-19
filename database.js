@@ -729,6 +729,61 @@ class Database {
     return true;
   }
 
+  updateDepartment(idOrName, newName) {
+    this.getDepartments();
+    const cleanName = (newName || '').trim();
+    if (!cleanName) {
+      throw new Error('Tên phòng ban mới không được để trống!');
+    }
+
+    const dept = this.data.departments.find(d => d.id === idOrName || d.name.toLowerCase() === idOrName.toLowerCase());
+    if (!dept) {
+      throw new Error('Không tìm thấy phòng ban cần điều chỉnh!');
+    }
+
+    const oldName = dept.name;
+
+    // Check if new name is already used by another department
+    const duplicate = this.data.departments.find(d => d.id !== dept.id && d.name.toLowerCase() === cleanName.toLowerCase());
+    if (duplicate) {
+      throw new Error(`Phòng ban "${cleanName}" đã tồn tại trên hệ thống!`);
+    }
+
+    dept.name = cleanName;
+    dept.updatedAt = new Date().toISOString();
+
+    // Cascade update to users
+    let updatedUsersCount = 0;
+    if (this.data.users && Array.isArray(this.data.users)) {
+      this.data.users.forEach(u => {
+        if (u.department === oldName) {
+          u.department = cleanName;
+          updatedUsersCount++;
+        }
+      });
+    }
+
+    // Cascade update to tasks
+    let updatedTasksCount = 0;
+    if (this.data.tasks && Array.isArray(this.data.tasks)) {
+      this.data.tasks.forEach(t => {
+        if (t.department === oldName) {
+          t.department = cleanName;
+          updatedTasksCount++;
+        }
+      });
+    }
+
+    this.save();
+    return {
+      department: dept,
+      oldName,
+      newName: cleanName,
+      updatedUsersCount,
+      updatedTasksCount
+    };
+  }
+
   // Reset database to initial seed data
   reset() {
     this.data = getDefaultData();
