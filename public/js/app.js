@@ -281,10 +281,10 @@ const App = {
     if (dot && text) {
       if (isConnected) {
         dot.className = 'status-dot';
-        text.innerText = `Trực tuyến: ${this.state.onlineCount} người`;
+        text.innerHTML = `<span class="hide-mobile">Trực tuyến: </span>${this.state.onlineCount} <span class="hide-mobile">người</span><span class="show-mobile-only">online</span>`;
       } else {
         dot.className = 'status-dot disconnected';
-        text.innerText = 'Mất kết nối (Đang thử lại...)';
+        text.innerHTML = `<span class="hide-mobile">Mất kết nối</span><span class="show-mobile-only">Offline</span>`;
       }
     }
   },
@@ -438,7 +438,7 @@ const App = {
       scanBtn.addEventListener('click', async () => {
         try {
           scanBtn.disabled = true;
-          scanBtn.innerHTML = '⏳ Đang quét...';
+          scanBtn.innerHTML = '⏳<span class="hide-mobile"> Đang quét...</span>';
           const res = await API.scanAlertsNow();
           this.showToast(`✅ ${res.message}`, 'success');
           await this.loadInitialData();
@@ -447,10 +447,24 @@ const App = {
           this.showToast(`Lỗi: ${e.message}`, 'danger');
         } finally {
           scanBtn.disabled = false;
-          scanBtn.innerHTML = '⚡ Quét Cảnh Báo';
+          scanBtn.innerHTML = '⚡<span class="hide-mobile"> Quét Cảnh Báo</span>';
         }
       });
     }
+
+    // Mobile Kanban Tab Switcher listeners
+    document.querySelectorAll('.kanban-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const col = btn.getAttribute('data-col');
+        const colHeader = document.querySelector(`.kanban-col-header.${col}`);
+        const colEl = colHeader ? colHeader.closest('.kanban-col') : null;
+        if (colEl) {
+          colEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+        }
+        document.querySelectorAll('.kanban-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
 
     // Filter controls
     const searchInput = document.getElementById('filterSearch');
@@ -874,13 +888,13 @@ const App = {
 
     // Update view title in header
     const titleMap = {
-      kanban: '📋 Bảng Công Việc (Kanban Board)',
-      table: '📑 Danh Sách Chi Tiết Công Việc',
-      calendar: '📅 Lịch Biểu & Theo Dõi Hạn Chót',
-      reports: '📈 Báo Cáo & Phân Tích Hiệu Suất',
-      alerts: '🚨 Trung Tâm Cảnh Báo & Quá Hạn',
-      users: '👥 Quản Lý Phân Quyền & Thành Viên',
-      activities: '📜 Lịch Sử & Nhật Ký Hoạt Động'
+      kanban: '📋 Bảng Công Việc',
+      table: '📑 Danh Sách Việc',
+      calendar: '📅 Lịch Biểu Hạn',
+      reports: '📈 Báo Cáo Thống Kê',
+      alerts: '🚨 Trung Tâm Cảnh Báo',
+      users: '👥 Quản Trị Nhân Sự',
+      activities: '📜 Nhật Ký Hoạt Động'
     };
     const titleEl = document.getElementById('currentViewTitle');
     if (titleEl) {
@@ -1058,6 +1072,8 @@ const App = {
       const countEl = document.getElementById(`kanbanCount_${col}`);
 
       if (countEl) countEl.innerText = colTasks.length;
+      const tabCountEl = document.getElementById(`tabCount_${col}`);
+      if (tabCountEl) tabCountEl.innerText = colTasks.length;
       if (!container) return;
 
       if (colTasks.length === 0) {

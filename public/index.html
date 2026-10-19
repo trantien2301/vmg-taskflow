@@ -289,20 +289,20 @@
       <!-- TOP HEADER -->
       <header class="top-header">
         <div class="header-left">
-          <button class="mobile-menu-toggle" id="mobileMenuToggle">☰</button>
-          <h1 class="current-view-title" id="currentViewTitle">📋 Bảng Công Việc (Kanban Board)</h1>
+          <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Menu">☰</button>
+          <h1 class="current-view-title" id="currentViewTitle">📋 Bảng Công Việc</h1>
         </div>
 
         <div class="header-right">
           <!-- Realtime status indicator -->
           <div class="realtime-status-pill">
             <div class="status-dot" id="statusDot"></div>
-            <span id="statusText">Trực tuyến: 1 người</span>
+            <span id="statusText"><span class="hide-mobile">Trực tuyến: </span>1 <span class="hide-mobile">người</span><span class="show-mobile-only">online</span></span>
           </div>
 
           <!-- Scan Alerts Now button -->
           <button class="btn btn-outline btn-sm" id="scanAlertsBtn" title="Kiểm tra hạn chót ngay tức thì">
-            ⚡ Quét Cảnh Báo
+            ⚡<span class="hide-mobile"> Quét Cảnh Báo</span>
           </button>
 
           <!-- Notification Bell -->
@@ -335,7 +335,7 @@
           </button>
 
           <!-- Logout Button -->
-          <button class="btn btn-outline btn-sm" id="btnLogoutHeader" title="Đăng xuất khỏi hệ thống" style="color:var(--danger); border-color:#fca5a5;">
+          <button class="btn btn-outline btn-sm hide-mobile" id="btnLogoutHeader" title="Đăng xuất khỏi hệ thống" style="color:var(--danger); border-color:#fca5a5;">
             🚪 Đăng Xuất
           </button>
         </div>
@@ -349,7 +349,7 @@
             <div class="kpi-icon blue">📊</div>
             <div class="kpi-info">
               <div class="kpi-value" id="kpiTotalTasks">0</div>
-              <div class="kpi-label">Tổng số công việc</div>
+              <div class="kpi-label"><span class="hide-mobile">Tổng số </span>công việc</div>
             </div>
           </div>
 
@@ -357,7 +357,7 @@
             <div class="kpi-icon green">🎯</div>
             <div class="kpi-info">
               <div class="kpi-value" id="kpiCompletedRate">0%</div>
-              <div class="kpi-label">Tỷ lệ hoàn thành</div>
+              <div class="kpi-label"><span class="hide-mobile">Tỷ lệ </span>hoàn thành</div>
             </div>
           </div>
 
@@ -373,7 +373,7 @@
             <div class="kpi-icon red">🚨</div>
             <div class="kpi-info">
               <div class="kpi-value" id="kpiOverdue" style="color:var(--danger)">0</div>
-              <div class="kpi-label">Bị trễ hạn chót</div>
+              <div class="kpi-label"><span class="hide-mobile">Bị </span>trễ hạn<span class="hide-mobile"> chót</span></div>
             </div>
           </div>
 
@@ -428,7 +428,15 @@
 
         <!-- VIEW 1: KANBAN BOARD -->
         <section class="view-panel active" id="view-kanban">
-          <div class="kanban-board">
+          <!-- Mobile Kanban Column Tab Switcher -->
+          <div class="mobile-kanban-nav" id="mobileKanbanNav">
+            <button type="button" class="kanban-tab-btn active" data-col="todo">📌 Cần Làm (<span id="tabCount_todo">0</span>)</button>
+            <button type="button" class="kanban-tab-btn" data-col="in_progress">⚡ Đang Làm (<span id="tabCount_in_progress">0</span>)</button>
+            <button type="button" class="kanban-tab-btn" data-col="review">🔍 Duyệt (<span id="tabCount_review">0</span>)</button>
+            <button type="button" class="kanban-tab-btn" data-col="completed">✅ Xong (<span id="tabCount_completed">0</span>)</button>
+          </div>
+
+          <div class="kanban-board" id="kanbanBoard">
             <!-- Col 1: Todo -->
             <div class="kanban-col">
               <div class="kanban-col-header todo">
