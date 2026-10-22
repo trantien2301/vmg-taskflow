@@ -75,14 +75,14 @@
       "id": "TSK-101",
       "title": "Khắc phục sự cố sập cổng thanh toán VNPAY",
       "description": "Cổng thanh toán đang phản hồi mã lỗi 502 với đơn hàng lớn. Cần kiểm tra timeout webhook và cấu hình SSL cert.",
-      "status": "in_progress",
+      "status": "review",
       "priority": "urgent",
       "department": "Phòng Kỹ Thuật",
       "assignedTo": "usr-2",
       "createdBy": "usr-1",
       "startDate": "2026-10-15T02:40:51.382Z",
       "dueDate": "2026-10-16T02:40:51.382Z",
-      "progress": 65,
+      "progress": 85,
       "tags": [
         "Khẩn cấp",
         "Bug",
@@ -90,7 +90,7 @@
       ],
       "completedAt": null,
       "createdAt": "2026-10-15T02:40:51.382Z",
-      "updatedAt": "2026-10-16T02:40:51.382Z"
+      "updatedAt": "2026-10-22T10:34:59.256Z"
     },
     {
       "id": "TSK-102",
@@ -1543,6 +1543,45 @@
     }
   ],
   "activities": [
+    {
+      "id": "act-1792665299256-5k33f",
+      "userId": "usr-1",
+      "userName": "Trần Quản Trị",
+      "userRole": "admin",
+      "userAvatar": "👑",
+      "action": "change_status",
+      "category": "task",
+      "details": "Chuyển trạng thái \"Khắc phục sự cố sập cổng thanh toán VNPAY\" sang \"Chờ duyệt\"",
+      "taskId": "TSK-101",
+      "taskTitle": "Khắc phục sự cố sập cổng thanh toán VNPAY",
+      "timestamp": "2026-10-22T10:34:59.256Z"
+    },
+    {
+      "id": "act-1792665299202-x4nrm",
+      "userId": "usr-1",
+      "userName": "Trần Quản Trị",
+      "userRole": "admin",
+      "userAvatar": "👑",
+      "action": "auth_login",
+      "category": "auth",
+      "details": "Quản trị viên (Admin) đã đăng nhập vào hệ thống (admin@company.com)",
+      "taskId": null,
+      "taskTitle": null,
+      "timestamp": "2026-10-22T10:34:59.202Z"
+    },
+    {
+      "id": "act-1792665268600-3y9dz",
+      "userId": "usr-1",
+      "userName": "Trần Quản Trị",
+      "userRole": "admin",
+      "userAvatar": "👑",
+      "action": "auth_login",
+      "category": "auth",
+      "details": "Quản trị viên (Admin) đã đăng nhập vào hệ thống (admin@company.com)",
+      "taskId": null,
+      "taskTitle": null,
+      "timestamp": "2026-10-22T10:34:28.600Z"
+    },
     {
       "id": "act-1792663580718",
       "userId": "usr-1",

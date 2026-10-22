@@ -107,6 +107,15 @@ const API = {
     return data;
   },
 
+  async logout() {
+    try {
+      await this.request('/api/auth/logout', { method: 'POST' });
+    } catch (e) {
+      // Ignore network errors on logout
+    }
+    this.clearAuth();
+  },
+
   async getMe() {
     return this.request('/api/auth/me');
   },

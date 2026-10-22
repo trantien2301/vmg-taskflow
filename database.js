@@ -496,13 +496,17 @@ class Database {
 
     this.data.tasks.unshift(newTask);
 
+    const assignedUser = this.getUserById(newTask.assignedTo);
     this.logActivity({
       userId: creatorUser.id,
       userName: creatorUser.name,
+      userRole: creatorUser.role || 'user',
+      userAvatar: creatorUser.avatar || (creatorUser.role === 'admin' ? '👑' : '👤'),
       action: 'create_task',
+      category: 'task',
       taskId: id,
       taskTitle: newTask.title,
-      details: `Đã tạo công việc mới và phân công cho ${this.getUserById(newTask.assignedTo)?.name || 'người dùng'}`
+      details: `Đã tạo công việc mới: "${newTask.title}" (${newTask.priority.toUpperCase()} - Phân công: ${assignedUser ? assignedUser.name : 'Chưa giao'})`
     });
 
     this.save();
@@ -540,17 +544,24 @@ class Database {
     };
 
     // Log activity
-    let actionDesc = 'Đã cập nhật công việc';
+    let actionType = 'update_task';
+    let actionDesc = `Đã cập nhật công việc: "${this.data.tasks[idx].title}"`;
     if (updates.status && updates.status !== oldTask.status) {
-      actionDesc = `Chuyển trạng thái sang "${updates.status}"`;
+      actionType = 'change_status';
+      const statusMap = { todo: 'Cần làm', in_progress: 'Đang làm', review: 'Chờ duyệt', completed: 'Hoàn thành' };
+      actionDesc = `Chuyển trạng thái "${this.data.tasks[idx].title}" sang "${statusMap[updates.status] || updates.status}"`;
     } else if (updates.progress !== undefined && updates.progress !== oldTask.progress) {
-      actionDesc = `Cập nhật tiến độ thành ${updates.progress}%`;
+      actionType = 'update_progress';
+      actionDesc = `Cập nhật tiến độ "${this.data.tasks[idx].title}" thành ${updates.progress}%`;
     }
 
     this.logActivity({
       userId: updaterUser.id,
       userName: updaterUser.name,
-      action: 'update_task',
+      userRole: updaterUser.role || 'user',
+      userAvatar: updaterUser.avatar || (updaterUser.role === 'admin' ? '👑' : '👤'),
+      action: actionType,
+      category: 'task',
       taskId: id,
       taskTitle: this.data.tasks[idx].title,
       details: actionDesc
@@ -569,10 +580,13 @@ class Database {
     this.logActivity({
       userId: deleterUser.id,
       userName: deleterUser.name,
+      userRole: deleterUser.role || 'user',
+      userAvatar: deleterUser.avatar || (deleterUser.role === 'admin' ? '👑' : '👤'),
       action: 'delete_task',
+      category: 'task',
       taskId: id,
       taskTitle: task.title,
-      details: `Đã xóa công việc #${id}`
+      details: `Đã xóa công việc: "${task.title}"`
     });
 
     this.save();
@@ -596,13 +610,17 @@ class Database {
     };
     this.data.comments.push(comment);
 
+    const task = this.getTaskById(taskId);
     this.logActivity({
       userId: user.id,
       userName: user.name,
-      action: 'comment',
+      userRole: user.role || 'user',
+      userAvatar: user.avatar || (user.role === 'admin' ? '👑' : '👤'),
+      action: 'add_comment',
+      category: 'task',
       taskId,
-      taskTitle: this.getTaskById(taskId)?.title || '',
-      details: `Đã bình luận: "${content.substring(0, 40)}..."`
+      taskTitle: task ? task.title : taskId,
+      details: `Đã bình luận vào "${task ? task.title : taskId}": "${content.slice(0, 60)}${content.length > 60 ? '...' : ''}"`
     });
 
     this.save();
@@ -656,20 +674,43 @@ class Database {
     return true;
   }
 
-  // --- Activity Log ---
-  logActivity(entry) {
-    const act = {
-      id: `act-${Date.now()}`,
-      ...entry,
-      timestamp: entry.timestamp || new Date().toISOString()
-    };
-    this.data.activities.unshift(act);
-    if (this.data.activities.length > 300) {
-      this.data.activities.pop();
-    }
+  // --- Activity Log & Realtime Stream ---
+  setActivityCallback(callback) {
+    this.onActivityLogged = callback;
   }
 
-  getActivities(limit = 50) {
+  logActivity(entry) {
+    const act = {
+      id: `act-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+      userId: entry.userId || 'system',
+      userName: entry.userName || 'Hệ thống',
+      userRole: entry.userRole || 'user',
+      userAvatar: entry.userAvatar || (entry.userRole === 'admin' ? '👑' : '👤'),
+      action: entry.action || 'general',
+      category: entry.category || 'general',
+      details: entry.details || '',
+      taskId: entry.taskId || null,
+      taskTitle: entry.taskTitle || null,
+      timestamp: entry.timestamp || new Date().toISOString()
+    };
+
+    this.data.activities.unshift(act);
+    if (this.data.activities.length > 500) {
+      this.data.activities.pop();
+    }
+    this.save();
+
+    if (typeof this.onActivityLogged === 'function') {
+      try {
+        this.onActivityLogged(act);
+      } catch (err) {
+        console.error('Error in onActivityLogged callback:', err);
+      }
+    }
+    return act;
+  }
+
+  getActivities(limit = 100) {
     return this.data.activities.slice(0, limit);
   }
 

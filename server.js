@@ -96,6 +96,11 @@ function broadcast(event, data, targetUserId = null) {
   }
 }
 
+// Tự động phát sóng tức thì mọi thao tác được ghi lại từ User đến Admin
+db.setActivityCallback((activity) => {
+  broadcast('activity:new', { activity });
+});
+
 function broadcastOnlineUsers() {
   const onlineList = [];
   const seenIds = new Set();
@@ -261,7 +266,31 @@ app.post('/api/auth/login', (req, res) => {
   const safeUser = { ...user };
   delete safeUser.password;
 
+  db.logActivity({
+    userId: user.id,
+    userName: user.name,
+    userRole: user.role,
+    userAvatar: user.avatar,
+    action: 'auth_login',
+    category: 'auth',
+    details: `${user.role === 'admin' ? 'Quản trị viên (Admin)' : 'Nhân sự'} đã đăng nhập vào hệ thống (${user.email})`
+  });
+
   res.json({ token, user: safeUser });
+});
+
+app.post('/api/auth/logout', authenticate, (req, res) => {
+  db.logActivity({
+    userId: req.user.id,
+    userName: req.user.name,
+    userRole: req.user.role,
+    userAvatar: req.user.avatar,
+    action: 'auth_logout',
+    category: 'auth',
+    details: `${req.user.role === 'admin' ? 'Quản trị viên (Admin)' : 'Nhân sự'} đã đăng xuất khỏi phiên làm việc`
+  });
+
+  res.json({ success: true, message: 'Đã đăng xuất thành công' });
 });
 
 // Registration endpoint restricted to @vmg.edu.vn internal company emails
@@ -318,8 +347,11 @@ app.post('/api/auth/register', (req, res) => {
   db.logActivity({
     userId: newUser.id,
     userName: newUser.name,
-    action: 'register',
-    details: `Đăng ký tài khoản nội bộ mới thành công (${cleanEmail})`
+    userRole: 'user',
+    userAvatar: newUser.avatar,
+    action: 'auth_register',
+    category: 'auth',
+    details: `Thành viên mới tự đăng ký tài khoản thành công: ${cleanEmail} (${newUser.department})`
   });
 
   broadcast('user:created', { user: newUser });
@@ -385,8 +417,11 @@ app.post('/api/auth/sso', (req, res) => {
     db.logActivity({
       userId: user.id,
       userName: user.name,
-      action: 'sso_register',
-      details: `Đăng ký tài khoản mới tự động qua SSO ${provider} (${cleanEmail})`
+      userRole: user.role,
+      userAvatar: user.avatar,
+      action: 'auth_sso_register',
+      category: 'auth',
+      details: `Nhân sự mới đã kích hoạt tài khoản qua SSO ${provider}: ${cleanEmail}`
     });
 
     broadcast('user:created', { user });
@@ -398,8 +433,11 @@ app.post('/api/auth/sso', (req, res) => {
     db.logActivity({
       userId: user.id,
       userName: user.name,
-      action: 'sso_login',
-      details: `Đăng nhập thành công qua SSO ${provider} (${cleanEmail})`
+      userRole: user.role,
+      userAvatar: user.avatar,
+      action: 'auth_sso_login',
+      category: 'auth',
+      details: `Đã xác thực và đăng nhập 1-click qua SSO ${provider}: ${cleanEmail}`
     });
   }
 
@@ -489,8 +527,11 @@ app.post('/api/auth/reset-password', (req, res) => {
   db.logActivity({
     userId: user.id,
     userName: user.name,
-    action: 'reset_password',
-    details: 'Đã đặt lại mật khẩu mới thành công'
+    userRole: user.role,
+    userAvatar: user.avatar,
+    action: 'auth_reset_pwd',
+    category: 'auth',
+    details: `Đã xác thực OTP và đặt lại mật khẩu mới cho tài khoản: ${user.email}`
   });
 
   res.json({
@@ -515,6 +556,16 @@ app.post('/api/auth/switch-demo', (req, res) => {
 
   const safeUser = { ...user };
   delete safeUser.password;
+
+  db.logActivity({
+    userId: user.id,
+    userName: user.name,
+    userRole: user.role,
+    userAvatar: user.avatar,
+    action: 'switch_demo',
+    category: 'auth',
+    details: `Đã chuyển đổi sang tài khoản trải nghiệm: "${user.name}" (${user.role.toUpperCase()})`
+  });
 
   res.json({ token, user: safeUser });
 });
@@ -885,6 +936,16 @@ app.post('/api/users', authenticate, requireAdmin, (req, res) => {
     phone
   });
 
+  db.logActivity({
+    userId: req.user.id,
+    userName: req.user.name,
+    userRole: req.user.role,
+    userAvatar: req.user.avatar || '👑',
+    action: 'create_user',
+    category: 'user',
+    details: `Admin đã thêm nhân sự mới: "${user.name}" (${user.email} - ${user.department})`
+  });
+
   broadcast('user:created', { user });
 
   res.status(201).json({ user });
@@ -905,6 +966,18 @@ app.put('/api/users/:id', authenticate, (req, res) => {
   const updatedUser = db.updateUser(req.params.id, updates);
   if (!updatedUser) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
 
+  db.logActivity({
+    userId: req.user.id,
+    userName: req.user.name,
+    userRole: req.user.role,
+    userAvatar: req.user.avatar || '👤',
+    action: 'update_user',
+    category: 'user',
+    details: req.user.id === updatedUser.id
+      ? `Đã cập nhật thông tin hồ sơ cá nhân`
+      : `Admin đã chỉnh sửa thông tin nhân sự: "${updatedUser.name}" (${updatedUser.email})`
+  });
+
   broadcast('user:updated', { user: updatedUser });
 
   res.json({ user: updatedUser });
@@ -914,8 +987,19 @@ app.delete('/api/users/:id', authenticate, requireAdmin, (req, res) => {
   if (req.params.id === req.user.id) {
     return res.status(400).json({ error: 'Không thể tự xóa tài khoản quản trị hiện tại của chính bạn' });
   }
+  const userToDelete = db.getUserById(req.params.id);
   const ok = db.deleteUser(req.params.id);
   if (!ok) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
+
+  db.logActivity({
+    userId: req.user.id,
+    userName: req.user.name,
+    userRole: req.user.role,
+    userAvatar: req.user.avatar || '👑',
+    action: 'delete_user',
+    category: 'user',
+    details: `Admin đã xóa tài khoản nhân sự: "${userToDelete ? userToDelete.name : req.params.id}" (${userToDelete ? userToDelete.email : ''})`
+  });
 
   broadcast('user:deleted', { userId: req.params.id });
 
@@ -925,9 +1009,20 @@ app.delete('/api/users/:id', authenticate, requireAdmin, (req, res) => {
 // -------------------------------------------------------------
 // SYSTEM / ACTIVITY / VERSION ROUTES
 // -------------------------------------------------------------
-const APP_VERSION = '2.8.0';
+const APP_VERSION = '2.8.5';
 const APP_BUILD_DATE = '22/10/2026';
 const APP_CHANGELOG = [
+  {
+    version: 'v2.8.5',
+    date: '22/10/2026',
+    title: 'Hệ Thống Nhật Ký & Theo Dõi Mọi Thao Tác Realtime (Audit Stream)',
+    highlights: [
+      'Ghi nhận tức thì 100% mọi thao tác từ User đến Admin: Đăng nhập/Đăng xuất, SSO, Thêm/Sửa/Xóa việc, Cập nhật trạng thái/tiến độ, Phòng ban, Quản trị nhân sự',
+      'Đồng bộ phát sóng Realtime qua WebSocket tới toàn bộ người dùng mà không cần tải lại trang',
+      'Bộ lọc chuyên sâu theo Vai trò (Admin/Nhân sự), theo Hạng mục (Công việc, Phòng ban, Nhân sự, Hệ thống) và tìm kiếm thông minh',
+      'Giao diện dòng sự kiện (Live Feed) hiện đại kèm thẻ màu nhận diện vai trò và hiệu ứng phát sáng thao tác mới'
+    ]
+  },
   {
     version: 'v2.8.0',
     date: '22/10/2026',
@@ -1001,8 +1096,11 @@ app.post('/api/system/publish-update', authenticate, requireAdmin, (req, res) =>
   db.logActivity({
     userId: req.user.id,
     userName: req.user.name,
+    userRole: req.user.role,
+    userAvatar: req.user.avatar || '👑',
     action: 'publish_update',
-    details: `Đã phát thông báo cập nhật phiên bản mới v${APP_VERSION} tới toàn bộ hệ thống`
+    category: 'system',
+    details: `Admin đã phát thông báo cập nhật phiên bản mới v${APP_VERSION} tới toàn bộ hệ thống`
   });
 
   broadcast('system:new_version_available', updatePayload);
@@ -1010,12 +1108,21 @@ app.post('/api/system/publish-update', authenticate, requireAdmin, (req, res) =>
 });
 
 app.get('/api/activities', authenticate, (req, res) => {
-  const activities = db.getActivities(50);
+  const activities = db.getActivities(100);
   res.json({ activities });
 });
 
 app.post('/api/system/reset-demo', authenticate, requireAdmin, (req, res) => {
   db.reset();
+  db.logActivity({
+    userId: req.user.id,
+    userName: req.user.name,
+    userRole: req.user.role,
+    userAvatar: req.user.avatar || '👑',
+    action: 'system_reset',
+    category: 'system',
+    details: 'Admin đã thực hiện khôi phục dữ liệu mẫu hệ thống về mặc định'
+  });
   broadcast('system:reset', { message: 'Dữ liệu đã được đặt lại về mặc định!' });
   res.json({ success: true, message: 'Đã hoàn tất đặt lại dữ liệu mẫu' });
 });
@@ -1040,8 +1147,11 @@ app.post('/api/departments', authenticate, (req, res) => {
     db.logActivity({
       userId: req.user.id,
       userName: req.user.name,
+      userRole: req.user.role,
+      userAvatar: req.user.avatar || '🏢',
       action: 'create_department',
-      details: `Đã tạo thêm phòng ban mới: "${department.name}"`
+      category: 'department',
+      details: `${req.user.role === 'admin' ? 'Admin' : 'Người dùng'} đã thêm phòng ban mới: "${department.name}"`
     });
 
     // Realtime WS broadcast
@@ -1067,8 +1177,11 @@ app.put('/api/departments/:id', authenticate, requireAdmin, (req, res) => {
     db.logActivity({
       userId: req.user.id,
       userName: req.user.name,
+      userRole: req.user.role,
+      userAvatar: req.user.avatar || '👑',
       action: 'update_department',
-      details: `Đã đổi tên phòng ban từ "${result.oldName}" thành "${result.newName}" (${result.updatedUsersCount} nhân sự, ${result.updatedTasksCount} công việc được cập nhật)`
+      category: 'department',
+      details: `Admin đã đổi tên phòng ban từ "${result.oldName}" thành "${result.newName}" (${result.updatedUsersCount} nhân sự, ${result.updatedTasksCount} công việc được cập nhật)`
     });
 
     broadcast('department:updated', {
@@ -1103,8 +1216,11 @@ app.delete('/api/departments/:id', authenticate, requireAdmin, (req, res) => {
     db.logActivity({
       userId: req.user.id,
       userName: req.user.name,
+      userRole: req.user.role,
+      userAvatar: req.user.avatar || '👑',
       action: 'delete_department',
-      details: `Đã xóa phòng ban: "${dept.name}"`
+      category: 'department',
+      details: `Admin đã xóa phòng ban: "${dept.name}"`
     });
 
     broadcast('department:deleted', { departmentId: dept.id, name: dept.name, deletedBy: req.user.name });

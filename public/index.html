@@ -309,7 +309,7 @@
         </div>
         <button class="sidebar-version-pill" id="sidebarVersionBtn" title="Xem thông tin phiên bản & cập nhật">
           <span class="version-dot"></span>
-          <span>TaskFlow Pro <strong id="sidebarVersionText">v2.8.0</strong></span>
+          <span>TaskFlow Pro <strong id="sidebarVersionText">v2.8.5</strong></span>
           <span class="version-badge-new" id="sidebarVersionNewBadge" style="display:none;">MỚI</span>
         </button>
         <button class="btn-logout" id="btnLogoutSidebar">
@@ -356,7 +356,7 @@
 
           <!-- Version Info button -->
           <button class="btn btn-outline btn-sm version-header-btn" id="btnHeaderVersion" title="Xem thông tin phiên bản & cập nhật">
-            🚀 <span class="hide-mobile">v2.8.0</span>
+            🚀 <span class="hide-mobile">v2.8.5</span>
             <span class="header-version-dot" id="headerVersionDot" style="display:none;"></span>
           </button>
 
@@ -703,10 +703,77 @@
         <!-- VIEW 7: ACTIVITIES AUDIT LOG -->
         <section class="view-panel" id="view-activities">
           <div class="table-card">
-            <div style="padding:16px 20px; font-weight:700; border-bottom:1px solid var(--border-color);">
-              Lịch Sử Nhật Ký Hoạt Động Hệ Thống Realtime
+            <!-- Header bar with live pulse status -->
+            <div class="activity-header-bar">
+              <div class="activity-header-title">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="font-size:20px;">📜</span>
+                  <span style="font-size:16px; font-weight:700;">Nhật Ký Thao Tác Hệ Thống (Audit Trail)</span>
+                </div>
+                <div class="activity-live-badge">
+                  <span class="live-dot-pulse"></span>
+                  <span>Đồng bộ Realtime trực tiếp mọi thao tác từ User đến Admin</span>
+                </div>
+              </div>
+
+              <!-- Quick Metrics -->
+              <div class="activity-metrics-group">
+                <div class="act-metric-pill" title="Tổng số hoạt động đã ghi nhận">
+                  <span class="act-metric-num" id="actStatTotal">0</span>
+                  <span class="act-metric-label">Tổng thao tác</span>
+                </div>
+                <div class="act-metric-pill admin" title="Thao tác bởi Quản trị viên">
+                  <span class="act-metric-num" id="actStatAdmin">0</span>
+                  <span class="act-metric-label">Admin</span>
+                </div>
+                <div class="act-metric-pill user" title="Thao tác bởi Nhân sự">
+                  <span class="act-metric-num" id="actStatUser">0</span>
+                  <span class="act-metric-label">Nhân sự</span>
+                </div>
+              </div>
             </div>
-            <div id="activityLogContainer"></div>
+
+            <!-- Filter and Search Toolbar -->
+            <div class="activity-toolbar">
+              <div class="activity-toolbar-left">
+                <!-- Role Filter -->
+                <div class="input-with-icon-compact">
+                  <span class="filter-label-icon">👤</span>
+                  <select id="actFilterRole" class="form-control form-control-sm">
+                    <option value="all">Tất cả vai trò</option>
+                    <option value="admin">Quản trị viên (Admin)</option>
+                    <option value="user">Nhân sự (User)</option>
+                  </select>
+                </div>
+
+                <!-- Category Filter -->
+                <div class="input-with-icon-compact">
+                  <span class="filter-label-icon">🏷️</span>
+                  <select id="actFilterCat" class="form-control form-control-sm">
+                    <option value="all">Tất cả hạng mục</option>
+                    <option value="task">Công việc (Tạo / Sửa / Đổi trạng thái / Xóa / Bình luận)</option>
+                    <option value="department">Phòng ban (Thêm / Sửa / Xóa)</option>
+                    <option value="user">Nhân sự (Tạo / Sửa / Xóa)</option>
+                    <option value="auth">Đăng nhập / Đăng xuất / SSO</option>
+                    <option value="system">Hệ thống & Cập nhật</option>
+                  </select>
+                </div>
+
+                <!-- Search Input -->
+                <div class="activity-search-box">
+                  <input type="text" id="actSearchInput" class="form-control form-control-sm" placeholder="Tìm theo người thực hiện, nội dung...">
+                </div>
+              </div>
+
+              <div class="activity-toolbar-right">
+                <button class="btn btn-outline btn-sm" id="btnRefreshActivities" title="Tải lại nhật ký hoạt động mới nhất">
+                  🔄 Làm Mới
+                </button>
+              </div>
+            </div>
+
+            <!-- Activity Items Feed Container -->
+            <div id="activityLogContainer" class="activity-log-feed"></div>
           </div>
         </section>
       </main>
@@ -1035,7 +1102,7 @@
           <div class="version-status-header">
             <div class="version-pill-large">
               <span class="version-status-pulse" id="versionStatusPulse"></span>
-              <span id="modalCurrentVersion">TaskFlow Pro v2.8.0</span>
+              <span id="modalCurrentVersion">TaskFlow Pro v2.8.5</span>
             </div>
             <span class="version-build-date" id="modalBuildDate">Bản dựng: 22/10/2026</span>
           </div>
@@ -1093,8 +1160,8 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- APPLICATION SCRIPTS -->
-  <script src="js/api.js?v=2.8.0"></script>
-  <script src="js/charts.js?v=2.8.0"></script>
-  <script src="js/app.js?v=2.8.0"></script>
+  <script src="js/api.js?v=2.8.5"></script>
+  <script src="js/charts.js?v=2.8.5"></script>
+  <script src="js/app.js?v=2.8.5"></script>
 </body>
 </html>

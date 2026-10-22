@@ -2648,3 +2648,332 @@ body {
     justify-content: flex-end;
   }
 }
+
+/* ========================================================
+   REALTIME ACTIVITY AUDIT LOG / STREAM
+   ======================================================== */
+.activity-header-bar {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: var(--bg-hover);
+}
+
+.activity-header-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.activity-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+.live-dot-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #10b981;
+  box-shadow: 0 0 6px #10b981;
+  animation: pulseLiveDot 2s infinite ease-in-out;
+}
+
+@keyframes pulseLiveDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.6; }
+}
+
+.activity-metrics-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.act-metric-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  font-size: 12px;
+}
+
+.act-metric-num {
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.act-metric-pill.admin .act-metric-num {
+  color: #b45309;
+}
+[data-theme="dark"] .act-metric-pill.admin .act-metric-num {
+  color: #fbbf24;
+}
+
+.act-metric-pill.user .act-metric-num {
+  color: #0284c7;
+}
+[data-theme="dark"] .act-metric-pill.user .act-metric-num {
+  color: #38bdf8;
+}
+
+.act-metric-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.activity-toolbar {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: var(--bg-card);
+}
+
+.activity-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.input-with-icon-compact {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filter-label-icon {
+  font-size: 14px;
+}
+
+.activity-search-box {
+  flex: 1;
+  min-width: 220px;
+  max-width: 380px;
+}
+
+.activity-log-feed {
+  display: flex;
+  flex-direction: column;
+  max-height: 680px;
+  overflow-y: auto;
+}
+
+.activity-item {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  transition: background-color 0.2s ease, border-left-color 0.2s ease;
+  border-left: 4px solid transparent;
+}
+
+.activity-item:hover {
+  background-color: var(--bg-hover);
+}
+
+.activity-item.cat-task {
+  border-left-color: #3b82f6;
+}
+.activity-item.cat-department {
+  border-left-color: #8b5cf6;
+}
+.activity-item.cat-user {
+  border-left-color: #f59e0b;
+}
+.activity-item.cat-auth {
+  border-left-color: #10b981;
+}
+.activity-item.cat-system {
+  border-left-color: #ec4899;
+}
+
+.activity-item.highlight-new {
+  animation: activityFlash 2.5s ease-out;
+}
+
+@keyframes activityFlash {
+  0% {
+    background-color: rgba(59, 130, 246, 0.25);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.activity-avatar-col {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.activity-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.activity-role-mini {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  font-size: 8.5px;
+  font-weight: 800;
+  padding: 0 4px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  border: 1px solid #fff;
+}
+
+.activity-role-mini.admin {
+  background: #fbbf24;
+  color: #78350f;
+}
+
+.activity-role-mini.user {
+  background: #38bdf8;
+  color: #0c4a6e;
+}
+
+.activity-content-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.activity-user-badge-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.activity-user-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.activity-action-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 12px;
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+}
+
+[data-theme="dark"] .activity-action-tag {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+}
+
+.activity-action-tag.tag-dept {
+  background: rgba(139, 92, 246, 0.1);
+  color: #7c3aed;
+}
+[data-theme="dark"] .activity-action-tag.tag-dept {
+  background: rgba(139, 92, 246, 0.2);
+  color: #a78bfa;
+}
+
+.activity-action-tag.tag-user {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+[data-theme="dark"] .activity-action-tag.tag-user {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+}
+
+.activity-action-tag.tag-auth {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+[data-theme="dark"] .activity-action-tag.tag-auth {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+
+.activity-action-tag.tag-system {
+  background: rgba(236, 72, 153, 0.1);
+  color: #db2777;
+}
+[data-theme="dark"] .activity-action-tag.tag-system {
+  background: rgba(236, 72, 153, 0.2);
+  color: #f472b6;
+}
+
+.activity-time-tag {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.activity-details-text {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.activity-details-text strong {
+  color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .activity-header-bar {
+    padding: 12px 14px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .activity-metrics-group {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .activity-toolbar {
+    padding: 10px 14px;
+  }
+  .activity-toolbar-left {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+  .activity-search-box {
+    max-width: 100%;
+  }
+  .activity-item {
+    padding: 12px 14px;
+  }
+}

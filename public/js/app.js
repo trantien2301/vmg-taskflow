@@ -13,7 +13,7 @@ const App = {
     currentDetailTask: null,
     draggedTaskId: null,
     onlineCount: 1,
-    clientVersion: '2.8.0',
+    clientVersion: '2.8.5',
     serverVersionInfo: null,
     hasNewUpdate: false,
     filters: {
@@ -247,7 +247,12 @@ const App = {
     }
   },
 
-  logout() {
+  async logout() {
+    try {
+      await API.logout();
+    } catch (e) {
+      // Ignore network error on logout
+    }
     API.clearAuth();
     if (this.ws) {
       try { this.ws.close(); } catch (e) {}
@@ -458,6 +463,12 @@ const App = {
 
       case 'system:new_version_available':
         this.handleNewVersionEvent(data);
+        break;
+
+      case 'activity:new':
+        if (data && data.activity) {
+          this.handleNewActivityEvent(data.activity);
+        }
         break;
     }
   },
@@ -877,6 +888,30 @@ const App = {
     const btnAdminBroadcastUpdate = document.getElementById('btnAdminBroadcastUpdate');
     if (btnAdminBroadcastUpdate) {
       btnAdminBroadcastUpdate.addEventListener('click', () => this.broadcastVersionUpdate());
+    }
+
+    // Activity Stream Listeners
+    const actFilterRole = document.getElementById('actFilterRole');
+    if (actFilterRole) {
+      actFilterRole.addEventListener('change', () => this.renderActivitiesList());
+    }
+
+    const actFilterCat = document.getElementById('actFilterCat');
+    if (actFilterCat) {
+      actFilterCat.addEventListener('change', () => this.renderActivitiesList());
+    }
+
+    const actSearchInput = document.getElementById('actSearchInput');
+    if (actSearchInput) {
+      actSearchInput.addEventListener('input', () => this.renderActivitiesList());
+    }
+
+    const btnRefreshActivities = document.getElementById('btnRefreshActivities');
+    if (btnRefreshActivities) {
+      btnRefreshActivities.addEventListener('click', () => {
+        this.renderActivitiesView();
+        this.showToast('Đã làm mới nhật ký hoạt động!', 'info');
+      });
     }
 
     // ========================================================
@@ -2038,36 +2073,228 @@ const App = {
   },
 
   // -------------------------------------------------------------
-  // ACTIVITIES VIEW
+  // REALTIME ACTIVITIES AUDIT STREAM
   // -------------------------------------------------------------
   async renderActivitiesView() {
     const container = document.getElementById('activityLogContainer');
     if (!container) return;
 
     try {
+      container.innerHTML = '<div style="padding:40px; text-align:center; color:var(--text-secondary);"><span style="display:inline-block; animation:spin 1s infinite linear;">🔄</span> Đang tải nhật ký hoạt động realtime...</div>';
       const res = await API.getActivities();
-      const list = res.activities || [];
+      this.state.activities = res.activities || [];
+      this.renderActivitiesList();
+    } catch (e) {
+      console.error('Lỗi khi tải nhật ký hoạt động:', e);
+      container.innerHTML = '<div style="padding:40px; text-align:center; color:var(--danger);">Không thể tải nhật ký hoạt động. Vui lòng thử lại.</div>';
+    }
+  },
 
-      if (list.length === 0) {
-        container.innerHTML = '<div style="padding:40px; text-align:center; color:var(--text-muted);">Chưa có nhật ký hoạt động nào.</div>';
-        return;
+  renderActivitiesList() {
+    const container = document.getElementById('activityLogContainer');
+    if (!container) return;
+
+    const list = this.state.activities || [];
+
+    // Calculate metrics
+    const totalCount = list.length;
+    const adminCount = list.filter(a => a.userRole === 'admin').length;
+    const userCount = list.filter(a => a.userRole !== 'admin').length;
+
+    const totalEl = document.getElementById('actStatTotal');
+    const adminEl = document.getElementById('actStatAdmin');
+    const userEl = document.getElementById('actStatUser');
+    if (totalEl) totalEl.innerText = totalCount;
+    if (adminEl) adminEl.innerText = adminCount;
+    if (userEl) userEl.innerText = userCount;
+
+    // Filters
+    const roleFilter = document.getElementById('actFilterRole')?.value || 'all';
+    const catFilter = document.getElementById('actFilterCat')?.value || 'all';
+    const searchVal = (document.getElementById('actSearchInput')?.value || '').trim().toLowerCase();
+
+    let filtered = list.filter(item => {
+      // Role filter
+      if (roleFilter === 'admin' && item.userRole !== 'admin') return false;
+      if (roleFilter === 'user' && item.userRole === 'admin') return false;
+
+      // Category filter
+      if (catFilter !== 'all' && item.category !== catFilter) return false;
+
+      // Search filter
+      if (searchVal) {
+        const text = `${item.userName || ''} ${item.details || ''} ${item.action || ''} ${item.taskTitle || ''}`.toLowerCase();
+        if (!text.includes(searchVal)) return false;
       }
+      return true;
+    });
 
-      container.innerHTML = list.map(item => `
-        <div style="padding:14px 18px; border-bottom:1px solid var(--border-color); display:flex; gap:12px; align-items:flex-start;">
-          <div style="font-size:18px;">📌</div>
-          <div style="flex:1;">
-            <div style="font-size:13px; font-weight:600;">
-              ${item.userName} <span style="font-weight:normal; color:var(--text-secondary);">${item.details}</span>
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div style="padding:48px 20px; text-align:center; color:var(--text-secondary);">
+          <div style="font-size:36px; margin-bottom:8px;">🔍</div>
+          <div style="font-weight:600; font-size:14px; margin-bottom:4px;">Không tìm thấy hoạt động nào phù hợp</div>
+          <div style="font-size:12px; color:var(--text-muted);">Hãy thử chọn bộ lọc khác hoặc thực hiện một thao tác mới trên ứng dụng.</div>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = filtered.map(item => this.buildActivityItemHtml(item)).join('');
+  },
+
+  buildActivityItemHtml(item, isNew = false) {
+    const category = item.category || 'general';
+    const userRole = item.userRole || 'user';
+    const avatar = item.userAvatar || (userRole === 'admin' ? '👑' : '👤');
+    const relativeTime = this.formatRelativeTime(item.timestamp);
+    const fullTime = new Date(item.timestamp).toLocaleString('vi-VN');
+
+    // Action tag badge
+    const tagInfo = this.getActionTagInfo(item.action, item.category);
+
+    return `
+      <div class="activity-item cat-${this.escapeHtml(category)} ${isNew ? 'highlight-new' : ''}" data-act-id="${item.id}">
+        <div class="activity-avatar-col">
+          <div class="activity-avatar">${avatar}</div>
+          <span class="activity-role-mini ${userRole}">${userRole === 'admin' ? 'ADMIN' : 'USER'}</span>
+        </div>
+        <div class="activity-content-col">
+          <div class="activity-top-row">
+            <div class="activity-user-badge-wrap">
+              <span class="activity-user-name">${this.escapeHtml(item.userName || 'Người dùng')}</span>
+              <span class="activity-action-tag ${tagInfo.tagClass}">
+                ${tagInfo.icon} ${tagInfo.label}
+              </span>
             </div>
-            <div style="font-size:11px; color:var(--text-muted); margin-top:3px;">
-              ${new Date(item.timestamp).toLocaleString('vi-VN')}
-            </div>
+            <span class="activity-time-tag" title="${fullTime}">
+              ⏱️ ${relativeTime}
+            </span>
+          </div>
+          <div class="activity-details-text">
+            ${this.escapeHtml(item.details || '')}
           </div>
         </div>
-      `).join('');
-    } catch (e) {
-      console.error(e);
+      </div>
+    `;
+  },
+
+  getActionTagInfo(action, category) {
+    const map = {
+      // Task
+      create_task: { icon: '📋', label: 'Tạo Việc', tagClass: '' },
+      update_task: { icon: '✏️', label: 'Sửa Việc', tagClass: '' },
+      change_status: { icon: '🔄', label: 'Đổi Trạng Thái', tagClass: '' },
+      update_progress: { icon: '📊', label: 'Tiến Độ', tagClass: '' },
+      delete_task: { icon: '🗑️', label: 'Xóa Việc', tagClass: '' },
+      add_comment: { icon: '💬', label: 'Bình Luận', tagClass: '' },
+
+      // Department
+      create_department: { icon: '🏢', label: 'Thêm Phòng Ban', tagClass: 'tag-dept' },
+      update_department: { icon: '✏️', label: 'Sửa Phòng Ban', tagClass: 'tag-dept' },
+      delete_department: { icon: '🗑️', label: 'Xóa Phòng Ban', tagClass: 'tag-dept' },
+
+      // User
+      create_user: { icon: '👤', label: 'Thêm Nhân Sự', tagClass: 'tag-user' },
+      update_user: { icon: '✏️', label: 'Sửa Nhân Sự', tagClass: 'tag-user' },
+      delete_user: { icon: '🗑️', label: 'Xóa Nhân Sự', tagClass: 'tag-user' },
+
+      // Auth
+      auth_login: { icon: '🔑', label: 'Đăng Nhập', tagClass: 'tag-auth' },
+      auth_logout: { icon: '🚪', label: 'Đăng Xuất', tagClass: 'tag-auth' },
+      auth_register: { icon: '📝', label: 'Đăng Ký', tagClass: 'tag-auth' },
+      auth_sso_login: { icon: '🌐', label: 'SSO Đăng Nhập', tagClass: 'tag-auth' },
+      auth_sso_register: { icon: '🌐', label: 'SSO Đăng Ký', tagClass: 'tag-auth' },
+      auth_reset_pwd: { icon: '🔄', label: 'Đổi Mật Khẩu', tagClass: 'tag-auth' },
+      switch_demo: { icon: '🎭', label: 'Đổi Tài Khoản', tagClass: 'tag-auth' },
+
+      // System
+      publish_update: { icon: '🚀', label: 'Phiên Bản Mới', tagClass: 'tag-system' },
+      system_reset: { icon: '♻️', label: 'Khôi Phục Mẫu', tagClass: 'tag-system' }
+    };
+
+    if (map[action]) return map[action];
+
+    if (category === 'task') return { icon: '📋', label: 'Công Việc', tagClass: '' };
+    if (category === 'department') return { icon: '🏢', label: 'Phòng Ban', tagClass: 'tag-dept' };
+    if (category === 'user') return { icon: '👤', label: 'Nhân Sự', tagClass: 'tag-user' };
+    if (category === 'auth') return { icon: '🔑', label: 'Xác Thực', tagClass: 'tag-auth' };
+    if (category === 'system') return { icon: '⚙️', label: 'Hệ Thống', tagClass: 'tag-system' };
+
+    return { icon: '📌', label: 'Hoạt Động', tagClass: '' };
+  },
+
+  formatRelativeTime(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffSec = Math.floor((now - date) / 1000);
+
+    if (diffSec < 10) return 'Vừa xong';
+    if (diffSec < 60) return `${diffSec} giây trước`;
+    const diffMin = Math.floor(diffSec / 60);
+    if (diffMin < 60) return `${diffMin} phút trước`;
+    const diffHour = Math.floor(diffMin / 60);
+    if (diffHour < 24) return `${diffHour} giờ trước`;
+    const diffDay = Math.floor(diffHour / 24);
+    if (diffDay === 1) return `Hôm qua ${date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`;
+    if (diffDay < 7) return `${diffDay} ngày trước`;
+
+    return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  },
+
+  handleNewActivityEvent(activity) {
+    if (!activity) return;
+
+    if (!Array.isArray(this.state.activities)) {
+      this.state.activities = [];
+    }
+
+    // Prepend to state
+    this.state.activities.unshift(activity);
+    if (this.state.activities.length > 300) {
+      this.state.activities.pop();
+    }
+
+    // Update counters in header if available
+    const totalEl = document.getElementById('actStatTotal');
+    const adminEl = document.getElementById('actStatAdmin');
+    const userEl = document.getElementById('actStatUser');
+    if (totalEl) totalEl.innerText = this.state.activities.length;
+    if (adminEl) adminEl.innerText = this.state.activities.filter(a => a.userRole === 'admin').length;
+    if (userEl) userEl.innerText = this.state.activities.filter(a => a.userRole !== 'admin').length;
+
+    // If currently viewing activities panel, insert new item with highlight
+    if (this.state.activeView === 'activities') {
+      const container = document.getElementById('activityLogContainer');
+      if (container) {
+        // Check current filter
+        const roleFilter = document.getElementById('actFilterRole')?.value || 'all';
+        const catFilter = document.getElementById('actFilterCat')?.value || 'all';
+        const searchVal = (document.getElementById('actSearchInput')?.value || '').trim().toLowerCase();
+
+        let passesFilter = true;
+        if (roleFilter === 'admin' && activity.userRole !== 'admin') passesFilter = false;
+        if (roleFilter === 'user' && activity.userRole === 'admin') passesFilter = false;
+        if (catFilter !== 'all' && activity.category !== catFilter) passesFilter = false;
+        if (searchVal) {
+          const text = `${activity.userName || ''} ${activity.details || ''} ${activity.action || ''}`.toLowerCase();
+          if (!text.includes(searchVal)) passesFilter = false;
+        }
+
+        if (passesFilter) {
+          // If empty placeholder is shown, clear it
+          if (container.children.length === 1 && container.children[0].textContent.includes('Không tìm thấy')) {
+            container.innerHTML = '';
+          }
+          const temp = document.createElement('div');
+          temp.innerHTML = this.buildActivityItemHtml(activity, true);
+          const newEl = temp.firstElementChild;
+          if (newEl) {
+            container.insertBefore(newEl, container.firstChild);
+          }
+        }
+      }
     }
   },
 
