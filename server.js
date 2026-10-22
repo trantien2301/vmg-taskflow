@@ -659,6 +659,15 @@ app.get('/api/tasks', authenticate, (req, res) => {
   const { status, priority, department, assignedTo, search } = req.query;
   let tasks = db.getTasks();
 
+  // Role-based task scoping
+  if (req.user.role === 'user') {
+    // Nhân viên: chỉ xem công việc cá nhân của mình (được giao hoặc do mình tạo)
+    tasks = tasks.filter(t => t.assignedTo === req.user.id || t.createdBy === req.user.id);
+  } else if (req.user.role === 'manager') {
+    // Trưởng phòng: chỉ xem công việc thuộc phòng ban mình phụ trách
+    tasks = tasks.filter(t => t.department === req.user.department);
+  }
+
   if (status && status !== 'all') tasks = tasks.filter(t => t.status === status);
   if (priority && priority !== 'all') tasks = tasks.filter(t => t.priority === priority);
   if (department && department !== 'all') tasks = tasks.filter(t => t.department === department);
@@ -679,6 +688,18 @@ app.get('/api/tasks', authenticate, (req, res) => {
 app.get('/api/tasks/:id', authenticate, (req, res) => {
   const task = db.getTaskById(req.params.id);
   if (!task) return res.status(404).json({ error: 'Không tìm thấy công việc' });
+
+  // Security check for role access
+  if (req.user.role === 'user') {
+    if (task.assignedTo !== req.user.id && task.createdBy !== req.user.id) {
+      return res.status(403).json({ error: 'Bạn không có quyền truy cập công việc của nhân sự khác.' });
+    }
+  } else if (req.user.role === 'manager') {
+    if (task.department !== req.user.department) {
+      return res.status(403).json({ error: 'Bạn không có quyền truy cập công việc ngoài phòng ban phụ trách.' });
+    }
+  }
+
   const comments = db.getComments(task.id);
   res.json({ task, comments });
 });

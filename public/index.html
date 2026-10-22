@@ -424,7 +424,7 @@
             <div class="kpi-icon blue">📊</div>
             <div class="kpi-info">
               <div class="kpi-value" id="kpiTotalTasks">0</div>
-              <div class="kpi-label"><span class="hide-mobile">Tổng số </span>công việc</div>
+              <div class="kpi-label" id="kpiTotalTasksLabel"><span class="hide-mobile">Tổng số </span>công việc</div>
             </div>
           </div>
 
@@ -479,14 +479,14 @@
             </select>
           </div>
 
-          <div class="filter-input-group">
+          <div class="filter-input-group" id="filterDeptWrapper">
             <span>🏢</span>
             <select id="filterDepartment">
               <option value="all">Tất cả phòng ban</option>
             </select>
           </div>
 
-          <div class="filter-input-group">
+          <div class="filter-input-group" id="filterAssigneeWrapper">
             <span>👤</span>
             <select id="filterAssignee">
               <option value="all">Tất cả người phụ trách</option>

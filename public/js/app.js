@@ -1537,17 +1537,45 @@ const App = {
   },
 
   populateFilterDropdowns() {
-    // Populate Assignee dropdown
+    const user = this.state.user;
+    const deptWrapper = document.getElementById('filterDeptWrapper');
+    const assigneeWrapper = document.getElementById('filterAssigneeWrapper');
     const assigneeSelect = document.getElementById('filterAssignee');
     const taskAssigneeSelect = document.getElementById('taskFormAssignee');
-    if (assigneeSelect) {
-      const currentVal = assigneeSelect.value;
-      assigneeSelect.innerHTML = '<option value="all">Tất cả người phụ trách</option>' +
-        this.state.users.map(u => `<option value="${u.id}">${u.name} (${u.role.toUpperCase()})</option>`).join('');
-      assigneeSelect.value = currentVal || 'all';
+
+    if (user && user.role === 'user') {
+      // Nhân viên chỉ làm việc cá nhân -> ẩn thanh lọc phòng ban và người phụ trách
+      if (deptWrapper) deptWrapper.style.display = 'none';
+      if (assigneeWrapper) assigneeWrapper.style.display = 'none';
+    } else if (user && user.role === 'manager') {
+      // Trưởng phòng -> ẩn lọc phòng ban (cố định phòng mình), lọc nhân sự trực thuộc phòng
+      if (deptWrapper) deptWrapper.style.display = 'none';
+      if (assigneeWrapper) {
+        assigneeWrapper.style.display = 'flex';
+        if (assigneeSelect) {
+          const deptUsers = (this.state.users || []).filter(u => u.department === user.department);
+          const currentVal = assigneeSelect.value;
+          assigneeSelect.innerHTML = '<option value="all">Tất cả nhân sự trong phòng</option>' +
+            deptUsers.map(u => `<option value="${u.id}">${u.name} (${u.position || 'Thành viên'})</option>`).join('');
+          assigneeSelect.value = currentVal || 'all';
+        }
+      }
+    } else {
+      // Admin hoặc Viewer: hiển thị đầy đủ
+      if (deptWrapper) deptWrapper.style.display = 'flex';
+      if (assigneeWrapper) {
+        assigneeWrapper.style.display = 'flex';
+        if (assigneeSelect) {
+          const currentVal = assigneeSelect.value;
+          assigneeSelect.innerHTML = '<option value="all">Tất cả người phụ trách</option>' +
+            (this.state.users || []).map(u => `<option value="${u.id}">${u.name} (${u.role.toUpperCase()})</option>`).join('');
+          assigneeSelect.value = currentVal || 'all';
+        }
+      }
     }
+
     if (taskAssigneeSelect) {
-      taskAssigneeSelect.innerHTML = this.state.users.map(u => 
+      taskAssigneeSelect.innerHTML = (this.state.users || []).map(u => 
         `<option value="${u.id}">${u.name} - ${u.department}</option>`
       ).join('');
     }
@@ -1773,9 +1801,25 @@ const App = {
     }
   },
 
+  getRoleScopedTasks() {
+    const user = this.state.user;
+    const all = this.state.tasks || [];
+    if (!user) return all;
+
+    if (user.role === 'user') {
+      // Nhân viên: CHỈ hiển thị và đo lường công việc cá nhân của mình
+      return all.filter(t => t.assignedTo === user.id || t.createdBy === user.id);
+    } else if (user.role === 'manager') {
+      // Trưởng phòng: CHỈ hiển thị và đo lường công việc thuộc phòng ban mình phụ trách
+      return all.filter(t => t.department === user.department);
+    }
+    // Admin và Viewer: toàn bộ công việc hệ thống
+    return all;
+  },
+
   getFilteredTasks() {
     const { status, priority, department, assignedTo, search } = this.state.filters;
-    let list = [...this.state.tasks];
+    let list = this.getRoleScopedTasks();
 
     if (status !== 'all') list = list.filter(t => t.status === status);
     if (priority !== 'all') list = list.filter(t => t.priority === priority);
@@ -1795,10 +1839,11 @@ const App = {
   },
 
   // -------------------------------------------------------------
-  // KPI METRICS
+  // KPI METRICS (ROLE-BASED SCOPED)
   // -------------------------------------------------------------
   renderKPIs() {
-    const tasks = this.state.tasks;
+    const user = this.state.user;
+    const tasks = this.getRoleScopedTasks();
     const now = new Date();
 
     const total = tasks.length;
@@ -1819,6 +1864,18 @@ const App = {
     setVal('kpiInProgress', inProgress);
     setVal('kpiOverdue', overdue);
     setVal('kpiUrgent', urgent);
+
+    // Update label dynamically based on role
+    const totalLabelEl = document.getElementById('kpiTotalTasksLabel');
+    if (totalLabelEl) {
+      if (user && user.role === 'user') {
+        totalLabelEl.innerHTML = '<span class="hide-mobile">Việc </span>của tôi';
+      } else if (user && user.role === 'manager') {
+        totalLabelEl.innerHTML = `<span class="hide-mobile">Việc </span>phòng ${user.department || ''}`;
+      } else {
+        totalLabelEl.innerHTML = '<span class="hide-mobile">Tổng số </span>công việc';
+      }
+    }
 
     // Sidebar badge for overdue
     const badge = document.getElementById('sidebarOverdueBadge');
@@ -2486,10 +2543,10 @@ const App = {
   },
 
   // -------------------------------------------------------------
-  // ALERTS CENTER VIEW
+  // ALERTS CENTER VIEW (ROLE-SCOPED)
   // -------------------------------------------------------------
   renderAlertsView() {
-    const tasks = this.state.tasks;
+    const tasks = this.getRoleScopedTasks();
     const now = new Date();
 
     const overdueTasks = tasks.filter(t => t.status !== 'completed' && t.dueDate && new Date(t.dueDate) < now);
