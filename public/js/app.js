@@ -1315,6 +1315,23 @@ const App = {
   // VIEW SWITCHING
   // -------------------------------------------------------------
   switchView(viewName) {
+    const user = this.state.user;
+    if (user) {
+      // 1. Quản Trị Hệ Thống guard: users, activities
+      const isAdminOrHr = user.role === 'admin' || user.permissions?.canManageUsers;
+      if ((viewName === 'users' || viewName === 'activities') && !isAdminOrHr) {
+        this.showToast('Bạn không có quyền truy cập mục Quản Trị Hệ Thống!', 'danger');
+        return;
+      }
+
+      // 2. Báo cáo hệ thống guard: reports
+      const canView = user.role === 'admin' || (user.permissions && user.permissions.canViewReports === true);
+      if (viewName === 'reports' && !canView) {
+        this.showToast('Tài khoản Vai trò Member và Manager không được xem Báo cáo của hệ thống!', 'danger');
+        return;
+      }
+    }
+
     this.state.activeView = viewName;
 
     // Update active nav item
@@ -1405,30 +1422,30 @@ const App = {
     // Demo Switcher select option & dropdown population
     this.populateDemoUserDropdown();
 
-    // Admin & Management Navigation item visibility
-    const adminNav = document.querySelector('.nav-item[data-view="users"]');
-    if (adminNav) {
-      adminNav.style.display = (user.role === 'admin' || user.permissions?.canManageUsers) ? 'flex' : 'none';
-    }
+    // Admin & Management Navigation section & items visibility (Quản Trị Hệ Thống)
+    const isAdminOrHr = user.role === 'admin' || user.permissions?.canManageUsers;
+    const adminTitleEl = document.getElementById('navSectionAdminTitle');
+    const adminUsersNav = document.getElementById('adminUsersNavItem');
+    const adminActivitiesNav = document.getElementById('adminActivitiesNavItem');
+
+    if (adminTitleEl) adminTitleEl.style.display = isAdminOrHr ? 'block' : 'none';
+    if (adminUsersNav) adminUsersNav.style.display = isAdminOrHr ? 'flex' : 'none';
+    if (adminActivitiesNav) adminActivitiesNav.style.display = isAdminOrHr ? 'flex' : 'none';
 
     // Automation Navigation visibility
     const autoNav = document.getElementById('navItemAutomation');
+    const autoTitle = document.getElementById('navSectionAutomationTitle');
     if (autoNav) {
       const canAuto = user.role === 'admin' || (user.permissions && user.permissions.canManageAutomation);
       autoNav.style.display = canAuto ? 'flex' : 'none';
+      if (autoTitle) autoTitle.style.display = canAuto ? 'block' : 'none';
     }
 
-    // Reports Navigation indicator
-    const reportsNav = document.querySelector('.nav-item[data-view="reports"]');
+    // Reports Navigation visibility (Member & Manager không xem báo cáo hệ thống)
+    const reportsNav = document.getElementById('sidebarNavReports') || document.querySelector('.nav-item[data-view="reports"]');
     if (reportsNav) {
-      const canView = user.role === 'admin' || (user.permissions && user.permissions.canViewReports !== false);
-      if (!canView) {
-        reportsNav.title = 'Tài khoản chưa được cấp quyền xem Báo Cáo';
-        reportsNav.style.opacity = '0.5';
-      } else {
-        reportsNav.title = 'Báo Cáo & Thống Kê';
-        reportsNav.style.opacity = '1';
-      }
+      const canView = user.role === 'admin' || (user.permissions && user.permissions.canViewReports === true);
+      reportsNav.style.display = canView ? 'flex' : 'none';
     }
   },
 
@@ -2560,9 +2577,10 @@ const App = {
     const accessDeniedEl = document.getElementById('reportAccessDenied');
     const mainContentEl = document.getElementById('reportMainContent');
 
-    // 1. Guard check on user permission
+    // 1. Guard check on user permission (Member & Manager không xem báo cáo hệ thống)
     const currentUser = this.state.user;
-    if (currentUser && currentUser.permissions && currentUser.permissions.canViewReports === false) {
+    const canView = currentUser && (currentUser.role === 'admin' || (currentUser.permissions && currentUser.permissions.canViewReports === true));
+    if (!canView) {
       if (accessDeniedEl) accessDeniedEl.style.display = 'block';
       if (mainContentEl) mainContentEl.style.display = 'none';
       return;
@@ -2946,7 +2964,7 @@ const App = {
       canManageDept: false,
       canManageUsers: false,
       canManageAutomation: true,
-      canViewReports: true
+      canViewReports: false // Manager không xem báo cáo hệ thống
     },
     user: {
       canCreateTask: true,
@@ -2956,7 +2974,7 @@ const App = {
       canManageDept: false,
       canManageUsers: false,
       canManageAutomation: false,
-      canViewReports: true
+      canViewReports: false // Member không xem báo cáo hệ thống
     },
     viewer: {
       canCreateTask: false,

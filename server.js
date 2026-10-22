@@ -870,10 +870,10 @@ app.post('/api/alerts/scan-now', authenticate, (req, res) => {
 // -------------------------------------------------------------
 app.get('/api/reports/summary', authenticate, (req, res) => {
   const user = req.user;
-  const canView = user.role === 'admin' || (user.permissions && user.permissions.canViewReports !== false);
+  const canView = user.role === 'admin' || (user.permissions && user.permissions.canViewReports === true);
   if (!canView) {
     return res.status(403).json({
-      error: 'Bạn không có quyền xem báo cáo thống kê. Vui lòng liên hệ Quản trị viên để được cấp quyền.'
+      error: 'Tài khoản của bạn không được phép xem Báo cáo của hệ thống. Vui lòng liên hệ Quản trị viên để được cấp quyền.'
     });
   }
 
@@ -1125,9 +1125,9 @@ app.get('/api/reports/summary', authenticate, (req, res) => {
 // CSV Export (Role-Enforced)
 app.get('/api/reports/export-csv', authenticate, (req, res) => {
   const user = req.user;
-  const canView = user.role === 'admin' || (user.permissions && user.permissions.canViewReports !== false);
+  const canView = user.role === 'admin' || (user.permissions && user.permissions.canViewReports === true);
   if (!canView) {
-    return res.status(403).json({ error: 'Bạn không có quyền trích xuất dữ liệu báo cáo.' });
+    return res.status(403).json({ error: 'Bạn không có quyền trích xuất dữ liệu báo cáo của hệ thống.' });
   }
 
   if (user.role === 'viewer') {
@@ -1510,6 +1510,10 @@ app.post('/api/system/publish-update', authenticate, requireAdmin, (req, res) =>
 });
 
 app.get('/api/activities', authenticate, (req, res) => {
+  const isAdminOrHr = req.user.role === 'admin' || (req.user.permissions && req.user.permissions.canManageUsers);
+  if (!isAdminOrHr) {
+    return res.status(403).json({ error: 'Bạn không có quyền truy cập nhật ký hoạt động của hệ thống.' });
+  }
   const activities = db.getActivities(100);
   res.json({ activities });
 });

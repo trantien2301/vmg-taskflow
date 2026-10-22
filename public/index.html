@@ -283,24 +283,24 @@
           <span>Trung Tâm Cảnh Báo</span>
           <span class="nav-badge danger" id="sidebarOverdueBadge" style="display:none;">0</span>
         </a>
-        <a class="nav-item" data-view="reports">
+        <a class="nav-item" data-view="reports" id="sidebarNavReports">
           <span class="icon">📈</span>
           <span>Báo Cáo & Thống Kê</span>
         </a>
 
-        <div class="nav-section-title">Quy Trình & Tự Động Hóa</div>
+        <div class="nav-section-title" id="navSectionAutomationTitle">Quy Trình & Tự Động Hóa</div>
         <a class="nav-item" data-view="automation" id="navItemAutomation">
           <span class="icon">⚡</span>
           <span>Tự Động Hóa (Bot)</span>
           <span class="nav-badge success" id="sidebarAutomationBadge" style="font-size:9.5px; font-weight:800; background:#10b981; color:#fff;">PRO</span>
         </a>
 
-        <div class="nav-section-title">Quản Trị Hệ Thống</div>
+        <div class="nav-section-title" id="navSectionAdminTitle">Quản Trị Hệ Thống</div>
         <a class="nav-item" data-view="users" id="adminUsersNavItem">
           <span class="icon">👥</span>
           <span>Quản Lý Nhân Sự</span>
         </a>
-        <a class="nav-item" data-view="activities">
+        <a class="nav-item" data-view="activities" id="adminActivitiesNavItem">
           <span class="icon">📜</span>
           <span>Nhật Ký Hoạt Động</span>
         </a>
@@ -1312,10 +1312,10 @@
           <div class="form-group">
             <label class="form-label">Cấp Bậc Vai Trò (Role) *</label>
             <select class="form-control" id="userFormRole" style="font-weight: 600;">
-              <option value="admin">👑 QUẢN TRỊ VIÊN (Admin) - Toàn quyền cấu hình & quản trị hệ thống</option>
-              <option value="manager">👔 TRƯỞNG PHÒNG / QUẢN LÝ (Manager) - Phê duyệt, giao việc & quản lý phòng ban</option>
-              <option value="user" selected>👤 NHÂN VIÊN (Member) - Thực thi công việc & báo cáo tiến độ</option>
-              <option value="viewer">👁️ CHỈ XEM (Viewer) - Theo dõi báo cáo & tiến độ, không chỉnh sửa</option>
+              <option value="admin">👑 QUẢN TRỊ VIÊN (Admin) - Toàn quyền cấu hình, nhân sự & báo cáo hệ thống</option>
+              <option value="manager">👔 TRƯỞNG PHÒNG / QUẢN LÝ (Manager) - Phê duyệt, giao việc & quản lý phòng ban (Không xem báo cáo hệ thống)</option>
+              <option value="user" selected>👤 NHÂN VIÊN (Member) - Thực thi công việc được giao (Không xem báo cáo hệ thống)</option>
+              <option value="viewer">👁️ CHỈ XEM (Viewer) - Theo dõi tiến độ chung, không chỉnh sửa</option>
             </select>
           </div>
 
@@ -1387,8 +1387,8 @@
               <label class="perm-checkbox-item">
                 <input type="checkbox" id="perm_canViewReports">
                 <div class="perm-info">
-                  <div class="perm-title">📈 Xem & xuất báo cáo KPI</div>
-                  <div class="perm-desc">Xem toàn cảnh tiến độ, hiệu suất và xuất file CSV</div>
+                  <div class="perm-title">📈 Xem báo cáo & thống kê hệ thống</div>
+                  <div class="perm-desc">Truy cập Báo cáo & Thống kê hệ thống (Mặc định: Admin & Ban Giám Sát; Member và Manager không được xem)</div>
                 </div>
               </label>
             </div>

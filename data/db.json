@@ -43,7 +43,7 @@
         "canManageDept": false,
         "canManageUsers": false,
         "canManageAutomation": false,
-        "canViewReports": true
+        "canViewReports": false
       }
     },
     {
@@ -66,7 +66,7 @@
         "canManageDept": false,
         "canManageUsers": false,
         "canManageAutomation": false,
-        "canViewReports": true
+        "canViewReports": false
       }
     },
     {
@@ -89,7 +89,7 @@
         "canManageDept": false,
         "canManageUsers": false,
         "canManageAutomation": false,
-        "canViewReports": true
+        "canViewReports": false
       }
     },
     {
@@ -112,7 +112,7 @@
         "canManageDept": true,
         "canManageUsers": false,
         "canManageAutomation": true,
-        "canViewReports": true
+        "canViewReports": false
       }
     },
     {
@@ -135,7 +135,7 @@
         "canManageDept": false,
         "canManageUsers": false,
         "canManageAutomation": false,
-        "canViewReports": true
+        "canViewReports": false
       }
     },
     {
@@ -158,7 +158,7 @@
         "canManageDept": false,
         "canManageUsers": false,
         "canManageAutomation": false,
-        "canViewReports": true
+        "canViewReports": false
       }
     },
     {
@@ -181,7 +181,7 @@
         "canManageDept": false,
         "canManageUsers": false,
         "canManageAutomation": false,
-        "canViewReports": true
+        "canViewReports": false
       }
     },
     {
@@ -204,7 +204,7 @@
         "canManageDept": false,
         "canManageUsers": false,
         "canManageAutomation": false,
-        "canViewReports": true
+        "canViewReports": false
       }
     },
     {
@@ -227,7 +227,7 @@
         "canManageDept": false,
         "canManageUsers": false,
         "canManageAutomation": false,
-        "canViewReports": true
+        "canViewReports": false
       }
     },
     {
@@ -250,7 +250,7 @@
         "canManageDept": false,
         "canManageUsers": false,
         "canManageAutomation": false,
-        "canViewReports": true
+        "canViewReports": false
       }
     },
     {
@@ -273,7 +273,7 @@
         "canManageDept": false,
         "canManageUsers": false,
         "canManageAutomation": false,
-        "canViewReports": true
+        "canViewReports": false
       }
     },
     {
@@ -296,7 +296,7 @@
         "canManageDept": false,
         "canManageUsers": false,
         "canManageAutomation": false,
-        "canViewReports": true
+        "canViewReports": false
       }
     },
     {
@@ -319,7 +319,7 @@
         "canManageDept": false,
         "canManageUsers": false,
         "canManageAutomation": false,
-        "canViewReports": true
+        "canViewReports": false
       }
     },
     {
@@ -342,7 +342,7 @@
         "canManageDept": false,
         "canManageUsers": false,
         "canManageAutomation": false,
-        "canViewReports": true
+        "canViewReports": false
       }
     },
     {
@@ -365,7 +365,7 @@
         "canManageDept": false,
         "canManageUsers": false,
         "canManageAutomation": false,
-        "canViewReports": true
+        "canViewReports": false
       }
     },
     {
@@ -19319,6 +19319,45 @@
   ],
   "activities": [
     {
+      "id": "act-1792679874045-c3wxw",
+      "userId": "usr-1792209027761",
+      "userName": "Trần Tiến",
+      "userRole": "user",
+      "userAvatar": "👨‍🎓",
+      "action": "auth_sso_login",
+      "category": "auth",
+      "details": "Đã xác thực và đăng nhập 1-click qua SSO Google Workspace: trantien.dni@vmg.edu.vn",
+      "taskId": null,
+      "taskTitle": null,
+      "timestamp": "2026-10-22T14:37:54.045Z"
+    },
+    {
+      "id": "act-1792679869012-uxr0v",
+      "userId": "usr-1792209027761",
+      "userName": "Trần Tiến",
+      "userRole": "user",
+      "userAvatar": "👨‍🎓",
+      "action": "auth_logout",
+      "category": "auth",
+      "details": "Nhân sự đã đăng xuất khỏi phiên làm việc",
+      "taskId": null,
+      "taskTitle": null,
+      "timestamp": "2026-10-22T14:37:49.012Z"
+    },
+    {
+      "id": "act-1792679816346-2bzc3",
+      "userId": "usr-1792209027761",
+      "userName": "Trần Tiến",
+      "userRole": "user",
+      "userAvatar": "👨‍🎓",
+      "action": "auth_sso_login",
+      "category": "auth",
+      "details": "Đã xác thực và đăng nhập 1-click qua SSO Google Workspace: trantien.dni@vmg.edu.vn",
+      "taskId": null,
+      "taskTitle": null,
+      "timestamp": "2026-10-22T14:36:56.346Z"
+    },
+    {
       "id": "act-1792679750556-lxloi",
       "userId": "usr-1",
       "userName": "Trần Quản Trị",
@@ -25778,45 +25817,6 @@
       "taskId": "TSK-587",
       "taskTitle": "Làm việc tại trường TH PTAN_Thầy Thoả",
       "timestamp": "2026-10-22T11:59:17.193Z"
-    },
-    {
-      "id": "act-1792670357171-4tbd6",
-      "userId": "bot-auto",
-      "userName": "🤖 Gắn nhãn cảnh báo việc Trễ hạn",
-      "userRole": "admin",
-      "userAvatar": "⏰",
-      "action": "automation_executed",
-      "category": "system",
-      "details": "Tự động gắn thẻ \"Quá hạn\" cho công việc trễ hạn #TSK-586",
-      "taskId": null,
-      "taskTitle": null,
-      "timestamp": "2026-10-22T11:59:17.171Z"
-    },
-    {
-      "id": "act-1792670357148-2wecm",
-      "userId": "bot-auto",
-      "userName": "⚡ Bot Tự Động",
-      "userRole": "admin",
-      "userAvatar": "👑",
-      "action": "update_task",
-      "category": "task",
-      "details": "Đã cập nhật công việc: \"Họp giao ban LKH_14h\"",
-      "taskId": "TSK-586",
-      "taskTitle": "Họp giao ban LKH_14h",
-      "timestamp": "2026-10-22T11:59:17.148Z"
-    },
-    {
-      "id": "act-1792670357127-3ov3y",
-      "userId": "bot-auto",
-      "userName": "🤖 Gắn nhãn cảnh báo việc Trễ hạn",
-      "userRole": "admin",
-      "userAvatar": "⏰",
-      "action": "automation_executed",
-      "category": "system",
-      "details": "Tự động gắn thẻ \"Quá hạn\" cho công việc trễ hạn #TSK-585",
-      "taskId": null,
-      "taskTitle": null,
-      "timestamp": "2026-10-22T11:59:17.127Z"
     }
   ],
   "settings": {

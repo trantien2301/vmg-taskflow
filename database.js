@@ -439,7 +439,7 @@ const DEFAULT_PERMISSIONS = {
     canManageDept: false,
     canManageUsers: false,
     canManageAutomation: true,
-    canViewReports: true
+    canViewReports: false // Manager không xem báo cáo hệ thống
   },
   user: {
     canCreateTask: true,
@@ -449,7 +449,7 @@ const DEFAULT_PERMISSIONS = {
     canManageDept: false,
     canManageUsers: false,
     canManageAutomation: false,
-    canViewReports: true
+    canViewReports: false // Member không xem báo cáo hệ thống
   },
   viewer: {
     canCreateTask: false,
@@ -500,6 +500,10 @@ class Database {
             if (!u.permissions) {
               const role = u.role || 'user';
               u.permissions = { ...(DEFAULT_PERMISSIONS[role] || DEFAULT_PERMISSIONS.user) };
+              modified = true;
+            } else if ((u.role === 'user' || u.role === 'manager') && u.permissions.canViewReports !== false) {
+              // Member và manager không được xem báo cáo hệ thống
+              u.permissions.canViewReports = false;
               modified = true;
             }
           });
