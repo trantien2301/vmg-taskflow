@@ -213,6 +213,88 @@ function scanDeadlinesAndGenerateAlerts() {
 setInterval(scanDeadlinesAndGenerateAlerts, 60 * 1000);
 
 // -------------------------------------------------------------
+// AUTOMATED CALENDAR REMINDER ENGINE (Nhắc Lịch Tự Động)
+// -------------------------------------------------------------
+const lastCalendarReminderSent = new Map(); // key -> timestamp
+
+function scanCalendarReminders() {
+  const tasks = db.getTasks();
+  const users = db.getUsers();
+  const userMap = new Map(users.map(u => [u.id, u]));
+  const now = Date.now();
+  let reminderCount = 0;
+
+  tasks.forEach(task => {
+    if (task.status === 'completed' || !task.dueDate || !task.assignedTo) return;
+    const user = userMap.get(task.assignedTo);
+    if (!user || !user.googleCalendar || !user.googleCalendar.enabled) return;
+
+    const dueTime = new Date(task.dueDate).getTime();
+    if (isNaN(dueTime)) return;
+    const diffMinutes = Math.round((dueTime - now) / 60000);
+    if (diffMinutes <= 0) return; // Overdue is handled by deadline scanner
+
+    const reminderTimes = user.googleCalendar.reminderTimes || [1440, 120, 30];
+
+    reminderTimes.forEach(threshold => {
+      // Check if current time is within +/- 15 min window of the threshold
+      if (Math.abs(diffMinutes - threshold) <= 15) {
+        const key = `remind-${task.id}-${threshold}`;
+        const lastSent = lastCalendarReminderSent.get(key) || 0;
+        // Don't resend within 12 hours for the exact same threshold
+        if (now - lastSent > 12 * 3600 * 1000) {
+          lastCalendarReminderSent.set(key, now);
+
+          let timeLabel = `${threshold} phút`;
+          if (threshold >= 1440 && threshold % 1440 === 0) {
+            timeLabel = `${threshold / 1440} ngày`;
+          } else if (threshold >= 60 && threshold % 60 === 0) {
+            timeLabel = `${threshold / 60} giờ`;
+          }
+
+          const notif = db.addNotification({
+            userId: user.id,
+            type: 'calendar_reminder',
+            level: threshold <= 30 ? 'danger' : (threshold <= 120 ? 'warning' : 'info'),
+            title: `⏰ NHẮC LỊCH: ${task.title}`,
+            message: `Chỉ còn ${timeLabel} nữa là đến hạn hoàn tất công việc (Hạn chót: ${new Date(task.dueDate).toLocaleString('vi-VN')})`,
+            taskId: task.id
+          });
+
+          broadcast('alert:new', notif, user.id);
+          broadcast('calendar:reminder', {
+            notification: notif,
+            task,
+            timeLabel,
+            threshold,
+            userId: user.id
+          }, user.id);
+
+          db.logActivity({
+            userId: 'bot-auto',
+            userName: '⏰ Bot Nhắc Lịch',
+            userRole: 'admin',
+            userAvatar: '📅',
+            action: 'calendar_reminder',
+            category: 'system',
+            taskId: task.id,
+            taskTitle: task.title,
+            details: `Đã tự động gửi thông báo nhắc lịch đến ${user.name} cho việc #${task.id} (Trước ${timeLabel})`
+          });
+
+          reminderCount++;
+        }
+      }
+    });
+  });
+
+  return reminderCount;
+}
+
+// Run calendar reminder scanner every 60 seconds
+setInterval(scanCalendarReminders, 60 * 1000);
+
+// -------------------------------------------------------------
 // WORKFLOW AUTOMATION ENGINE
 // -------------------------------------------------------------
 function executeAutomations(triggerName, payload = {}) {
@@ -893,6 +975,7 @@ app.post('/api/notifications/read-all', authenticate, (req, res) => {
 
 app.post('/api/alerts/scan-now', authenticate, (req, res) => {
   const count = scanDeadlinesAndGenerateAlerts();
+  const reminderCount = scanCalendarReminders();
   db.logActivity({
     userId: req.user.id,
     userName: req.user.name,
@@ -900,9 +983,136 @@ app.post('/api/alerts/scan-now', authenticate, (req, res) => {
     userAvatar: req.user.avatar || '⏰',
     action: 'scan_deadlines',
     category: 'system',
-    details: `Đã kích hoạt quét thời hạn công việc toàn hệ thống (Phát hiện ${count} cảnh báo mới)`
+    details: `Đã kích hoạt quét thời hạn & nhắc lịch tự động (Phát hiện ${count} cảnh báo, ${reminderCount} nhắc việc mới)`
   });
-  res.json({ message: `Đã quét và tạo ${count} cảnh báo mới`, count });
+  res.json({ message: `Đã quét và tạo ${count} cảnh báo, ${reminderCount} nhắc việc mới`, count, reminderCount });
+});
+
+// -------------------------------------------------------------
+// GOOGLE CALENDAR & SYNC ENDPOINTS (Mỗi Account Cá Nhân)
+// -------------------------------------------------------------
+
+// Live RFC 5545 iCalendar (.ics) subscription feed for Google Calendar / Apple / Outlook
+app.get('/api/calendar/feed/:userId/:token.ics', (req, res) => {
+  const { userId, token } = req.params;
+  const user = db.getUserByCalendarToken(userId, token);
+  if (!user) {
+    return res.status(404).send('Lịch không tồn tại hoặc mã liên kết bảo mật không chính xác.');
+  }
+
+  const hostUrl = `${req.protocol}://${req.get('host')}`;
+  const icsContent = db.generateIcsFeed(user, hostUrl);
+
+  res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
+  res.setHeader('Content-Disposition', `inline; filename="taskflow-${user.id}.ics"`);
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.send(icsContent);
+});
+
+// Download offline .ics file
+app.get('/api/calendar/download-ics', authenticate, (req, res) => {
+  const hostUrl = `${req.protocol}://${req.get('host')}`;
+  const icsContent = db.generateIcsFeed(req.user, hostUrl);
+
+  res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="taskflow-${req.user.name.replace(/\\s+/g, '_')}.ics"`);
+  res.send(icsContent);
+});
+
+// Get user's Google Calendar settings & feed URLs
+app.get('/api/users/:id/calendar-settings', authenticate, (req, res) => {
+  if (req.user.id !== req.params.id && req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Không có quyền truy cập cài đặt lịch của người khác' });
+  }
+
+  const user = db.getUserById(req.params.id);
+  if (!user) return res.status(404).json({ error: 'Người dùng không tồn tại' });
+
+  const hostUrl = `${req.protocol}://${req.get('host')}`;
+  const token = user.googleCalendar?.syncToken || `gcal_${user.id}_token`;
+  const feedUrl = `${hostUrl}/api/calendar/feed/${user.id}/${token}.ics`;
+  const webcalUrl = `webcal://${req.get('host')}/api/calendar/feed/${user.id}/${token}.ics`;
+  const googleCalendarSubscribeUrl = `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(feedUrl)}`;
+
+  res.json({
+    settings: user.googleCalendar || {},
+    feedUrl,
+    webcalUrl,
+    googleCalendarSubscribeUrl
+  });
+});
+
+// Update Google Calendar & Reminder settings
+app.put('/api/users/:id/calendar-settings', authenticate, (req, res) => {
+  if (req.user.id !== req.params.id && req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Không có quyền cập nhật cài đặt lịch của người khác' });
+  }
+
+  const updatedSettings = db.updateUserCalendarSettings(req.params.id, req.body);
+  if (!updatedSettings) return res.status(404).json({ error: 'Người dùng không tồn tại' });
+
+  db.logActivity({
+    userId: req.user.id,
+    userName: req.user.name,
+    userRole: req.user.role,
+    userAvatar: req.user.avatar || '👤',
+    action: 'update_calendar_settings',
+    category: 'user',
+    details: `Đã cập nhật cấu hình đồng bộ Google Calendar & tùy chọn nhắc lịch tự động`
+  });
+
+  res.json({ success: true, settings: updatedSettings });
+});
+
+// 1-Click Sync Now / Record Sync
+app.post('/api/calendar/sync-now', authenticate, (req, res) => {
+  const now = new Date().toISOString();
+  db.updateUserCalendarSettings(req.user.id, { lastSync: now });
+
+  db.logActivity({
+    userId: req.user.id,
+    userName: req.user.name,
+    userRole: req.user.role,
+    userAvatar: req.user.avatar || '📅',
+    action: 'sync_google_calendar',
+    category: 'calendar',
+    details: `Đã thực hiện đồng bộ lịch công việc với Google Calendar`
+  });
+
+  res.json({ success: true, lastSync: now });
+});
+
+// Test immediate reminder notification
+app.post('/api/calendar/test-reminder', authenticate, (req, res) => {
+  const notif = db.addNotification({
+    userId: req.user.id,
+    type: 'calendar_reminder',
+    level: 'warning',
+    title: '⏰ [THỬ NGHIỆM] NHẮC LỊCH TỰ ĐỘNG THÀNH CÔNG',
+    message: `Hệ thống nhắc lịch tự động cho tài khoản ${req.user.name} đang hoạt động bình thường! (Âm thanh & thông báo đẩy sẵn sàng)`,
+    taskId: null
+  });
+
+  broadcast('alert:new', notif, req.user.id);
+  broadcast('calendar:reminder', {
+    notification: notif,
+    task: { title: 'Thử nghiệm nhắc lịch Google Calendar & TaskFlow' },
+    timeLabel: 'Ngay bây giờ',
+    threshold: 0,
+    userId: req.user.id
+  }, req.user.id);
+
+  db.logActivity({
+    userId: req.user.id,
+    userName: req.user.name,
+    userRole: req.user.role,
+    userAvatar: '⏰',
+    action: 'test_calendar_reminder',
+    category: 'system',
+    details: `Đã thử nghiệm tính năng phát chuông và cảnh báo nhắc lịch tự động`
+  });
+
+  res.json({ success: true, message: 'Đã phát cảnh báo thử nghiệm thành công!' });
 });
 
 // -------------------------------------------------------------

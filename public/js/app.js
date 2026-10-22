@@ -64,6 +64,16 @@ const App = {
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
         osc.start(now);
         osc.stop(now + 0.4);
+      } else if (type === 'reminder' || type === 'calendar') {
+        // Melodic calendar reminder chime: C5 -> G5 -> C6
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(783.99, now + 0.12);
+        osc.frequency.setValueAtTime(1046.50, now + 0.24);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.55);
+        osc.start(now);
+        osc.stop(now + 0.55);
       } else if (type === 'automation' || type === 'magic') {
         // High sparkling arpeggio chime
         osc.type = 'triangle';
@@ -116,6 +126,7 @@ const App = {
         await this.loadInitialData();
         this.renderHeader();
         this.renderView();
+        this.startCalendarReminderMonitor();
         return;
       } catch (err) {
         console.warn('Session check failed, requiring login:', err);
@@ -485,6 +496,10 @@ const App = {
         if (data && data.activity) {
           this.handleNewActivityEvent(data.activity);
         }
+        break;
+
+      case 'calendar:reminder':
+        this.handleCalendarReminderEvent(data);
         break;
 
       case 'automation:executed':
@@ -4700,8 +4715,318 @@ const App = {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
-  }
+  },
+
+  // =============================================================
+  // GOOGLE CALENDAR SYNC & AUTOMATED REMINDERS MODULE
+  // =============================================================
+  activeGcalTab: 'sync',
+  calendarSettings: null,
+  localRemindersSent: new Set(),
+  reminderMonitorInterval: null,
+
+  async openGoogleCalendarModal() {
+    const user = this.state.user;
+    if (!user) {
+      this.showToast('Vui lòng đăng nhập để sử dụng tính năng đồng bộ lịch', 'warning');
+      return;
+    }
+
+    // Populate user profile info in modal
+    const avatarEl = document.getElementById('gcalUserAvatar');
+    const nameEl = document.getElementById('gcalUserName');
+    const roleDeptEl = document.getElementById('gcalUserRoleDept');
+    if (avatarEl) avatarEl.innerText = user.avatar || '👤';
+    if (nameEl) nameEl.innerText = user.name;
+    if (roleDeptEl) roleDeptEl.innerText = `${user.role === 'admin' ? 'Quản Trị Viên' : (user.role === 'manager' ? 'Trưởng Phòng' : 'Nhân Viên')} • ${user.department || 'Nội bộ'}`;
+
+    try {
+      const res = await API.getCalendarSettings(user.id);
+      this.calendarSettings = res.settings || {};
+
+      const emailInput = document.getElementById('gcalEmailInput');
+      if (emailInput) {
+        emailInput.value = this.calendarSettings.email || user.email || '';
+      }
+
+      const feedInput = document.getElementById('gcalFeedUrlInput');
+      if (feedInput) {
+        feedInput.value = res.feedUrl || '';
+      }
+
+      const subscribeBtn = document.getElementById('gcalSubscribeLinkBtn');
+      if (subscribeBtn) {
+        subscribeBtn.href = res.googleCalendarSubscribeUrl || '#';
+      }
+
+      // Reminders configuration
+      const toggle = document.getElementById('gcalRemindersToggle');
+      if (toggle) {
+        toggle.checked = this.calendarSettings.enabled !== false;
+      }
+
+      const reminderTimes = this.calendarSettings.reminderTimes || [1440, 120, 30];
+      [1440, 120, 60, 30, 15, 2880].forEach(t => {
+        const cb = document.getElementById(`remindTime${t}`);
+        if (cb) cb.checked = reminderTimes.includes(t);
+      });
+
+      const notifyBrowserCb = document.getElementById('gcalNotifyBrowser');
+      if (notifyBrowserCb) notifyBrowserCb.checked = this.calendarSettings.notifyBrowser !== false;
+
+      const notifySoundCb = document.getElementById('gcalNotifySound');
+      if (notifySoundCb) notifySoundCb.checked = this.calendarSettings.notifySound !== false;
+
+      this.switchGcalTab('sync');
+      this.openModal('googleCalendarModal');
+    } catch (err) {
+      console.error('Error loading calendar settings:', err);
+      this.showToast(`Lỗi tải cài đặt lịch: ${err.message}`, 'danger');
+    }
+  },
+
+  switchGcalTab(tab) {
+    this.activeGcalTab = tab;
+    const tabSync = document.getElementById('tabContentGcalSync');
+    const tabReminders = document.getElementById('tabContentGcalReminders');
+    const btnSync = document.getElementById('tabBtnGcalSync');
+    const btnReminders = document.getElementById('tabBtnGcalReminders');
+
+    if (tab === 'sync') {
+      if (tabSync) tabSync.style.display = 'block';
+      if (tabReminders) tabReminders.style.display = 'none';
+      if (btnSync) { btnSync.classList.add('active'); btnSync.style.borderColor = 'var(--primary)'; btnSync.style.color = 'var(--primary)'; }
+      if (btnReminders) { btnReminders.classList.remove('active'); btnReminders.style.borderColor = 'var(--border-color)'; btnReminders.style.color = 'inherit'; }
+    } else {
+      if (tabSync) tabSync.style.display = 'none';
+      if (tabReminders) tabReminders.style.display = 'block';
+      if (btnSync) { btnSync.classList.remove('active'); btnSync.style.borderColor = 'var(--border-color)'; btnSync.style.color = 'inherit'; }
+      if (btnReminders) { btnReminders.classList.add('active'); btnReminders.style.borderColor = 'var(--primary)'; btnReminders.style.color = 'var(--primary)'; }
+    }
+  },
+
+  copyGcalFeedUrl() {
+    const input = document.getElementById('gcalFeedUrlInput');
+    if (!input || !input.value) return;
+    navigator.clipboard.writeText(input.value).then(() => {
+      this.showToast('📋 Đã sao chép link đăng ký Google Calendar vào bộ nhớ tạm!', 'success');
+      this.playSound('success');
+    }).catch(() => {
+      input.select();
+      document.execCommand('copy');
+      this.showToast('📋 Đã sao chép link vào bộ nhớ tạm!', 'success');
+    });
+  },
+
+  downloadIcsFile() {
+    const token = API.getToken();
+    const url = '/api/calendar/download-ics';
+    fetch(url, { headers: { 'Authorization': `Bearer ${token}` } })
+      .then(res => {
+        if (!res.ok) throw new Error('Không thể tải file lịch');
+        return res.blob();
+      })
+      .then(blob => {
+        const objUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = objUrl;
+        link.download = `TaskFlow-${(this.state.user?.name || 'calendar').replace(/\s+/g, '_')}.ics`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(objUrl);
+        this.showToast('📥 Đã tải file lịch .ICS thành công!', 'success');
+        this.playSound('success');
+      })
+      .catch(err => {
+        this.showToast(`Lỗi tải file ICS: ${err.message}`, 'danger');
+      });
+  },
+
+  openGoogleCalendarSubscribe() {
+    const linkBtn = document.getElementById('gcalSubscribeLinkBtn');
+    if (linkBtn && linkBtn.href && linkBtn.href !== '#') {
+      window.open(linkBtn.href, '_blank');
+      API.syncCalendarNow().catch(() => {});
+    }
+  },
+
+  async saveGoogleCalendarSettings() {
+    const user = this.state.user;
+    if (!user) return;
+
+    const email = document.getElementById('gcalEmailInput')?.value?.trim() || user.email;
+    const enabled = document.getElementById('gcalRemindersToggle')?.checked ?? true;
+    const notifyBrowser = document.getElementById('gcalNotifyBrowser')?.checked ?? true;
+    const notifySound = document.getElementById('gcalNotifySound')?.checked ?? true;
+
+    const reminderTimes = [];
+    [1440, 120, 60, 30, 15, 2880].forEach(t => {
+      const cb = document.getElementById(`remindTime${t}`);
+      if (cb && cb.checked) reminderTimes.push(t);
+    });
+
+    try {
+      if (notifyBrowser && 'Notification' in window && Notification.permission === 'default') {
+        await Notification.requestPermission();
+      }
+
+      await API.updateCalendarSettings(user.id, {
+        email,
+        enabled,
+        reminderTimes,
+        notifyBrowser,
+        notifySound
+      });
+
+      this.showToast('💾 Đã lưu cấu hình đồng bộ Google Calendar & nhắc lịch tự động thành công!', 'success');
+      this.playSound('success');
+      this.closeModal('googleCalendarModal');
+    } catch (err) {
+      this.showToast(`Lỗi lưu cấu hình: ${err.message}`, 'danger');
+    }
+  },
+
+  async testCalendarReminder() {
+    try {
+      if ('Notification' in window && Notification.permission === 'default') {
+        await Notification.requestPermission();
+      }
+
+      await API.testCalendarReminder();
+      this.playSound('reminder');
+
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('⏰ [THỬ NGHIỆM] NHẮC LỊCH GOOGLE CALENDAR', {
+          body: 'Tính năng nhắc lịch tự động cho công việc của bạn đã sẵn sàng hoạt động!',
+          icon: 'favicon.ico'
+        });
+      }
+
+      this.showToast('🔔 Đã kích hoạt thử nghiệm chuông & nhắc lịch tự động thành công!', 'warning');
+    } catch (err) {
+      this.showToast(`Lỗi thử nghiệm: ${err.message}`, 'danger');
+    }
+  },
+
+  openCurrentTaskGoogleCalendar() {
+    const task = this.state.currentDetailTask;
+    if (!task) return;
+    this.openTaskGoogleCalendar(task);
+  },
+
+  openTaskGoogleCalendar(task) {
+    if (!task) return;
+    const pad = n => String(n).padStart(2, '0');
+    const formatIcsUtc = (dStr) => {
+      const d = new Date(dStr || Date.now());
+      if (isNaN(d.getTime())) return null;
+      return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + 'T' +
+             pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + pad(d.getUTCSeconds()) + 'Z';
+    };
+
+    const startUtc = formatIcsUtc(task.startDate) || formatIcsUtc(new Date());
+    const dueUtc = formatIcsUtc(task.dueDate) || formatIcsUtc(new Date(Date.now() + 86400000));
+    const title = encodeURIComponent(`[TaskFlow] ${task.title}`);
+    const details = encodeURIComponent(
+      `Mã công việc: #${task.id}\n` +
+      `Mức độ ưu tiên: ${(task.priority || 'medium').toUpperCase()}\n` +
+      `Phòng ban: ${task.department || ''}\n` +
+      `Tiến độ: ${task.progress || 0}%\n` +
+      `Trạng thái: ${task.status || 'todo'}\n\n` +
+      `Mô tả:\n${task.description || 'Không có mô tả chi tiết'}\n\n` +
+      `---\nĐược tạo tự động từ TaskFlow Pro Webapp`
+    );
+
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startUtc}/${dueUtc}&details=${details}`;
+    window.open(url, '_blank');
+    this.showToast(`📅 Đang mở Google Calendar để thêm công việc #${task.id}...`, 'info');
+  },
+
+  handleCalendarReminderEvent(data) {
+    if (!data) return;
+    const task = data.task || {};
+    const timeLabel = data.timeLabel || 'Sắp đến hạn';
+
+    // Play pleasant reminder chime
+    this.playSound('reminder');
+
+    // Show native browser notification if permitted
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try {
+        new Notification(`⏰ NHẮC LỊCH: ${task.title || 'Công việc sắp đến hạn'}`, {
+          body: `Chỉ còn ${timeLabel} nữa là đến hạn chót! Bấm để xem trên Web App.`,
+          icon: 'favicon.ico',
+          tag: `task-${task.id}`
+        });
+      } catch (e) {}
+    }
+
+    // High visibility toast
+    this.showToast(`⏰ [NHẮC LỊCH] "${task.title || 'Công việc'}" chỉ còn ${timeLabel} nữa là đến hạn!`, 'warning');
+
+    // Update notifications list
+    if (data.notification) {
+      this.state.notifications.unshift(data.notification);
+      this.updateNotificationBadge();
+    }
+  },
+
+  startCalendarReminderMonitor() {
+    if (this.reminderMonitorInterval) return;
+
+    // Check every 30 seconds
+    this.reminderMonitorInterval = setInterval(() => {
+      if (!this.state.user || !this.state.tasks || this.state.tasks.length === 0) return;
+
+      const now = Date.now();
+      const userTasks = this.state.tasks.filter(t => 
+        t.status !== 'completed' && t.dueDate && 
+        (t.assignedTo === this.state.user.id || t.createdBy === this.state.user.id)
+      );
+
+      const reminderTimes = this.calendarSettings?.reminderTimes || [1440, 120, 30];
+
+      userTasks.forEach(task => {
+        const due = new Date(task.dueDate).getTime();
+        if (isNaN(due)) return;
+        const diffMinutes = Math.round((due - now) / 60000);
+        if (diffMinutes <= 0) return;
+
+        reminderTimes.forEach(threshold => {
+          if (Math.abs(diffMinutes - threshold) <= 2) {
+            const key = `local-remind-${task.id}-${threshold}`;
+            if (!this.localRemindersSent.has(key)) {
+              this.localRemindersSent.add(key);
+
+              let timeLabel = `${threshold} phút`;
+              if (threshold >= 1440 && threshold % 1440 === 0) {
+                timeLabel = `${threshold / 1440} ngày`;
+              } else if (threshold >= 60 && threshold % 60 === 0) {
+                timeLabel = `${threshold / 60} giờ`;
+              }
+
+              this.playSound('reminder');
+              this.showToast(`⏰ [NHẮC LỊCH] "${task.title}" chỉ còn ${timeLabel} nữa là đến hạn chót!`, 'warning');
+
+              if ('Notification' in window && Notification.permission === 'granted') {
+                try {
+                  new Notification(`⏰ NHẮC LỊCH: ${task.title}`, {
+                    body: `Chỉ còn ${timeLabel} nữa là đến hạn chót (Hạn: ${new Date(task.dueDate).toLocaleDateString('vi-VN')})`,
+                    icon: 'favicon.ico',
+                    tag: `task-${task.id}`
+                  });
+                } catch (e) {}
+              }
+            }
+          }
+        });
+      });
+    }, 30 * 1000);
+  },
+
 };
+
 
 // Start application when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {

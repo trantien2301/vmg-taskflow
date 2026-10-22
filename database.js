@@ -506,6 +506,21 @@ class Database {
               u.permissions.canViewReports = false;
               modified = true;
             }
+
+            // Đảm bảo cấu hình Google Calendar & Nhắc lịch cho từng account
+            if (!u.googleCalendar) {
+              u.googleCalendar = {
+                enabled: true,
+                email: u.email || '',
+                autoSync: true,
+                syncToken: `gcal_${u.id}_${Math.random().toString(36).substring(2, 10)}`,
+                reminderTimes: [1440, 120, 30], // Nhắc trước 1 ngày (1440p), 2 giờ (120p), 30 phút (30p)
+                notifyBrowser: true,
+                notifySound: true,
+                lastSync: null
+              };
+              modified = true;
+            }
           });
 
           // Ensure a sample viewer account exists for testing Viewer role
@@ -593,6 +608,16 @@ class Database {
       avatar: userData.avatar || (role === 'admin' ? '👑' : (role === 'manager' ? '👔' : '👤')),
       phone: userData.phone || '',
       active: typeof userData.active === 'boolean' ? userData.active : true,
+      googleCalendar: {
+        enabled: true,
+        email: userData.email.toLowerCase(),
+        autoSync: true,
+        syncToken: `gcal_${id}_${Math.random().toString(36).substring(2, 10)}`,
+        reminderTimes: [1440, 120, 30],
+        notifyBrowser: true,
+        notifySound: true,
+        lastSync: null
+      },
       createdAt: new Date().toISOString()
     };
     this.data.users.push(newUser);
@@ -916,6 +941,125 @@ class Database {
     this.data.settings = { ...this.data.settings, ...newSettings };
     this.save();
     return this.data.settings;
+  }
+
+  // --- Google Calendar & Live ICS Feed Integration ---
+  getUserByCalendarToken(userId, token) {
+    if (!userId || !token) return null;
+    return this.data.users.find(u => u.id === userId && u.googleCalendar && u.googleCalendar.syncToken === token);
+  }
+
+  updateUserCalendarSettings(userId, settings) {
+    const user = this.data.users.find(u => u.id === userId);
+    if (!user) return null;
+    if (!user.googleCalendar) {
+      user.googleCalendar = {
+        enabled: true,
+        email: user.email || '',
+        autoSync: true,
+        syncToken: `gcal_${user.id}_${Math.random().toString(36).substring(2, 10)}`,
+        reminderTimes: [1440, 120, 30],
+        notifyBrowser: true,
+        notifySound: true,
+        lastSync: null
+      };
+    }
+    user.googleCalendar = { ...user.googleCalendar, ...settings };
+    this.save();
+    return user.googleCalendar;
+  }
+
+  generateIcsFeed(user, baseUrl = 'https://taskflow.vmg.edu.vn') {
+    let tasks = this.getTasks();
+    if (user.role === 'user') {
+      tasks = tasks.filter(t => t.assignedTo === user.id || t.createdBy === user.id);
+    } else if (user.role === 'manager') {
+      tasks = tasks.filter(t => t.department === user.department);
+    }
+
+    const pad = n => String(n).padStart(2, '0');
+    const formatIcsDate = (dStr) => {
+      const d = new Date(dStr || Date.now());
+      if (isNaN(d.getTime())) return null;
+      return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + 'T' +
+             pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + pad(d.getUTCSeconds()) + 'Z';
+    };
+
+    const cleanText = (str) => {
+      if (!str) return '';
+      return String(str).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+    };
+
+    const nowIcs = formatIcsDate(new Date());
+    const calName = cleanText(`TaskFlow - ${user.name} (${user.department})`);
+    const reminderTimes = user.googleCalendar?.reminderTimes || [1440, 120, 30];
+
+    let lines = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//VMG TaskFlow Pro//Google Calendar Sync//VI',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      `X-WR-CALNAME:${calName}`,
+      'X-WR-TIMEZONE:Asia/Ho_Chi_Minh',
+      'REFRESH-INTERVAL;VALUE=DURATION:PT15M',
+      'X-PUBLISHED-TTL:PT15M'
+    ];
+
+    tasks.forEach(task => {
+      const startIcs = formatIcsDate(task.startDate) || nowIcs;
+      const dueIcs = formatIcsDate(task.dueDate) || formatIcsDate(new Date(Date.now() + 86400000));
+      const uid = `task-${task.id}@vmg.edu.vn`;
+      const priorityMap = { urgent: '1', high: '3', medium: '5', low: '9' };
+      const statusMap = { todo: 'Chưa làm', in_progress: 'Đang làm', review: 'Chờ duyệt', completed: 'Hoàn thành' };
+
+      const summary = cleanText(`[${(task.priority || 'vừa').toUpperCase()}] ${task.title}`);
+      const desc = cleanText(
+        `Mã công việc: #${task.id}\n` +
+        `Tiến độ: ${task.progress || 0}%\n` +
+        `Trạng thái: ${statusMap[task.status] || task.status}\n` +
+        `Phòng ban: ${task.department || ''}\n` +
+        `Hạn chót: ${task.dueDate ? new Date(task.dueDate).toLocaleString('vi-VN') : 'Không có'}\n\n` +
+        `Mô tả chi tiết:\n${task.description || 'Không có mô tả chi tiết'}\n\n` +
+        `Xem trên Web App: ${baseUrl}/#task=${task.id}`
+      );
+
+      lines.push('BEGIN:VEVENT');
+      lines.push(`UID:${uid}`);
+      lines.push(`DTSTAMP:${nowIcs}`);
+      lines.push(`DTSTART:${startIcs}`);
+      lines.push(`DTEND:${dueIcs}`);
+      lines.push(`SUMMARY:${summary}`);
+      lines.push(`DESCRIPTION:${desc}`);
+      lines.push(`PRIORITY:${priorityMap[task.priority] || '5'}`);
+      lines.push(`STATUS:${task.status === 'completed' ? 'COMPLETED' : 'CONFIRMED'}`);
+
+      // Add VALARM triggers based on user's reminder preferences
+      if (task.status !== 'completed' && Array.isArray(reminderTimes)) {
+        reminderTimes.forEach(m => {
+          let trigger = `-PT${m}M`;
+          let descLabel = `Hạn chót trong ${m} phút`;
+          if (m >= 1440 && m % 1440 === 0) {
+            trigger = `-P${m / 1440}D`;
+            descLabel = `Nhắc trước ${m / 1440} ngày`;
+          } else if (m >= 60 && m % 60 === 0) {
+            trigger = `-PT${m / 60}H`;
+            descLabel = `Hạn chót trong ${m / 60} giờ`;
+          }
+
+          lines.push('BEGIN:VALARM');
+          lines.push('ACTION:DISPLAY');
+          lines.push(`DESCRIPTION:${cleanText(`[Nhắc Lịch] ${task.title} - ${descLabel}`)}`);
+          lines.push(`TRIGGER:${trigger}`);
+          lines.push('END:VALARM');
+        });
+      }
+
+      lines.push('END:VEVENT');
+    });
+
+    lines.push('END:VCALENDAR');
+    return lines.join('\r\n');
   }
 
   // --- Departments ---

@@ -4650,3 +4650,39 @@ body {
   border-radius: 4px;
   margin-left: 6px;
 }
+
+/* Google Calendar Sync & Automated Reminder Styles */
+.switch-toggle input:checked + .toggle-slider {
+  background-color: #10b981 !important;
+}
+.switch-toggle input:not(:checked) + .toggle-slider {
+  background-color: var(--border-color) !important;
+}
+.switch-toggle input:checked + .toggle-slider:before {
+  transform: translateX(20px);
+}
+.switch-toggle .toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.gcal-sync-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(66, 133, 244, 0.1);
+  color: #2563eb;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border: 1px solid rgba(66, 133, 244, 0.2);
+}

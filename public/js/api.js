@@ -305,5 +305,25 @@ const API = {
 
   async resetDemo() {
     return this.request('/api/system/reset-demo', { method: 'POST' });
+  },
+
+  // Google Calendar & Automated Reminders
+  async getCalendarSettings(userId) {
+    return this.request(`/api/users/${encodeURIComponent(userId)}/calendar-settings`);
+  },
+
+  async updateCalendarSettings(userId, settings) {
+    return this.request(`/api/users/${encodeURIComponent(userId)}/calendar-settings`, {
+      method: 'PUT',
+      body: JSON.stringify(settings)
+    });
+  },
+
+  async syncCalendarNow() {
+    return this.request('/api/calendar/sync-now', { method: 'POST' });
+  },
+
+  async testCalendarReminder() {
+    return this.request('/api/calendar/test-reminder', { method: 'POST' });
   }
 };

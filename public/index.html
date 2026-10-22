@@ -380,6 +380,11 @@
             ⚡<span class="hide-mobile"> Quét Cảnh Báo</span>
           </button>
 
+          <!-- Google Calendar & Nhắc Lịch button -->
+          <button class="btn btn-outline btn-sm" id="btnHeaderGoogleCal" onclick="App.openGoogleCalendarModal()" title="Đồng bộ Google Calendar & Nhắc lịch tự động trên tài khoản này" style="color:var(--primary); font-weight:600; display:inline-flex; align-items:center; gap:5px;">
+            📅 <span class="hide-mobile">Google Calendar</span>
+          </button>
+
           <!-- Notification Bell -->
           <div class="notif-btn-wrapper">
             <button class="btn-icon-badge" id="notifBtn" title="Thông báo & Cảnh báo">
@@ -596,18 +601,25 @@
                 <h2 class="calendar-title-display" id="calDateDisplay">Tháng 10, 2026</h2>
               </div>
 
-              <div class="calendar-mode-switcher">
-                <button class="cal-mode-btn" data-cal-mode="day" id="calModeDay">
-                  <span>☀️</span>
-                  <span>Ngày</span>
-                </button>
-                <button class="cal-mode-btn" data-cal-mode="week" id="calModeWeek">
-                  <span>📆</span>
-                  <span>Tuần</span>
-                </button>
-                <button class="cal-mode-btn active" data-cal-mode="month" id="calModeMonth">
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <div class="calendar-mode-switcher">
+                  <button class="cal-mode-btn" data-cal-mode="day" id="calModeDay">
+                    <span>☀️</span>
+                    <span>Ngày</span>
+                  </button>
+                  <button class="cal-mode-btn" data-cal-mode="week" id="calModeWeek">
+                    <span>📆</span>
+                    <span>Tuần</span>
+                  </button>
+                  <button class="cal-mode-btn active" data-cal-mode="month" id="calModeMonth">
+                    <span>📅</span>
+                    <span>Tháng</span>
+                  </button>
+                </div>
+
+                <button class="btn btn-outline btn-sm" id="btnCalSyncGoogle" onclick="App.openGoogleCalendarModal()" title="Đồng bộ toàn bộ công việc với Google Calendar của bạn" style="display:inline-flex; align-items:center; gap:6px; font-weight:600; border-color:var(--primary); color:var(--primary);">
                   <span>📅</span>
-                  <span>Tháng</span>
+                  <span class="hide-mobile">Đồng Bộ Google Calendar</span>
                 </button>
               </div>
             </div>
@@ -1236,6 +1248,9 @@
         <button class="btn btn-outline" style="color:var(--danger); margin-right:auto;" id="detailDeleteTaskBtn">
           🗑️ Xóa việc (Admin)
         </button>
+        <button class="btn btn-outline" id="detailGoogleCalBtn" onclick="App.openCurrentTaskGoogleCalendar()" title="Thêm công việc này vào Google Calendar của bạn" style="color:#2563eb; border-color:#93c5fd; font-weight:600;">
+          📅 Google Calendar
+        </button>
         <button class="btn btn-outline" id="detailEditTaskBtn">Chỉnh Sửa</button>
         <button class="btn btn-primary" data-close-modal="taskDetailModal">Đóng</button>
       </div>
@@ -1725,6 +1740,199 @@
           <button type="submit" class="btn btn-primary" id="btnSubmitAutoRule">💾 Lưu & Kích Hoạt Quy Tắc</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- MODAL: GOOGLE CALENDAR SYNC & AUTOMATED REMINDERS -->
+  <div class="modal-overlay" id="googleCalendarModal" style="z-index: 10006;">
+    <div class="modal-content" style="max-width: 660px;">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:38px; height:38px; border-radius:10px; background:linear-gradient(135deg, #4285F4, #34A853); display:flex; align-items:center; justify-content:center; color:#fff; font-size:20px; box-shadow:0 3px 8px rgba(66,133,244,0.3);">
+            📅
+          </div>
+          <div>
+            <h3 class="modal-title" style="margin:0; font-size:16.5px; font-weight:700;">Đồng Bộ Google Calendar & Nhắc Lịch Tự Động</h3>
+            <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
+              Đồng bộ công việc vào Google Calendar cá nhân và kích hoạt chuông nhắc lịch tự động
+            </div>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close-modal="googleCalendarModal">&times;</button>
+      </div>
+
+      <div class="modal-body" style="padding: 16px 20px; max-height: calc(85vh - 120px); overflow-y:auto;">
+        <!-- Account Summary Card -->
+        <div style="background:var(--bg-main); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:12px 14px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div id="gcalUserAvatar" style="font-size:22px; width:34px; height:34px; border-radius:50%; background:var(--card-bg); display:flex; align-items:center; justify-content:center; border:1px solid var(--border-color);">👤</div>
+            <div>
+              <div style="font-weight:700; font-size:13.5px;" id="gcalUserName">Đang tải...</div>
+              <div style="font-size:11.5px; color:var(--text-secondary);" id="gcalUserRoleDept">Tài khoản nội bộ</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span class="badge" style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3); font-size:11px; font-weight:600; padding:4px 8px; border-radius:12px;">
+              🟢 Đang kích hoạt đồng bộ
+            </span>
+          </div>
+        </div>
+
+        <!-- Tab Controls -->
+        <div style="display:flex; gap:8px; border-bottom:1px solid var(--border-color); margin-bottom:16px;">
+          <button type="button" class="btn btn-sm btn-outline active" id="tabBtnGcalSync" onclick="App.switchGcalTab('sync')" style="border-bottom-left-radius:0; border-bottom-right-radius:0; border-bottom:none; font-weight:600;">
+            📅 Đồng Bộ Google Calendar
+          </button>
+          <button type="button" class="btn btn-sm btn-outline" id="tabBtnGcalReminders" onclick="App.switchGcalTab('reminders')" style="border-bottom-left-radius:0; border-bottom-right-radius:0; border-bottom:none; font-weight:600;">
+            ⏰ Nhắc Lịch Tự Động
+          </button>
+        </div>
+
+        <!-- TAB 1: GOOGLE CALENDAR SYNC -->
+        <div id="tabContentGcalSync">
+          <div class="form-group" style="margin-bottom:14px;">
+            <label class="form-label" style="font-weight:600; font-size:13px; display:flex; justify-content:space-between;">
+              <span>Email Google Workspace / Gmail Đồng Bộ:</span>
+              <span style="font-weight:400; font-size:11.5px; color:var(--text-secondary);">Mỗi account có một luồng lịch riêng</span>
+            </label>
+            <input type="email" class="form-control" id="gcalEmailInput" placeholder="nhanvien@vmg.edu.vn hoặc account@gmail.com">
+          </div>
+
+          <!-- 1-Click Subscribe Button Banner -->
+          <div style="background:linear-gradient(135deg, rgba(66,133,244,0.08), rgba(52,168,83,0.08)); border:1px solid rgba(66,133,244,0.25); border-radius:var(--radius-sm); padding:14px; margin-bottom:16px;">
+            <div style="font-weight:700; font-size:13px; color:var(--text-main); margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+              <span>⚡</span>
+              <span>Đăng Ký Đồng Bộ 1-Click Vào Google Calendar</span>
+            </div>
+            <div style="font-size:12px; color:var(--text-secondary); line-height:1.45; margin-bottom:12px;">
+              Bấm nút bên dưới để Google Calendar tự động thêm lịch công việc của bạn. Mọi deadline, nhiệm vụ mới sẽ tự động cập nhật lên điện thoại và máy tính!
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <a href="#" id="gcalSubscribeLinkBtn" target="_blank" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; font-weight:600; text-decoration:none; padding:7px 14px;">
+                <span>🚀 Thêm Trực Tiếp Vào Google Calendar</span>
+              </a>
+              <button type="button" class="btn btn-outline btn-sm" onclick="App.downloadIcsFile()" style="display:inline-flex; align-items:center; gap:6px;">
+                <span>📥 Tải File .ICS (Offline)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Subscription Feed URL -->
+          <div class="form-group" style="margin-bottom:16px;">
+            <label class="form-label" style="font-weight:600; font-size:12.5px;">
+              🔗 Link Đăng Ký Lịch Trực Tiếp Cá Nhân (iCal / Webcal Feed):
+            </label>
+            <div style="display:flex; gap:8px;">
+              <input type="text" class="form-control" id="gcalFeedUrlInput" readonly style="font-family:monospace; font-size:11.5px; background:var(--bg-main); color:var(--text-main);" onclick="this.select()">
+              <button type="button" class="btn btn-outline btn-sm" id="btnCopyGcalFeed" onclick="App.copyGcalFeedUrl()" style="white-space:nowrap; font-weight:600;">
+                📋 Sao chép
+              </button>
+            </div>
+            <div style="font-size:11px; color:var(--text-secondary); margin-top:4px;">
+              Link này được bảo mật riêng biệt cho từng tài khoản và tương thích với Google Calendar, Apple Calendar, Microsoft Outlook.
+            </div>
+          </div>
+
+          <!-- 3-Step Guide -->
+          <div style="border-top:1px dashed var(--border-color); padding-top:12px; margin-top:12px;">
+            <div style="font-size:12px; font-weight:700; color:var(--text-secondary); margin-bottom:8px;">
+              📖 Hướng Dẫn Thêm Vào Google Calendar Thủ Công (Nếu cần):
+            </div>
+            <ol style="margin:0; padding-left:18px; font-size:11.5px; color:var(--text-secondary); line-height:1.6;">
+              <li>Mở <a href="https://calendar.google.com" target="_blank" style="color:var(--primary); font-weight:600;">calendar.google.com</a> trên trình duyệt web máy tính hoặc điện thoại.</li>
+              <li>Tại cột trái bên dưới, tìm mục <strong>"Lịch khác" (Other calendars)</strong> ➔ Bấm dấu <strong>[ + ]</strong> ➔ Chọn <strong>"Từ URL" (From URL)</strong>.</li>
+              <li>Dán liên kết cá nhân ở ô phía trên vào và bấm <strong>"Thêm lịch" (Add calendar)</strong>. Toàn bộ công việc & thông báo sẽ được đồng bộ tự động!</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- TAB 2: AUTOMATED REMINDERS -->
+        <div id="tabContentGcalReminders" style="display:none;">
+          <!-- Master Toggle -->
+          <div style="background:var(--bg-main); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:12px 14px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between;">
+            <div>
+              <div style="font-weight:700; font-size:13.5px;">⏰ Bật Tính Năng Nhắc Lịch Tự Động</div>
+              <div style="font-size:11.5px; color:var(--text-secondary);">Tự động cảnh báo trước thời hạn hoàn thành công việc</div>
+            </div>
+            <label class="switch-toggle" style="position:relative; display:inline-block; width:44px; height:24px;">
+              <input type="checkbox" id="gcalRemindersToggle" checked style="opacity:0; width:0; height:0;">
+              <span style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#10b981; transition:.3s; border-radius:24px;" class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <!-- Reminder Thresholds Checklist -->
+          <div class="form-group" style="margin-bottom:16px;">
+            <label class="form-label" style="font-weight:700; font-size:13px; margin-bottom:8px;">
+              ⏱️ Chọn Các Mốc Thời Gian Nhắc Lịch:
+            </label>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; cursor:pointer; background:var(--bg-main); padding:8px 12px; border-radius:var(--radius-sm); border:1px solid var(--border-color);">
+                <input type="checkbox" id="remindTime1440" value="1440" checked>
+                <span>Nhắc trước <strong>1 ngày (24 giờ)</strong></span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; cursor:pointer; background:var(--bg-main); padding:8px 12px; border-radius:var(--radius-sm); border:1px solid var(--border-color);">
+                <input type="checkbox" id="remindTime120" value="120" checked>
+                <span>Nhắc trước <strong>2 giờ</strong></span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; cursor:pointer; background:var(--bg-main); padding:8px 12px; border-radius:var(--radius-sm); border:1px solid var(--border-color);">
+                <input type="checkbox" id="remindTime60" value="60" checked>
+                <span>Nhắc trước <strong>1 giờ</strong></span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; cursor:pointer; background:var(--bg-main); padding:8px 12px; border-radius:var(--radius-sm); border:1px solid var(--border-color);">
+                <input type="checkbox" id="remindTime30" value="30" checked>
+                <span>Nhắc trước <strong>30 phút</strong></span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; cursor:pointer; background:var(--bg-main); padding:8px 12px; border-radius:var(--radius-sm); border:1px solid var(--border-color);">
+                <input type="checkbox" id="remindTime15" value="15">
+                <span>Nhắc trước <strong>15 phút</strong></span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; cursor:pointer; background:var(--bg-main); padding:8px 12px; border-radius:var(--radius-sm); border:1px solid var(--border-color);">
+                <input type="checkbox" id="remindTime2880" value="2880">
+                <span>Nhắc trước <strong>2 ngày (48 giờ)</strong></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Notification Delivery Channels -->
+          <div class="form-group" style="margin-bottom:16px;">
+            <label class="form-label" style="font-weight:700; font-size:13px; margin-bottom:8px;">
+              📢 Phương Thức Nhắc Nhở:
+            </label>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; cursor:pointer;">
+                <input type="checkbox" id="gcalNotifyBrowser" checked>
+                <span>🖥️ <strong>Thông báo đẩy màn hình (Browser Push):</strong> Hiện popup góc màn hình kể cả khi thu nhỏ trình duyệt</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; cursor:pointer;">
+                <input type="checkbox" id="gcalNotifySound" checked>
+                <span>🔊 <strong>Chuông âm thanh báo thức:</strong> Phát âm thanh chuông sinh động khi đến giờ nhắc việc</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; cursor:pointer;">
+                <input type="checkbox" id="gcalNotifyBell" checked disabled>
+                <span>🔔 <strong>Trung tâm Cảnh Báo Web App:</strong> Tự động đẩy vào chuông thông báo & huy hiệu đỏ (Mặc định)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Test Button -->
+          <div style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.3); border-radius:var(--radius-sm); padding:12px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+            <div>
+              <div style="font-weight:700; font-size:12.5px; color:#d97706;">🔔 Thử Nghiệm Chuông & Thông Báo</div>
+              <div style="font-size:11.5px; color:var(--text-secondary);">Bấm để kiểm tra âm thanh chuông và thông báo đẩy ngay lập tức</div>
+            </div>
+            <button type="button" class="btn btn-outline btn-sm" onclick="App.testCalendarReminder()" style="color:#d97706; border-color:#d97706; font-weight:600;">
+              ⚡ Bấm Thử Nghiệm Ngay
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display:flex; justify-content:space-between; align-items:center;">
+        <button type="button" class="btn btn-outline" data-close-modal="googleCalendarModal">Đóng</button>
+        <button type="button" class="btn btn-primary" onclick="App.saveGoogleCalendarSettings()">
+          💾 Lưu Cấu Hình Đồng Bộ & Nhắc Lịch
+        </button>
+      </div>
     </div>
   </div>
 
