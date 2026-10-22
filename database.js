@@ -503,6 +503,27 @@ class Database {
               modified = true;
             }
           });
+
+          // Ensure a sample viewer account exists for testing Viewer role
+          const hasViewer = this.data.users.some(u => u.role === 'viewer');
+          if (!hasViewer) {
+            this.data.users.push({
+              id: 'usr-viewer-1',
+              name: 'Hoàng Giám Sát',
+              email: 'viewer@vmg.edu.vn',
+              password: DEFAULT_PASSWORD_HASH,
+              role: 'viewer',
+              department: 'Ban Kiểm Soát',
+              position: 'Chuyên viên Giám Sát',
+              avatar: '👁️',
+              phone: '0988 999 111',
+              active: true,
+              permissions: { ...DEFAULT_PERMISSIONS.viewer },
+              createdAt: new Date().toISOString()
+            });
+            modified = true;
+          }
+
           if (modified) {
             this.save();
           }

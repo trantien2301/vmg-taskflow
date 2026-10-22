@@ -187,8 +187,9 @@ const API = {
   },
 
   // Reports
-  async getReportsSummary() {
-    return this.request('/api/reports/summary');
+  async getReportsSummary(dept = '') {
+    const query = dept ? `?department=${encodeURIComponent(dept)}` : '';
+    return this.request(`/api/reports/summary${query}`);
   },
 
   // Users

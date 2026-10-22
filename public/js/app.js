@@ -13,7 +13,7 @@ const App = {
     currentDetailTask: null,
     draggedTaskId: null,
     onlineCount: 1,
-    clientVersion: '3.1.0',
+    clientVersion: '3.2.0',
     serverVersionInfo: null,
     hasNewUpdate: false,
     automations: [],
@@ -517,6 +517,7 @@ const App = {
       this.state.automations = (autoRes && autoRes.automations) ? autoRes.automations : [];
       this.populateFilterDropdowns();
       this.populateDepartmentDropdowns();
+      this.populateDemoUserDropdown();
       this.updateNotificationBadge();
     } catch (err) {
       console.error('Failed to load initial data', err);
@@ -1388,23 +1389,79 @@ const App = {
     const nameEl = document.getElementById('sidebarUserName');
     const roleTagEl = document.getElementById('sidebarUserRole');
 
-    if (avatarEl) avatarEl.innerText = user.avatar || (user.role === 'admin' ? '👑' : '👤');
+    if (avatarEl) avatarEl.innerText = user.avatar || (user.role === 'admin' ? '👑' : (user.role === 'manager' ? '👔' : (user.role === 'viewer' ? '👁️' : '👤')));
     if (nameEl) nameEl.innerText = user.name;
     if (roleTagEl) {
       roleTagEl.className = `user-role-tag ${user.role}`;
-      roleTagEl.innerText = user.role === 'admin' ? 'ADMIN' : 'USER';
+      const roleLabels = {
+        admin: 'QUẢN TRỊ VIÊN',
+        manager: 'TRƯỞNG PHÒNG',
+        user: 'NHÂN VIÊN',
+        viewer: 'CHỈ XEM'
+      };
+      roleTagEl.innerText = roleLabels[user.role] || user.role.toUpperCase();
     }
 
-    // Demo Switcher select option
-    const demoSelect = document.getElementById('demoUserSelect');
-    if (demoSelect) {
-      demoSelect.value = user.id;
-    }
+    // Demo Switcher select option & dropdown population
+    this.populateDemoUserDropdown();
 
-    // Admin-only Navigation item visibility
+    // Admin & Management Navigation item visibility
     const adminNav = document.querySelector('.nav-item[data-view="users"]');
     if (adminNav) {
-      adminNav.style.display = user.role === 'admin' ? 'flex' : 'none';
+      adminNav.style.display = (user.role === 'admin' || user.permissions?.canManageUsers) ? 'flex' : 'none';
+    }
+
+    // Automation Navigation visibility
+    const autoNav = document.getElementById('navItemAutomation');
+    if (autoNav) {
+      const canAuto = user.role === 'admin' || (user.permissions && user.permissions.canManageAutomation);
+      autoNav.style.display = canAuto ? 'flex' : 'none';
+    }
+
+    // Reports Navigation indicator
+    const reportsNav = document.querySelector('.nav-item[data-view="reports"]');
+    if (reportsNav) {
+      const canView = user.role === 'admin' || (user.permissions && user.permissions.canViewReports !== false);
+      if (!canView) {
+        reportsNav.title = 'Tài khoản chưa được cấp quyền xem Báo Cáo';
+        reportsNav.style.opacity = '0.5';
+      } else {
+        reportsNav.title = 'Báo Cáo & Thống Kê';
+        reportsNav.style.opacity = '1';
+      }
+    }
+  },
+
+  populateDemoUserDropdown() {
+    const demoSelect = document.getElementById('demoUserSelect');
+    if (!demoSelect) return;
+
+    const users = this.state.users || [];
+    if (users.length === 0) return;
+
+    const currentUser = this.state.user;
+    const roleIcons = {
+      admin: '👑',
+      manager: '👔',
+      user: '👤',
+      viewer: '👁️'
+    };
+    const roleLabels = {
+      admin: 'Admin',
+      manager: 'Trưởng phòng',
+      user: 'Nhân viên',
+      viewer: 'Chỉ xem'
+    };
+
+    demoSelect.innerHTML = users.map(u => {
+      const icon = roleIcons[u.role] || '👤';
+      const rLabel = roleLabels[u.role] || u.role;
+      const dept = u.department || 'N/A';
+      return `<option value="${u.id}">${icon} ${u.name} (${rLabel} - ${dept})</option>`;
+    }).join('');
+
+    if (currentUser) {
+      demoSelect.value = currentUser.id;
     }
   },
 
@@ -2497,51 +2554,370 @@ const App = {
   },
 
   // -------------------------------------------------------------
-  // REPORTS & ANALYTICS VIEW
+  // REPORTS & ANALYTICS VIEW (ROLE-BASED INTELLIGENCE)
   // -------------------------------------------------------------
-  async renderReportsView() {
+  async renderReportsView(dept = null) {
+    const accessDeniedEl = document.getElementById('reportAccessDenied');
+    const mainContentEl = document.getElementById('reportMainContent');
+
+    // 1. Guard check on user permission
+    const currentUser = this.state.user;
+    if (currentUser && currentUser.permissions && currentUser.permissions.canViewReports === false) {
+      if (accessDeniedEl) accessDeniedEl.style.display = 'block';
+      if (mainContentEl) mainContentEl.style.display = 'none';
+      return;
+    }
+
+    if (accessDeniedEl) accessDeniedEl.style.display = 'none';
+    if (mainContentEl) mainContentEl.style.display = 'block';
+
     try {
-      const summary = await API.getReportsSummary();
+      // Determine department query if admin selected one
+      const deptFilter = document.getElementById('reportDeptFilter');
+      const selectedDept = dept !== null ? dept : (deptFilter ? deptFilter.value : '');
+
+      const summary = await API.getReportsSummary(selectedDept !== 'all' ? selectedDept : '');
+
+      // 2. Populate Scope Header
+      const roleBadge = document.getElementById('reportRoleBadge');
+      const scopeDeptText = document.getElementById('reportScopeDeptText');
+      const scopeTitle = document.getElementById('reportScopeTitle');
+      const scopeDesc = document.getElementById('reportScopeDesc');
+      const deptFilterWrap = document.getElementById('reportDeptFilterWrap');
+      const btnExportCsv = document.getElementById('btnExportReportCsv');
+
+      if (roleBadge) {
+        roleBadge.className = `report-scope-badge ${summary.userRole || 'user'}`;
+        const roleNames = {
+          admin: '👑 QUẢN TRỊ VIÊN',
+          manager: '👔 TRƯỞNG PHÒNG',
+          user: '👤 NHÂN VIÊN',
+          viewer: '👁️ CHỈ XEM'
+        };
+        roleBadge.innerText = roleNames[summary.userRole] || summary.userRole.toUpperCase();
+      }
+
+      if (scopeDeptText) {
+        scopeDeptText.innerText = summary.scope === 'admin' 
+          ? (summary.targetDept ? summary.targetDept : 'Toàn Doanh Nghiệp (16 Phòng Ban)')
+          : (summary.userDepartment || 'Bộ Phận');
+      }
+
+      if (scopeTitle) scopeTitle.innerText = summary.scopeTitle || 'Biểu Đồ Phân Tích & Báo Cáo';
+      if (scopeDesc) scopeDesc.innerText = summary.scopeDesc || 'Hệ thống báo cáo chỉ số KPI & tiến độ';
+
+      // Show department filter only for Admin
+      if (deptFilterWrap) {
+        deptFilterWrap.style.display = summary.scope === 'admin' ? 'flex' : 'none';
+        if (summary.scope === 'admin' && deptFilter && deptFilter.options.length <= 1) {
+          const depts = (this.state.departments && this.state.departments.length > 0)
+            ? this.state.departments.map(d => typeof d === 'string' ? d : d.name)
+            : [];
+          deptFilter.innerHTML = '<option value="all">🏢 Tất cả 16 phòng ban</option>' + 
+            depts.map(d => `<option value="${d}">${d}</option>`).join('');
+          if (selectedDept) deptFilter.value = selectedDept;
+
+          deptFilter.onchange = (e) => this.renderReportsView(e.target.value);
+        }
+      }
+
+      // Handle Export CSV button visibility & state
+      if (btnExportCsv) {
+        if (summary.canExportCsv === false || summary.userRole === 'viewer') {
+          btnExportCsv.style.display = 'none';
+        } else {
+          btnExportCsv.style.display = 'inline-flex';
+        }
+      }
+
+      // 3. Populate 6 KPI Cards
+      const kpis = summary.kpis || {};
+      const elTotal = document.getElementById('rptKpiTotal');
+      const elCompleted = document.getElementById('rptKpiCompleted');
+      const elInProgress = document.getElementById('rptKpiInProgress');
+      const elReview = document.getElementById('rptKpiReview');
+      const elOverdue = document.getElementById('rptKpiOverdue');
+      const elScore = document.getElementById('rptKpiScore');
+      const elRate = document.getElementById('rptKpiRate');
+      const elFill = document.getElementById('rptKpiProgressFill');
+
+      if (elTotal) elTotal.innerText = kpis.total || 0;
+      if (elCompleted) elCompleted.innerText = kpis.completed || 0;
+      if (elInProgress) elInProgress.innerText = kpis.inProgress || 0;
+      if (elReview) elReview.innerText = (kpis.review || 0) + (kpis.todo || 0);
+      if (elOverdue) elOverdue.innerText = kpis.overdue || 0;
+      if (elScore) elScore.innerText = `${kpis.completionRate || 0}%`;
+      if (elRate) elRate.innerText = `${kpis.completionRate || 0}%`;
+      if (elFill) elFill.style.width = `${kpis.completionRate || 0}%`;
+
+      // Update Subtitles based on scope
+      const subTotal = document.getElementById('rptKpiTotalSub');
+      const subProgress = document.getElementById('rptKpiInProgressSub');
+      const subReview = document.getElementById('rptKpiReviewSub');
+      const subOverdue = document.getElementById('rptKpiOverdueSub');
+
+      if (summary.scope === 'personal') {
+        if (subTotal) subTotal.innerText = 'Nhiệm vụ cá nhân được giao';
+        if (subProgress) subProgress.innerText = 'Đang trực tiếp xử lý';
+        if (subReview) subReview.innerText = 'Chờ quản lý duyệt hoặc cần làm';
+        if (subOverdue) subOverdue.innerText = (kpis.overdue > 0 ? `🚨 Bạn có ${kpis.overdue} việc trễ hạn!` : '✅ Không có việc trễ hạn');
+      } else if (summary.scope === 'manager') {
+        if (subTotal) subTotal.innerText = `Nhiệm vụ của phòng ${summary.userDepartment}`;
+        if (subProgress) subProgress.innerText = 'Nhân sự phòng đang xử lý';
+        if (subReview) subReview.innerText = 'Cần bạn kiểm tra & nghiệm thu';
+        if (subOverdue) subOverdue.innerText = (kpis.overdue > 0 ? `Cảnh báo ${kpis.overdue} việc trễ của phòng` : 'Tiến độ phòng đạt chuẩn');
+      } else {
+        if (subTotal) subTotal.innerText = 'Phạm vi toàn doanh nghiệp';
+        if (subProgress) subProgress.innerText = 'Khối lượng đang thực hiện';
+        if (subReview) subReview.innerText = 'Chờ nghiệm thu & bàn giao';
+        if (subOverdue) subOverdue.innerText = (kpis.overdue > 0 ? `Tổng cộng ${kpis.overdue} việc trễ hạn` : 'Tiến độ toàn hệ thống tốt');
+      }
+
+      // 4. Update Chart Titles Dynamically
+      const titleStatus = document.getElementById('chartStatusTitle');
+      const titleDept = document.getElementById('chartDeptTitle');
+      const titleTrend = document.getElementById('chartTrendTitle');
+      const titleMember = document.getElementById('chartMemberTitle');
+
+      if (summary.scope === 'personal') {
+        if (titleStatus) titleStatus.innerText = '🥧 Trạng Thái Nhiệm Vụ Của Bạn';
+        if (titleDept) titleDept.innerText = '🎯 Mức Độ Ưu Tiên Công Việc Của Bạn';
+        if (titleTrend) titleTrend.innerText = '📈 Xu Hướng Hoàn Thành 7 Ngày Của Bạn';
+        if (titleMember) titleMember.innerText = '📊 Phân Bổ Tiến Độ Nhiệm Vụ Cá Nhân';
+      } else if (summary.scope === 'manager') {
+        if (titleStatus) titleStatus.innerText = `🥧 Trạng Thái Việc Phòng ${summary.userDepartment}`;
+        if (titleDept) titleDept.innerText = `🎯 Mức Độ Ưu Tiên Trong Phòng Ban`;
+        if (titleTrend) titleTrend.innerText = `📈 Xu Hướng Tiến Độ 7 Ngày (${summary.userDepartment})`;
+        if (titleMember) titleMember.innerText = `👥 So Sánh Hiệu Suất Nhân Sự Phòng ${summary.userDepartment}`;
+      } else if (summary.scope === 'viewer') {
+        if (titleStatus) titleStatus.innerText = '🥧 Cơ Cấu Trạng Thái Toàn Hệ Thống';
+        if (titleDept) titleDept.innerText = '🏢 Khối Lượng Theo Phòng Ban';
+        if (titleTrend) titleTrend.innerText = '📈 Xu Hướng Hoàn Thành 7 Ngày';
+        if (titleMember) titleMember.innerText = '📊 Tỷ Lệ Hoàn Thành Theo Phòng Ban';
+      } else {
+        // Admin
+        if (titleStatus) titleStatus.innerText = '🥧 Cơ Cấu Trạng Thái Toàn Doanh Nghiệp';
+        if (titleDept) titleDept.innerText = '🏢 Khối Lượng Theo 16 Phòng Ban';
+        if (titleTrend) titleTrend.innerText = '📈 Xu Hướng Giao Việc & Hoàn Thành 7 Ngày';
+        if (titleMember) titleMember.innerText = '👥 Hiệu Suất & Tải Việc Nhân Sự';
+      }
+
+      // 5. Render Charts
       TaskCharts.renderReports(summary);
 
-      // Render Member Performance Table
-      const tbody = document.getElementById('reportMemberTableBody');
-      if (tbody && summary.memberPerformance) {
-        tbody.innerHTML = summary.memberPerformance.map(m => `
+      // 6. Render Adaptive Table
+      this.renderAdaptiveReportTable(summary);
+
+    } catch (err) {
+      console.error('Failed to render reports', err);
+      if (err.message && (err.message.includes('403') || err.message.includes('quyền'))) {
+        if (accessDeniedEl) accessDeniedEl.style.display = 'block';
+        if (mainContentEl) mainContentEl.style.display = 'none';
+      } else {
+        this.showToast(`Lỗi tải báo cáo: ${err.message}`, 'danger');
+      }
+    }
+  },
+
+  renderAdaptiveReportTable(summary) {
+    const tableTitleEl = document.getElementById('reportTableCardTitle');
+    const thead = document.getElementById('reportTableHead');
+    const tbody = document.getElementById('reportTableBody');
+
+    if (!thead || !tbody) return;
+
+    if (summary.scope === 'personal') {
+      // PERSONAL TASKS TABLE
+      const tasks = summary.personalTasks || [];
+      if (tableTitleEl) {
+        tableTitleEl.innerHTML = `📋 Danh Sách Nhiệm Vụ Trọng Tâm Của Bạn <span style="font-size:12px; font-weight:normal; color:var(--text-muted);">(${tasks.length} công việc được giao)</span>`;
+      }
+
+      thead.innerHTML = `
+        <tr>
+          <th style="width:36%;">Nhiệm Vụ Cần Xử Lý</th>
+          <th style="width:16%;">Hạn Chót</th>
+          <th style="width:14%;">Mức Độ Ưu Tiên</th>
+          <th style="width:14%;">Trạng Thái</th>
+          <th style="width:12%;">Tiến Độ</th>
+          <th style="width:8%; text-align:right;">Thao Tác</th>
+        </tr>
+      `;
+
+      if (tasks.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align:center; padding:36px; color:var(--text-muted);">
+              🎉 Tuyệt vời! Bạn hiện không có công việc nào tồn đọng hoặc cần xử lý.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      const priorityMap = {
+        urgent: '<span class="task-priority urgent" style="display:inline-flex;">🚨 Khẩn cấp</span>',
+        high: '<span class="task-priority high" style="display:inline-flex;">⚡ Cao</span>',
+        medium: '<span class="task-priority medium" style="display:inline-flex;">🔷 Trung bình</span>',
+        low: '<span class="task-priority low" style="display:inline-flex;">⚪ Thấp</span>'
+      };
+
+      const statusMap = {
+        todo: '<span class="badge" style="background:#64748b; color:#fff;">Cần làm</span>',
+        in_progress: '<span class="badge" style="background:#3b82f6; color:#fff;">Đang làm</span>',
+        review: '<span class="badge" style="background:#f59e0b; color:#fff;">Chờ duyệt</span>',
+        completed: '<span class="badge" style="background:#10b981; color:#fff;">Hoàn thành</span>'
+      };
+
+      tbody.innerHTML = tasks.map(t => {
+        const dateStr = t.dueDate ? new Date(t.dueDate).toLocaleDateString('vi-VN') : 'Không có hạn';
+        const isOverdue = t.isOverdue;
+        return `
           <tr>
             <td>
-              <div style="display:flex; align-items:center; gap:8px;">
-                <span style="font-size:18px;">${m.avatar}</span>
-                <div>
-                  <div style="font-weight:600;">${m.name}</div>
-                  <div style="font-size:11px; color:var(--text-muted);">${m.department}</div>
-                </div>
+              <div style="font-weight:600; cursor:pointer;" onclick="App.openTaskDetail('${t.id}')">
+                <span style="font-family:monospace; color:var(--primary); font-size:11px; margin-right:4px;">${t.id}</span>
+                ${t.title}
+              </div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+                ${t.department || ''}
               </div>
             </td>
-            <td><strong>${m.total}</strong></td>
-            <td style="color:var(--success); font-weight:600;">${m.completed}</td>
-            <td style="color:var(--primary); font-weight:600;">${m.inProgress}</td>
-            <td style="color:${m.overdue > 0 ? 'var(--danger)' : 'inherit'}; font-weight:700;">
-              ${m.overdue > 0 ? `🚨 ${m.overdue}` : '0'}
+            <td>
+              ${isOverdue 
+                ? `<span style="color:var(--danger); font-weight:700;">${dateStr} <span class="overdue-tag-pill">🚨 Quá hạn</span></span>`
+                : `<span>${dateStr}</span>`
+              }
+            </td>
+            <td>${priorityMap[t.priority] || t.priority}</td>
+            <td>${statusMap[t.status] || t.status}</td>
+            <td>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <div class="task-progress-bar" style="width:60px; margin:0;">
+                  <div class="task-progress-fill" style="width:${t.progress || 0}%;"></div>
+                </div>
+                <span style="font-weight:700; font-size:11px;">${t.progress || 0}%</span>
+              </div>
+            </td>
+            <td style="text-align:right;">
+              <button class="btn btn-outline btn-sm" onclick="App.openTaskDetail('${t.id}')" style="padding:3px 8px; font-size:11px;">
+                👁️ Xem
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+    } else if (summary.scope === 'viewer') {
+      // VIEWER: DEPARTMENT OVERVIEW
+      const depts = Object.keys(summary.departmentMap || {});
+      if (tableTitleEl) {
+        tableTitleEl.innerHTML = `🏢 Bảng Tổng Hợp Tiến Độ Các Phòng Ban Doanh Nghiệp <span style="font-size:12px; font-weight:normal; color:var(--text-muted);">(${depts.length} phòng ban)</span>`;
+      }
+
+      thead.innerHTML = `
+        <tr>
+          <th style="width:28%;">Phòng Ban</th>
+          <th style="width:14%;">Tổng Công Việc</th>
+          <th style="width:14%;">Đã Hoàn Thành</th>
+          <th style="width:14%;">Đang Thực Hiện</th>
+          <th style="width:14%;">Bị Quá Hạn</th>
+          <th style="width:16%;">Tỷ Lệ Hoàn Thành</th>
+        </tr>
+      `;
+
+      if (depts.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">Chưa có dữ liệu phòng ban</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = depts.map(d => {
+        const item = summary.departmentMap[d];
+        const rate = item.total > 0 ? Math.round((item.completed / item.total) * 100) : 0;
+        return `
+          <tr>
+            <td><strong>🏢 ${d}</strong></td>
+            <td><strong>${item.total}</strong></td>
+            <td style="color:var(--success); font-weight:600;">${item.completed}</td>
+            <td style="color:var(--primary); font-weight:600;">${item.inProgress}</td>
+            <td style="color:${item.overdue > 0 ? 'var(--danger)' : 'inherit'}; font-weight:700;">
+              ${item.overdue > 0 ? `🚨 ${item.overdue}` : '0'}
             </td>
             <td>
               <div style="display:flex; align-items:center; gap:8px;">
                 <div class="task-progress-bar" style="width:70px; margin:0;">
-                  <div class="task-progress-fill" style="width:${m.completionRate}%;"></div>
+                  <div class="task-progress-fill" style="width:${rate}%;"></div>
                 </div>
-                <span style="font-weight:700;">${m.completionRate}%</span>
+                <span style="font-weight:700;">${rate}%</span>
               </div>
             </td>
           </tr>
-        `).join('');
+        `;
+      }).join('');
+
+    } else {
+      // ADMIN & MANAGER: MEMBER PERFORMANCE TABLE
+      const members = summary.memberPerformance || [];
+      if (tableTitleEl) {
+        if (summary.scope === 'manager') {
+          tableTitleEl.innerHTML = `👥 Bảng Đánh Giá KPI Nhân Sự Phòng ${summary.userDepartment} <span style="font-size:12px; font-weight:normal; color:var(--text-muted);">(${members.length} nhân sự trực thuộc)</span>`;
+        } else {
+          tableTitleEl.innerHTML = `👥 Bảng Tổng Hợp Chỉ Số KPI Nhân Sự Toàn Doanh Nghiệp <span style="font-size:12px; font-weight:normal; color:var(--text-muted);">(${members.length} nhân sự)</span>`;
+        }
       }
-    } catch (err) {
-      console.error('Failed to render reports', err);
+
+      thead.innerHTML = `
+        <tr>
+          <th style="width:24%;">Nhân Viên</th>
+          <th style="width:18%;">Phòng Ban</th>
+          <th style="width:11%;">Tổng Việc</th>
+          <th style="width:11%;">Đã Xong</th>
+          <th style="width:11%;">Đang Làm</th>
+          <th style="width:11%;">Quá Hạn</th>
+          <th style="width:14%;">Tỷ Lệ Đạt KPI</th>
+        </tr>
+      `;
+
+      if (members.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">Không có nhân viên nào trong phạm vi này</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = members.map(m => `
+        <tr>
+          <td>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:18px;">${m.avatar || '👤'}</span>
+              <div>
+                <div style="font-weight:600;">${m.name}</div>
+                <div style="font-size:11px; color:var(--text-muted);">${m.role === 'admin' ? 'Quản trị viên' : (m.role === 'manager' ? 'Trưởng phòng' : 'Nhân viên')}</div>
+              </div>
+            </div>
+          </td>
+          <td><span style="font-size:12px; color:var(--text-secondary);">${m.department || 'N/A'}</span></td>
+          <td><strong>${m.total}</strong></td>
+          <td style="color:var(--success); font-weight:600;">${m.completed}</td>
+          <td style="color:var(--primary); font-weight:600;">${m.inProgress}</td>
+          <td style="color:${m.overdue > 0 ? 'var(--danger)' : 'inherit'}; font-weight:700;">
+            ${m.overdue > 0 ? `🚨 ${m.overdue}` : '0'}
+          </td>
+          <td>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div class="task-progress-bar" style="width:70px; margin:0;">
+                <div class="task-progress-fill" style="width:${m.completionRate}%;"></div>
+              </div>
+              <span style="font-weight:700;">${m.completionRate}%</span>
+            </div>
+          </td>
+        </tr>
+      `).join('');
     }
   },
 
   exportCsvReport() {
-    window.location.href = '/api/reports/export-csv';
+    const deptFilter = document.getElementById('reportDeptFilter');
+    const dept = (deptFilter && deptFilter.value && deptFilter.value !== 'all') ? `?department=${encodeURIComponent(deptFilter.value)}` : '';
+    window.location.href = `/api/reports/export-csv${dept}`;
   },
 
   printReport() {

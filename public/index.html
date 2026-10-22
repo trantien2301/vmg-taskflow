@@ -316,7 +316,7 @@
         </div>
         <button class="sidebar-version-pill" id="sidebarVersionBtn" title="Xem thông tin phiên bản & cập nhật">
           <span class="version-dot"></span>
-          <span>TaskFlow Pro <strong id="sidebarVersionText">v3.1.0</strong></span>
+          <span>TaskFlow Pro <strong id="sidebarVersionText">v3.2.0</strong></span>
           <span class="version-badge-new" id="sidebarVersionNewBadge" style="display:none;">MỚI</span>
         </button>
         <button class="btn-logout" id="btnLogoutSidebar">
@@ -355,6 +355,14 @@
         </div>
 
         <div class="header-right">
+          <!-- Demo User / Role Switcher for instant testing -->
+          <div class="demo-user-switcher" title="Chuyển đổi tài khoản trải nghiệm nhanh giữa các vai trò">
+            <span class="demo-switcher-label hide-mobile">👤 Trải nghiệm:</span>
+            <select id="demoUserSelect" class="demo-user-dropdown" aria-label="Chọn tài khoản trải nghiệm vai trò">
+              <option value="">Đang tải danh sách...</option>
+            </select>
+          </div>
+
           <!-- Realtime status indicator -->
           <div class="realtime-status-pill">
             <div class="status-dot" id="statusDot"></div>
@@ -363,7 +371,7 @@
 
           <!-- Version Info button -->
           <button class="btn btn-outline btn-sm version-header-btn" id="btnHeaderVersion" title="Xem thông tin phiên bản & cập nhật">
-            🚀 <span class="hide-mobile">v3.1.0</span>
+            🚀 <span class="hide-mobile">v3.2.0</span>
             <span class="header-version-dot" id="headerVersionDot" style="display:none;"></span>
           </button>
 
@@ -641,73 +649,177 @@
           <div class="alert-cards-grid" id="alertsDueSoonGrid"></div>
         </section>
 
-        <!-- VIEW 5: REPORTS & ANALYTICS -->
+        <!-- VIEW 5: REPORTS & ANALYTICS (ROLE-BASED INTELLIGENCE) -->
         <section class="view-panel" id="view-reports">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-            <h2 style="font-size:18px; font-weight:700;">Biểu Đồ Phân Tích & Báo Cáo Hiệu Suất</h2>
-            <div style="display:flex; gap:10px;">
-              <button class="btn btn-outline btn-sm" onclick="App.exportCsvReport()">📥 Xuất File Excel (CSV)</button>
-              <button class="btn btn-primary btn-sm" onclick="App.printReport()">🖨️ In Báo Cáo</button>
-            </div>
+          <!-- Access Denied Card (Shown when canViewReports is false) -->
+          <div class="report-access-denied" id="reportAccessDenied" style="display:none;">
+            <div class="access-denied-icon">🚫</div>
+            <h2 class="access-denied-title">Truy Cập Báo Cáo Bị Từ Chối</h2>
+            <p class="access-denied-desc">
+              Tài khoản của bạn hiện <strong>chưa được cấp quyền xem Báo Cáo & Thống Kê</strong> (<code>canViewReports: false</code>).<br>
+              Vui lòng liên hệ Quản Trị Viên (Admin) trong mục Quản Lý Nhân Sự để được phân quyền.
+            </p>
+            <button class="btn btn-primary btn-sm" onclick="App.switchView('kanban')">
+              📋 Quay Lại Bảng Công Việc
+            </button>
           </div>
 
-          <!-- Charts Grid -->
-          <div class="charts-grid">
-            <div class="chart-card">
-              <div class="chart-title">
-                <span>🥧 Phân Bổ Trạng Thái Công Việc</span>
+          <!-- Main Reports Content -->
+          <div id="reportMainContent">
+            <!-- Scope Header Card -->
+            <div class="report-scope-card">
+              <div class="report-scope-info">
+                <div class="report-scope-badge-row">
+                  <span class="report-scope-badge admin" id="reportRoleBadge">👑 QUẢN TRỊ VIÊN</span>
+                  <span class="report-scope-dept" id="reportScopeDeptText">Toàn Doanh Nghiệp</span>
+                </div>
+                <h2 class="report-scope-title" id="reportScopeTitle">Biểu Đồ Phân Tích & Báo Cáo Hiệu Suất</h2>
+                <p class="report-scope-desc" id="reportScopeDesc">
+                  Giám sát tiến độ toàn cảnh, phân bổ nguồn lực và đánh giá năng lực thực thi theo vai trò chức năng.
+                </p>
               </div>
-              <div class="chart-canvas-container">
-                <canvas id="chartStatus"></canvas>
+
+              <!-- Scope Actions & Filters -->
+              <div class="report-scope-actions">
+                <!-- Department Filter (Visible only for Admin) -->
+                <div class="report-dept-filter-wrap" id="reportDeptFilterWrap">
+                  <label for="reportDeptFilter" class="report-filter-label">Phòng ban:</label>
+                  <select id="reportDeptFilter" class="form-control form-control-sm report-dept-select">
+                    <option value="all">🏢 Tất cả 16 phòng ban</option>
+                  </select>
+                </div>
+
+                <button class="btn btn-outline btn-sm" id="btnExportReportCsv" onclick="App.exportCsvReport()" title="Xuất dữ liệu công việc định dạng Excel (CSV)">
+                  📥 <span class="hide-mobile">Xuất File </span>Excel (CSV)
+                </button>
+                <button class="btn btn-primary btn-sm" onclick="App.printReport()" title="In bản báo cáo chuẩn hóa">
+                  🖨️ <span class="hide-mobile">In </span>Báo Cáo
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="App.renderReportsView()" title="Làm mới dữ liệu tức thì">
+                  🔄
+                </button>
               </div>
             </div>
 
-            <div class="chart-card">
-              <div class="chart-title">
-                <span>🏢 Khối Lượng Theo Phòng Ban</span>
+            <!-- KPI Metric Cards Grid -->
+            <div class="report-kpi-grid">
+              <div class="report-kpi-card">
+                <div class="report-kpi-header">
+                  <span class="report-kpi-icon blue">📋</span>
+                  <span class="report-kpi-label">Tổng Công Việc</span>
+                </div>
+                <div class="report-kpi-val" id="rptKpiTotal">0</div>
+                <div class="report-kpi-sub" id="rptKpiTotalSub">Trong phạm vi phân quyền</div>
               </div>
-              <div class="chart-canvas-container">
-                <canvas id="chartDept"></canvas>
+
+              <div class="report-kpi-card">
+                <div class="report-kpi-header">
+                  <span class="report-kpi-icon green">✅</span>
+                  <span class="report-kpi-label">Đã Hoàn Thành</span>
+                </div>
+                <div class="report-kpi-val text-success" id="rptKpiCompleted">0</div>
+                <div class="report-kpi-sub">
+                  Tỷ lệ đạt KPI: <strong id="rptKpiRate" style="color:var(--success);">0%</strong>
+                </div>
+              </div>
+
+              <div class="report-kpi-card">
+                <div class="report-kpi-header">
+                  <span class="report-kpi-icon indigo">🚀</span>
+                  <span class="report-kpi-label">Đang Thực Hiện</span>
+                </div>
+                <div class="report-kpi-val text-primary" id="rptKpiInProgress">0</div>
+                <div class="report-kpi-sub" id="rptKpiInProgressSub">Nhiệm vụ đang diễn ra</div>
+              </div>
+
+              <div class="report-kpi-card">
+                <div class="report-kpi-header">
+                  <span class="report-kpi-icon orange">⏳</span>
+                  <span class="report-kpi-label">Chờ Duyệt / Cần Làm</span>
+                </div>
+                <div class="report-kpi-val text-warning" id="rptKpiReview">0</div>
+                <div class="report-kpi-sub" id="rptKpiReviewSub">Cần kiểm tra & nghiệm thu</div>
+              </div>
+
+              <div class="report-kpi-card">
+                <div class="report-kpi-header">
+                  <span class="report-kpi-icon red">🚨</span>
+                  <span class="report-kpi-label">Bị Quá Hạn</span>
+                </div>
+                <div class="report-kpi-val text-danger" id="rptKpiOverdue">0</div>
+                <div class="report-kpi-sub text-danger" id="rptKpiOverdueSub">Cần xử lý khẩn trương</div>
+              </div>
+
+              <div class="report-kpi-card">
+                <div class="report-kpi-header">
+                  <span class="report-kpi-icon purple">🎯</span>
+                  <span class="report-kpi-label">Tiến Độ & Năng Suất</span>
+                </div>
+                <div class="report-kpi-val text-purple" id="rptKpiScore">0%</div>
+                <div class="report-kpi-progress-bar">
+                  <div class="report-kpi-progress-fill" id="rptKpiProgressFill" style="width:0%;"></div>
+                </div>
               </div>
             </div>
 
-            <div class="chart-card">
-              <div class="chart-title">
-                <span>📈 Xu Hướng Hoàn Thành 7 Ngày Qua</span>
+            <!-- Charts Grid -->
+            <div class="charts-grid">
+              <div class="chart-card">
+                <div class="chart-title">
+                  <span id="chartStatusTitle">🥧 Phân Bổ Trạng Thái Công Việc</span>
+                </div>
+                <div class="chart-canvas-container">
+                  <canvas id="chartStatus"></canvas>
+                </div>
               </div>
-              <div class="chart-canvas-container">
-                <canvas id="chartTrend"></canvas>
+
+              <div class="chart-card">
+                <div class="chart-title">
+                  <span id="chartDeptTitle">🏢 Khối Lượng Theo Phòng Ban</span>
+                </div>
+                <div class="chart-canvas-container">
+                  <canvas id="chartDept"></canvas>
+                </div>
+              </div>
+
+              <div class="chart-card">
+                <div class="chart-title">
+                  <span id="chartTrendTitle">📈 Xu Hướng Hoàn Thành 7 Ngày Qua</span>
+                </div>
+                <div class="chart-canvas-container">
+                  <canvas id="chartTrend"></canvas>
+                </div>
+              </div>
+
+              <div class="chart-card">
+                <div class="chart-title">
+                  <span id="chartMemberTitle">👥 Hiệu Suất Từng Nhân Viên</span>
+                </div>
+                <div class="chart-canvas-container">
+                  <canvas id="chartMember"></canvas>
+                </div>
               </div>
             </div>
 
-            <div class="chart-card">
-              <div class="chart-title">
-                <span>👥 Hiệu Suất Từng Nhân Viên</span>
+            <!-- Detail Table Card (Adaptive: Member KPI for Admin/Manager, Personal Focus Tasks for User, Dept Overview for Viewer) -->
+            <div class="table-card" style="margin-top:20px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border-color); flex-wrap:wrap; gap:10px;">
+                <div style="font-weight:700; font-size:15px;" id="reportTableCardTitle">
+                  Bảng Tổng Hợp Chỉ Số KPI Nhân Sự
+                </div>
+                <div id="reportTableFilterArea" style="display:flex; gap:10px; align-items:center;">
+                  <!-- Dynamic search/filter input -->
+                </div>
               </div>
-              <div class="chart-canvas-container">
-                <canvas id="chartMember"></canvas>
-              </div>
-            </div>
-          </div>
 
-          <!-- Member Performance Table -->
-          <div class="table-card">
-            <div style="padding:16px 20px; font-weight:700; border-bottom:1px solid var(--border-color);">
-              Bảng Tổng Hợp Chỉ Số KPI Nhân Sự
+              <!-- Table Container -->
+              <div class="table-responsive" id="reportTableWrapper">
+                <table class="data-table" id="reportDataTable">
+                  <thead id="reportTableHead"></thead>
+                  <tbody id="reportTableBody"></tbody>
+                </table>
+              </div>
             </div>
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Nhân Viên</th>
-                  <th>Tổng Việc</th>
-                  <th>Đã Xong</th>
-                  <th>Đang Làm</th>
-                  <th>Quá Hạn</th>
-                  <th>Tỷ Lệ Hoàn Thành</th>
-                </tr>
-              </thead>
-              <tbody id="reportMemberTableBody"></tbody>
-            </table>
           </div>
         </section>
 
@@ -1470,7 +1582,7 @@
           <div class="version-status-header">
             <div class="version-pill-large">
               <span class="version-status-pulse" id="versionStatusPulse"></span>
-              <span id="modalCurrentVersion">TaskFlow Pro v3.1.0</span>
+              <span id="modalCurrentVersion">TaskFlow Pro v3.2.0</span>
             </div>
             <span class="version-build-date" id="modalBuildDate">Bản dựng: 22/10/2026</span>
           </div>
@@ -1620,8 +1732,8 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- APPLICATION SCRIPTS -->
-  <script src="js/api.js?v=3.1.0"></script>
-  <script src="js/charts.js?v=3.1.0"></script>
-  <script src="js/app.js?v=3.1.0"></script>
+  <script src="js/api.js?v=3.2.0"></script>
+  <script src="js/charts.js?v=3.2.0"></script>
+  <script src="js/app.js?v=3.2.0"></script>
 </body>
 </html>

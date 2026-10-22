@@ -866,29 +866,96 @@ app.post('/api/alerts/scan-now', authenticate, (req, res) => {
 });
 
 // -------------------------------------------------------------
-// REPORTS & ANALYTICS ROUTES
+// REPORTS & ANALYTICS ROUTES (Role-Based Reporting Intelligence)
 // -------------------------------------------------------------
 app.get('/api/reports/summary', authenticate, (req, res) => {
-  const tasks = db.getTasks();
-  const users = db.getUsers();
+  const user = req.user;
+  const canView = user.role === 'admin' || (user.permissions && user.permissions.canViewReports !== false);
+  if (!canView) {
+    return res.status(403).json({
+      error: 'Bạn không có quyền xem báo cáo thống kê. Vui lòng liên hệ Quản trị viên để được cấp quyền.'
+    });
+  }
+
+  const allTasks = db.getTasks();
+  const allUsers = db.getUsers();
   const now = new Date();
 
-  const total = tasks.length;
+  const userRole = user.role || 'user';
+  const userDept = user.department || 'Phòng Kỹ Thuật';
+
+  let filteredTasks = [];
+  let scope = 'personal';
+  let scopeTitle = '';
+  let scopeDesc = '';
+  let targetDept = null;
+
+  if (userRole === 'admin') {
+    scope = 'admin';
+    const deptQuery = req.query.department;
+    if (deptQuery && deptQuery !== 'all' && deptQuery !== 'Tất cả phòng ban') {
+      filteredTasks = allTasks.filter(t => t.department === deptQuery);
+      targetDept = deptQuery;
+      scopeTitle = `Báo Cáo Phân Tích Phòng Ban: ${deptQuery}`;
+      scopeDesc = `Chế độ Quản trị viên - Giám sát toàn diện dữ liệu của ${deptQuery}`;
+    } else {
+      filteredTasks = allTasks;
+      scopeTitle = 'Báo Cáo Toàn Doanh Nghiệp (Tất Cả Phòng Ban)';
+      scopeDesc = 'Chế độ Quản trị viên - Giám sát bức tranh toàn cảnh 16 phòng ban và toàn bộ nhân sự';
+    }
+  } else if (userRole === 'manager') {
+    scope = 'manager';
+    targetDept = userDept;
+    filteredTasks = allTasks.filter(t => t.department === userDept);
+    scopeTitle = `Báo Cáo Quản Trị Phòng Ban: ${userDept}`;
+    scopeDesc = `Chế độ Trưởng phòng - Quản trị tiến độ và đánh giá chỉ số KPI nhân sự trực thuộc ${userDept}`;
+  } else if (userRole === 'viewer') {
+    scope = 'viewer';
+    filteredTasks = allTasks;
+    scopeTitle = 'Báo Cáo Giám Sát Tiến Độ Chung';
+    scopeDesc = 'Chế độ Chỉ Xem (Read-only) - Theo dõi tiến độ cấp cao toàn hệ thống (Không có quyền trích xuất dữ liệu)';
+  } else {
+    // Role: 'user'
+    scope = 'personal';
+    filteredTasks = allTasks.filter(t => t.assignedTo === user.id || t.createdBy === user.id);
+    scopeTitle = `Báo Cáo Hiệu Suất Cá Nhân: ${user.name}`;
+    scopeDesc = `Chế độ Nhân viên - Theo dõi nhiệm vụ được giao và chỉ số KPI cá nhân (${userDept})`;
+  }
+
+  // Calculate KPIs on filteredTasks
+  const total = filteredTasks.length;
   let completed = 0;
   let inProgress = 0;
   let todo = 0;
   let review = 0;
   let overdue = 0;
   let urgent = 0;
+  let high = 0;
+  let medium = 0;
+  let low = 0;
 
-  // Status breakdown
-  tasks.forEach(t => {
+  // Task progress distribution (for personal view)
+  let p0_25 = 0;
+  let p26_50 = 0;
+  let p51_75 = 0;
+  let p76_100 = 0;
+
+  filteredTasks.forEach(t => {
     if (t.status === 'completed') completed++;
     else if (t.status === 'in_progress') inProgress++;
     else if (t.status === 'review') review++;
     else if (t.status === 'todo') todo++;
 
     if (t.priority === 'urgent') urgent++;
+    else if (t.priority === 'high') high++;
+    else if (t.priority === 'medium') medium++;
+    else if (t.priority === 'low') low++;
+
+    const pr = Number(t.progress) || 0;
+    if (pr <= 25) p0_25++;
+    else if (pr <= 50) p26_50++;
+    else if (pr <= 75) p51_75++;
+    else p76_100++;
 
     if (t.status !== 'completed' && t.dueDate && new Date(t.dueDate) < now) {
       overdue++;
@@ -897,43 +964,105 @@ app.get('/api/reports/summary', authenticate, (req, res) => {
 
   const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-  // Performance per department
+  // Department breakdown (for admin & viewer)
   const departmentMap = {};
-  tasks.forEach(t => {
-    const dept = t.department || 'Khác';
-    if (!departmentMap[dept]) {
-      departmentMap[dept] = { total: 0, completed: 0, overdue: 0, inProgress: 0 };
-    }
-    departmentMap[dept].total++;
-    if (t.status === 'completed') departmentMap[dept].completed++;
-    else if (t.dueDate && new Date(t.dueDate) < now) departmentMap[dept].overdue++;
-    else departmentMap[dept].inProgress++;
-  });
+  if (scope === 'admin' || scope === 'viewer') {
+    allTasks.forEach(t => {
+      const dept = t.department || 'Khác';
+      if (!departmentMap[dept]) {
+        departmentMap[dept] = { total: 0, completed: 0, overdue: 0, inProgress: 0 };
+      }
+      departmentMap[dept].total++;
+      if (t.status === 'completed') departmentMap[dept].completed++;
+      else if (t.status !== 'completed' && t.dueDate && new Date(t.dueDate) < now) departmentMap[dept].overdue++;
+      else departmentMap[dept].inProgress++;
+    });
+  }
 
-  // Performance per member
-  const memberPerformance = users.map(u => {
-    const memberTasks = tasks.filter(t => t.assignedTo === u.id);
-    const mTotal = memberTasks.length;
-    const mCompleted = memberTasks.filter(t => t.status === 'completed').length;
-    const mOverdue = memberTasks.filter(t => t.status !== 'completed' && t.dueDate && new Date(t.dueDate) < now).length;
-    const mInProgress = memberTasks.filter(t => t.status === 'in_progress' || t.status === 'review').length;
-    const mRate = mTotal > 0 ? Math.round((mCompleted / mTotal) * 100) : 0;
+  // Member performance list tailored to role
+  let memberPerformance = [];
+  if (scope === 'admin') {
+    const targetUsers = targetDept ? allUsers.filter(u => u.department === targetDept) : allUsers;
+    memberPerformance = targetUsers.map(u => {
+      const mTasks = allTasks.filter(t => t.assignedTo === u.id);
+      const mTotal = mTasks.length;
+      const mCompleted = mTasks.filter(t => t.status === 'completed').length;
+      const mOverdue = mTasks.filter(t => t.status !== 'completed' && t.dueDate && new Date(t.dueDate) < now).length;
+      const mInProgress = mTasks.filter(t => t.status === 'in_progress' || t.status === 'review').length;
+      const mRate = mTotal > 0 ? Math.round((mCompleted / mTotal) * 100) : 0;
+      return {
+        userId: u.id,
+        name: u.name,
+        avatar: u.avatar,
+        department: u.department,
+        role: u.role,
+        total: mTotal,
+        completed: mCompleted,
+        overdue: mOverdue,
+        inProgress: mInProgress,
+        completionRate: mRate
+      };
+    });
+  } else if (scope === 'manager') {
+    // Only users in manager's department
+    const deptUsers = allUsers.filter(u => u.department === userDept);
+    memberPerformance = deptUsers.map(u => {
+      const mTasks = filteredTasks.filter(t => t.assignedTo === u.id);
+      const mTotal = mTasks.length;
+      const mCompleted = mTasks.filter(t => t.status === 'completed').length;
+      const mOverdue = mTasks.filter(t => t.status !== 'completed' && t.dueDate && new Date(t.dueDate) < now).length;
+      const mInProgress = mTasks.filter(t => t.status === 'in_progress' || t.status === 'review').length;
+      const mRate = mTotal > 0 ? Math.round((mCompleted / mTotal) * 100) : 0;
+      return {
+        userId: u.id,
+        name: u.name,
+        avatar: u.avatar,
+        department: u.department,
+        role: u.role,
+        total: mTotal,
+        completed: mCompleted,
+        overdue: mOverdue,
+        inProgress: mInProgress,
+        completionRate: mRate
+      };
+    });
+  } else if (scope === 'personal') {
+    // Only self performance
+    memberPerformance = [{
+      userId: user.id,
+      name: user.name,
+      avatar: user.avatar,
+      department: user.department,
+      role: user.role,
+      total,
+      completed,
+      overdue,
+      inProgress,
+      completionRate
+    }];
+  }
 
-    return {
-      userId: u.id,
-      name: u.name,
-      avatar: u.avatar,
-      department: u.department,
-      role: u.role,
-      total: mTotal,
-      completed: mCompleted,
-      overdue: mOverdue,
-      inProgress: mInProgress,
-      completionRate: mRate
-    };
-  });
+  // Personal tasks list (for user view)
+  let personalTasks = [];
+  if (scope === 'personal') {
+    personalTasks = filteredTasks.map(t => ({
+      id: t.id,
+      title: t.title,
+      priority: t.priority,
+      status: t.status,
+      progress: t.progress || 0,
+      dueDate: t.dueDate,
+      department: t.department,
+      isOverdue: t.status !== 'completed' && t.dueDate && new Date(t.dueDate) < now
+    })).sort((a, b) => {
+      if (a.isOverdue && !b.isOverdue) return -1;
+      if (!a.isOverdue && b.isOverdue) return 1;
+      if (a.dueDate && b.dueDate) return new Date(a.dueDate) - new Date(b.dueDate);
+      return 0;
+    });
+  }
 
-  // Weekly completion trend (last 7 days)
+  // 7-day trend calculated on filteredTasks
   const last7Days = [];
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
@@ -941,11 +1070,11 @@ app.get('/api/reports/summary', authenticate, (req, res) => {
     const dateStr = d.toISOString().split('T')[0];
     const displayStr = `${d.getDate()}/${d.getMonth() + 1}`;
     
-    const countCompletedOnDay = tasks.filter(t => {
+    const countCompletedOnDay = filteredTasks.filter(t => {
       return t.completedAt && t.completedAt.startsWith(dateStr);
     }).length;
 
-    const countCreatedOnDay = tasks.filter(t => {
+    const countCreatedOnDay = filteredTasks.filter(t => {
       return t.createdAt && t.createdAt.startsWith(dateStr);
     }).length;
 
@@ -957,6 +1086,13 @@ app.get('/api/reports/summary', authenticate, (req, res) => {
   }
 
   res.json({
+    scope,
+    scopeTitle,
+    scopeDesc,
+    userRole,
+    userDepartment: userDept,
+    targetDept,
+    canExportCsv: userRole !== 'viewer',
     kpis: {
       total,
       completed,
@@ -967,20 +1103,64 @@ app.get('/api/reports/summary', authenticate, (req, res) => {
       urgent,
       completionRate
     },
+    priorityMap: {
+      urgent,
+      high,
+      medium,
+      low
+    },
+    progressDistribution: {
+      p0_25,
+      p26_50,
+      p51_75,
+      p76_100
+    },
     departmentMap,
     memberPerformance,
+    personalTasks,
     trend: last7Days
   });
 });
 
-// CSV Export
+// CSV Export (Role-Enforced)
 app.get('/api/reports/export-csv', authenticate, (req, res) => {
-  const tasks = db.getTasks();
+  const user = req.user;
+  const canView = user.role === 'admin' || (user.permissions && user.permissions.canViewReports !== false);
+  if (!canView) {
+    return res.status(403).json({ error: 'Bạn không có quyền trích xuất dữ liệu báo cáo.' });
+  }
+
+  if (user.role === 'viewer') {
+    return res.status(403).json({ error: 'Tài khoản vai trò Chỉ Xem không có quyền trích xuất dữ liệu Excel/CSV.' });
+  }
+
+  const allTasks = db.getTasks();
   const users = db.getUsers();
   const userMap = new Map(users.map(u => [u.id, u.name]));
 
+  let tasksToExport = [];
+  let filePrefix = 'Bao_cao_cong_viec';
+
+  if (user.role === 'admin') {
+    const deptQuery = req.query.department;
+    if (deptQuery && deptQuery !== 'all' && deptQuery !== 'Tất cả phòng ban') {
+      tasksToExport = allTasks.filter(t => t.department === deptQuery);
+      filePrefix = `Bao_cao_${encodeURIComponent(deptQuery)}`;
+    } else {
+      tasksToExport = allTasks;
+      filePrefix = 'Bao_cao_toan_cong_ty';
+    }
+  } else if (user.role === 'manager') {
+    tasksToExport = allTasks.filter(t => t.department === user.department);
+    filePrefix = `Bao_cao_${encodeURIComponent(user.department || 'phong_ban')}`;
+  } else {
+    // Role: 'user'
+    tasksToExport = allTasks.filter(t => t.assignedTo === user.id || t.createdBy === user.id);
+    filePrefix = `Bao_cao_ca_nhan_${encodeURIComponent(user.name)}`;
+  }
+
   let csv = '\uFEFFMã CV,Tiêu đề,Người phụ trách,Phòng ban,Độ ưu tiên,Trạng thái,Tiến độ (%),Ngày hết hạn\n';
-  tasks.forEach(t => {
+  tasksToExport.forEach(t => {
     const assignee = userMap.get(t.assignedTo) || 'Chưa gán';
     const statusMap = {
       todo: 'Cần làm',
@@ -1008,7 +1188,7 @@ app.get('/api/reports/export-csv', authenticate, (req, res) => {
   });
 
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader('Content-Disposition', 'attachment; filename=Bao_cao_cong_viec.csv');
+  res.setHeader('Content-Disposition', `attachment; filename="${filePrefix}.csv"`);
   res.send(csv);
 });
 
@@ -1183,9 +1363,21 @@ app.delete('/api/users/:id', authenticate, requireAdmin, (req, res) => {
 // -------------------------------------------------------------
 // SYSTEM / ACTIVITY / VERSION ROUTES
 // -------------------------------------------------------------
-const APP_VERSION = '3.1.0';
+const APP_VERSION = '3.2.0';
 const APP_BUILD_DATE = '22/10/2026';
 const APP_CHANGELOG = [
+  {
+    version: 'v3.2.0',
+    date: '22/10/2026',
+    title: 'Phân Quyền Báo Cáo Thông Minh Theo Từng Vai Trò Chức Năng',
+    highlights: [
+      'Quản Trị Viên (Admin): Báo cáo toàn doanh nghiệp 16 phòng ban, bộ lọc linh hoạt từng phòng ban, bảng xếp hạng KPI toàn bộ nhân viên, xuất dữ liệu toàn cảnh',
+      'Trưởng Phòng / Quản Lý (Manager): Giới hạn bảo mật xem báo cáo phòng ban mình phụ trách, đánh giá chỉ số KPI và biểu đồ hiệu suất nhân sự trực thuộc bộ phận',
+      'Nhân Viên (Member): Báo cáo hiệu suất cá nhân (My KPI Report), phân bổ mức độ ưu tiên, danh sách nhiệm vụ trọng tâm cần hoàn thành, bảo mật không lộ dữ liệu người khác',
+      'Chỉ Xem (Viewer): Chế độ theo dõi tiến độ cấp cao (Read-only), tự động khóa và chặn quyền trích xuất dữ liệu Excel/CSV để bảo vệ dữ liệu',
+      'Kiểm soát quyền canViewReports nghiêm ngặt: Chặn 403 Forbidden tại API máy chủ và hiển thị cảnh báo truy cập bị từ chối nếu không được cấp phép'
+    ]
+  },
   {
     version: 'v3.1.0',
     date: '22/10/2026',

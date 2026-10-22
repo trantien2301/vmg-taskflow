@@ -64,61 +64,96 @@ const TaskCharts = {
       });
     }
 
-    // 2. Department Breakdown (Bar Chart)
+    // 2. Department Breakdown or Priority Distribution
     const ctxDept = document.getElementById('chartDept');
-    if (ctxDept && reportData.departmentMap) {
-      const labels = Object.keys(reportData.departmentMap);
-      const totalData = labels.map(l => reportData.departmentMap[l].total);
-      const completedData = labels.map(l => reportData.departmentMap[l].completed);
-      const overdueData = labels.map(l => reportData.departmentMap[l].overdue);
+    if (ctxDept) {
+      if ((reportData.scope === 'admin' || reportData.scope === 'viewer') && reportData.departmentMap) {
+        const labels = Object.keys(reportData.departmentMap);
+        const totalData = labels.map(l => reportData.departmentMap[l].total);
+        const completedData = labels.map(l => reportData.departmentMap[l].completed);
+        const overdueData = labels.map(l => reportData.departmentMap[l].overdue);
 
-      this.instances.dept = new Chart(ctxDept, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: 'Tổng công việc',
-              data: totalData,
-              backgroundColor: '#6366f1',
-              borderRadius: 6
-            },
-            {
-              label: 'Đã hoàn thành',
-              data: completedData,
-              backgroundColor: '#10b981',
-              borderRadius: 6
-            },
-            {
-              label: 'Bị quá hạn',
-              data: overdueData,
-              backgroundColor: '#ef4444',
-              borderRadius: 6
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: {
-              grid: { display: false },
-              ticks: { color: textColor }
-            },
-            y: {
-              beginAtZero: true,
-              grid: { color: gridColor },
-              ticks: { color: textColor, stepSize: 1 }
-            }
+        this.instances.dept = new Chart(ctxDept, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Tổng công việc',
+                data: totalData,
+                backgroundColor: '#6366f1',
+                borderRadius: 6
+              },
+              {
+                label: 'Đã hoàn thành',
+                data: completedData,
+                backgroundColor: '#10b981',
+                borderRadius: 6
+              },
+              {
+                label: 'Bị quá hạn',
+                data: overdueData,
+                backgroundColor: '#ef4444',
+                borderRadius: 6
+              }
+            ]
           },
-          plugins: {
-            legend: {
-              position: 'top',
-              labels: { color: textColor }
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { color: textColor }
+              },
+              y: {
+                beginAtZero: true,
+                grid: { color: gridColor },
+                ticks: { color: textColor, stepSize: 1 }
+              }
+            },
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: { color: textColor }
+              }
             }
           }
-        }
-      });
+        });
+      } else if (reportData.priorityMap) {
+        // Manager or User scope: Priority distribution
+        const prio = reportData.priorityMap;
+        this.instances.dept = new Chart(ctxDept, {
+          type: 'bar',
+          data: {
+            labels: ['🚨 Khẩn cấp', '⚡ Ưu tiên Cao', '🔷 Trung bình', '⚪ Thấp'],
+            datasets: [{
+              label: 'Số lượng công việc',
+              data: [prio.urgent, prio.high, prio.medium, prio.low],
+              backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#94a3b8'],
+              borderRadius: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { color: textColor }
+              },
+              y: {
+                beginAtZero: true,
+                grid: { color: gridColor },
+                ticks: { color: textColor, stepSize: 1 }
+              }
+            },
+            plugins: {
+              legend: { display: false }
+            }
+          }
+        });
+      }
     }
 
     // 3. Weekly Trend (Line Chart)
@@ -178,61 +213,138 @@ const TaskCharts = {
       });
     }
 
-    // 4. Member Performance (Horizontal Bar)
+    // 4. Member Performance or Progress Breakdown
     const ctxMember = document.getElementById('chartMember');
-    if (ctxMember && reportData.memberPerformance) {
-      const members = reportData.memberPerformance.filter(m => m.total > 0);
-      const labels = members.map(m => m.name);
-      const completed = members.map(m => m.completed);
-      const inProgress = members.map(m => m.inProgress);
-      const overdue = members.map(m => m.overdue);
-
-      this.instances.member = new Chart(ctxMember, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: 'Hoàn thành',
-              data: completed,
-              backgroundColor: '#10b981'
-            },
-            {
-              label: 'Đang làm',
-              data: inProgress,
-              backgroundColor: '#3b82f6'
-            },
-            {
-              label: 'Trễ hạn',
-              data: overdue,
-              backgroundColor: '#ef4444'
-            }
-          ]
-        },
-        options: {
-          indexAxis: 'y',
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: {
-              stacked: true,
-              grid: { color: gridColor },
-              ticks: { color: textColor, stepSize: 1 }
-            },
-            y: {
-              stacked: true,
-              grid: { display: false },
-              ticks: { color: textColor }
-            }
+    if (ctxMember) {
+      if (reportData.scope === 'user' && reportData.progressDistribution) {
+        // User view: Personal progress stages
+        const pd = reportData.progressDistribution;
+        this.instances.member = new Chart(ctxMember, {
+          type: 'bar',
+          data: {
+            labels: ['🌱 0 - 25% (Khởi đầu)', '🚀 26 - 50% (Đang làm)', '⚡ 51 - 75% (Tăng tốc)', '🏆 76 - 100% (Về đích)'],
+            datasets: [{
+              label: 'Số lượng nhiệm vụ',
+              data: [pd.p0_25, pd.p26_50, pd.p51_75, pd.p76_100],
+              backgroundColor: ['#94a3b8', '#3b82f6', '#f59e0b', '#10b981'],
+              borderRadius: 6
+            }]
           },
-          plugins: {
-            legend: {
-              position: 'top',
-              labels: { color: textColor }
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                beginAtZero: true,
+                grid: { color: gridColor },
+                ticks: { color: textColor, stepSize: 1 }
+              },
+              y: {
+                grid: { display: false },
+                ticks: { color: textColor }
+              }
+            },
+            plugins: {
+              legend: { display: false }
             }
           }
-        }
-      });
+        });
+      } else if (reportData.scope === 'viewer' && reportData.departmentMap) {
+        // Viewer view: Department completion rates
+        const depts = Object.keys(reportData.departmentMap);
+        const rates = depts.map(d => {
+          const item = reportData.departmentMap[d];
+          return item.total > 0 ? Math.round((item.completed / item.total) * 100) : 0;
+        });
+
+        this.instances.member = new Chart(ctxMember, {
+          type: 'bar',
+          data: {
+            labels: depts,
+            datasets: [{
+              label: 'Tỷ lệ hoàn thành (%)',
+              data: rates,
+              backgroundColor: '#10b981',
+              borderRadius: 6
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                beginAtZero: true,
+                max: 100,
+                grid: { color: gridColor },
+                ticks: { color: textColor, callback: val => `${val}%` }
+              },
+              y: {
+                grid: { display: false },
+                ticks: { color: textColor }
+              }
+            },
+            plugins: {
+              legend: { display: false }
+            }
+          }
+        });
+      } else if (reportData.memberPerformance) {
+        // Admin or Manager view: Member performance stacked bar
+        const members = reportData.memberPerformance.filter(m => m.total > 0);
+        const labels = members.map(m => m.name);
+        const completed = members.map(m => m.completed);
+        const inProgress = members.map(m => m.inProgress);
+        const overdue = members.map(m => m.overdue);
+
+        this.instances.member = new Chart(ctxMember, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Hoàn thành',
+                data: completed,
+                backgroundColor: '#10b981'
+              },
+              {
+                label: 'Đang làm',
+                data: inProgress,
+                backgroundColor: '#3b82f6'
+              },
+              {
+                label: 'Trễ hạn',
+                data: overdue,
+                backgroundColor: '#ef4444'
+              }
+            ]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                stacked: true,
+                grid: { color: gridColor },
+                ticks: { color: textColor, stepSize: 1 }
+              },
+              y: {
+                stacked: true,
+                grid: { display: false },
+                ticks: { color: textColor }
+              }
+            },
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: { color: textColor }
+              }
+            }
+          }
+        });
+      }
     }
   }
 };
