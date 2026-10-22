@@ -3483,3 +3483,541 @@ body {
     grid-template-columns: repeat(7, 150px);
   }
 }
+
+/* ========================================================
+   WORKFLOW AUTOMATION STYLES (MOBILE & DESKTOP)
+   ======================================================== */
+.automation-container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.automation-hero-banner {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  box-shadow: 0 8px 24px rgba(49, 46, 129, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.automation-hero-banner::after {
+  content: "⚡";
+  position: absolute;
+  right: -20px;
+  bottom: -30px;
+  font-size: 150px;
+  opacity: 0.07;
+  pointer-events: none;
+}
+
+.automation-hero-content {
+  flex: 1;
+  min-width: 280px;
+  max-width: 620px;
+}
+
+.automation-spark-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fde047;
+  margin-bottom: 8px;
+}
+
+.sparkle-anim {
+  animation: pulseSparkle 1.5s infinite;
+}
+
+@keyframes pulseSparkle {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 2px #fde047); }
+  50% { transform: scale(1.3) rotate(15deg); filter: drop-shadow(0 0 8px #fde047); }
+}
+
+.automation-hero-title {
+  font-size: 21px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 6px 0;
+  line-height: 1.3;
+}
+
+.automation-hero-desc {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+}
+
+.automation-engine-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.engine-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 8px #34d399;
+  animation: enginePulse 1.8s infinite;
+}
+
+@keyframes enginePulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+.automation-metrics-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.auto-metric-card {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  padding: 12px 16px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 140px;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.auto-metric-card:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.auto-metric-icon {
+  font-size: 26px;
+}
+
+.auto-metric-val {
+  font-size: 19px;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.1;
+}
+
+.auto-metric-label {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.75);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-top: 2px;
+}
+
+.automation-toolbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 4px 2px;
+}
+
+.automation-rules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+.automation-recipe-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.automation-recipe-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+}
+
+.automation-recipe-card.disabled {
+  opacity: 0.65;
+  filter: grayscale(0.5);
+}
+
+.automation-recipe-card.anim-executing {
+  animation: execSparkle 1.2s ease-out;
+}
+
+@keyframes execSparkle {
+  0% {
+    box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.7);
+    border-color: #eab308;
+  }
+  50% {
+    box-shadow: 0 0 24px 6px rgba(234, 179, 8, 0.6);
+    border-color: #eab308;
+  }
+  100% {
+    box-shadow: var(--shadow-sm);
+    border-color: var(--border-color);
+  }
+}
+
+.recipe-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.recipe-bot-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.recipe-bot-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.recipe-bot-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 2px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recipe-bot-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Toggle Switch */
+.toggle-switch-wrap {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.toggle-switch-wrap input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #cbd5e1;
+  transition: 0.25s;
+  border-radius: 24px;
+}
+
+[data-theme="dark"] .toggle-slider {
+  background-color: #475569;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.25s;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch-wrap input:checked + .toggle-slider {
+  background-color: #10b981;
+}
+
+.toggle-switch-wrap input:checked + .toggle-slider:before {
+  transform: translateX(20px);
+}
+
+/* Recipe Flow visual connector */
+.recipe-flow-box {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.flow-step-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.flow-badge {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.flow-badge.when {
+  background: rgba(59, 130, 246, 0.15);
+  color: #2563eb;
+}
+[data-theme="dark"] .flow-badge.when {
+  color: #60a5fa;
+}
+
+.flow-badge.then {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+[data-theme="dark"] .flow-badge.then {
+  color: #34d399;
+}
+
+.flow-desc {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+
+.flow-divider-arrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
+  padding-left: 12px;
+}
+
+.recipe-desc-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.recipe-footer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border-color);
+  padding-top: 10px;
+  margin-top: auto;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.recipe-run-counter {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.recipe-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-trigger-test {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 6px;
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .btn-trigger-test {
+  color: #fbbf24;
+}
+
+.btn-trigger-test:hover {
+  background: #f59e0b;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* Automation Execution Log Feed */
+.automation-log-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.automation-log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.automation-feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.auto-feed-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-hover);
+  border-radius: 6px;
+  font-size: 12px;
+  border-left: 3px solid #10b981;
+  animation: feedFadeIn 0.3s ease-out;
+}
+
+@keyframes feedFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.auto-feed-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auto-feed-time {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Modal Rule Builder Steps */
+.rule-builder-step {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px;
+  position: relative;
+}
+
+.rule-builder-step.trigger {
+  border-left: 4px solid var(--primary);
+}
+
+.rule-builder-step.action {
+  border-left: 4px solid #10b981;
+}
+
+.step-label-badge {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.step-label-badge.action {
+  color: #10b981;
+}
+
+.rule-connector-arrow {
+  text-align: center;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--primary);
+  padding: 6px 0;
+  letter-spacing: 0.05em;
+}
+
+@media (max-width: 768px) {
+  .automation-hero-banner {
+    padding: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .automation-metrics-panel {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .auto-metric-card {
+    min-width: auto;
+    padding: 8px 10px;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
+  }
+  .auto-metric-icon {
+    font-size: 20px;
+  }
+  .auto-metric-val {
+    font-size: 16px;
+  }
+  .auto-metric-label {
+    font-size: 9px;
+  }
+  .automation-rules-grid {
+    grid-template-columns: 1fr;
+  }
+}

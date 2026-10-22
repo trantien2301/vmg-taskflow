@@ -179,6 +179,9 @@ function scanDeadlinesAndGenerateAlerts() {
 
         broadcast('alert:new', notif);
         newAlertCount++;
+
+        // Kích hoạt automation tự động gắn thẻ việc quá hạn
+        executeAutomations('task_overdue_detected', { task });
       }
     }
     // 2. Sắp đến hạn (Due soon, e.g. within warningHours)
@@ -208,6 +211,81 @@ function scanDeadlinesAndGenerateAlerts() {
 
 // Run scanner every 60 seconds
 setInterval(scanDeadlinesAndGenerateAlerts, 60 * 1000);
+
+// -------------------------------------------------------------
+// WORKFLOW AUTOMATION ENGINE
+// -------------------------------------------------------------
+function executeAutomations(triggerName, payload = {}) {
+  const automations = (db.getAutomations() || []).filter(a => a.enabled);
+  const matchedRules = automations.filter(a => a.trigger === triggerName);
+
+  matchedRules.forEach(rule => {
+    let triggered = false;
+    let actionDesc = '';
+
+    // Bot 1: Auto 100% on Complete
+    if (rule.trigger === 'task_status_completed' && payload.task && payload.task.status === 'completed') {
+      if (payload.task.progress !== 100) {
+        db.updateTask(payload.task.id, { progress: 100 }, { id: 'bot-auto', name: '⚡ Bot Tự Động', role: 'admin' });
+        triggered = true;
+        actionDesc = `Tự động cập nhật tiến độ công việc #${payload.task.id} lên 100%`;
+      }
+    }
+    // Bot 2: Auto Review on 100% progress
+    else if (rule.trigger === 'task_progress_100' && payload.task && payload.task.progress === 100 && payload.task.status === 'in_progress') {
+      db.updateTask(payload.task.id, { status: 'review' }, { id: 'bot-auto', name: '⚡ Bot Tự Động', role: 'admin' });
+      triggered = true;
+      actionDesc = `Tự động chuyển công việc #${payload.task.id} sang "Chờ duyệt" khi tiến độ đạt 100%`;
+    }
+    // Bot 3: Urgent escalation
+    else if (rule.trigger === 'task_urgent_created' && payload.task && payload.task.priority === 'urgent') {
+      const currentTags = payload.task.tags || [];
+      if (!currentTags.includes('Ưu Tiên Số 1')) {
+        db.updateTask(payload.task.id, { tags: [...currentTags, 'Ưu Tiên Số 1'] }, { id: 'bot-auto', name: '⚡ Bot Tự Động', role: 'admin' });
+        triggered = true;
+        actionDesc = `Gắn thẻ "Ưu Tiên Số 1" và gửi cảnh báo đỏ cho công việc khẩn cấp #${payload.task.id}`;
+      }
+    }
+    // Bot 4: Overdue auto tag
+    else if (rule.trigger === 'task_overdue_detected' && payload.task) {
+      const currentTags = payload.task.tags || [];
+      if (!currentTags.includes('Quá hạn')) {
+        db.updateTask(payload.task.id, { tags: [...currentTags, 'Quá hạn'] }, { id: 'bot-auto', name: '⚡ Bot Tự Động', role: 'admin' });
+        triggered = true;
+        actionDesc = `Tự động gắn thẻ "Quá hạn" cho công việc trễ hạn #${payload.task.id}`;
+      }
+    }
+    // Bot 5: Unassigned auto tag
+    else if (rule.trigger === 'task_unassigned_created' && payload.task && !payload.task.assignedTo) {
+      const currentTags = payload.task.tags || [];
+      if (!currentTags.includes('Chờ nhận việc')) {
+        db.updateTask(payload.task.id, { tags: [...currentTags, 'Chờ nhận việc'] }, { id: 'bot-auto', name: '⚡ Bot Tự Động', role: 'admin' });
+        triggered = true;
+        actionDesc = `Tự động gắn thẻ "Chờ nhận việc" cho công việc #${payload.task.id}`;
+      }
+    }
+
+    if (triggered) {
+      db.recordAutomationExecution(rule.id);
+      db.logActivity({
+        userId: 'bot-auto',
+        userName: `🤖 ${rule.name}`,
+        userRole: 'admin',
+        userAvatar: rule.icon || '⚡',
+        action: 'automation_executed',
+        category: 'system',
+        details: actionDesc
+      });
+      broadcast('automation:executed', {
+        ruleId: rule.id,
+        ruleName: rule.name,
+        icon: rule.icon,
+        actionDesc,
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+}
 
 // -------------------------------------------------------------
 // AUTH MIDDLEWARE
@@ -640,6 +718,14 @@ app.post('/api/tasks', authenticate, (req, res) => {
   // Realtime WS broadcast
   broadcast('task:created', { task: newTask, creator: req.user.name });
 
+  // Workflow Automations Trigger
+  if (newTask.priority === 'urgent') {
+    executeAutomations('task_urgent_created', { task: newTask });
+  }
+  if (!newTask.assignedTo) {
+    executeAutomations('task_unassigned_created', { task: newTask });
+  }
+
   res.status(201).json({ task: newTask });
 });
 
@@ -656,6 +742,17 @@ app.put('/api/tasks/:id', authenticate, (req, res) => {
   
   // Realtime WS broadcast
   broadcast('task:updated', { task: updatedTask, updatedBy: req.user.name });
+
+  // Workflow Automations Trigger
+  if (updatedTask.status === 'completed') {
+    executeAutomations('task_status_completed', { task: updatedTask });
+  }
+  if (updatedTask.progress === 100 && updatedTask.status === 'in_progress') {
+    executeAutomations('task_progress_100', { task: updatedTask });
+  }
+  if (updatedTask.priority === 'urgent') {
+    executeAutomations('task_urgent_created', { task: updatedTask });
+  }
 
   res.json({ task: updatedTask });
 });
@@ -678,6 +775,14 @@ app.patch('/api/tasks/:id/status', authenticate, (req, res) => {
     task: updatedTask,
     updatedBy: req.user.name
   });
+
+  // Workflow Automations Trigger
+  if (updatedTask.status === 'completed') {
+    executeAutomations('task_status_completed', { task: updatedTask });
+  }
+  if (updatedTask.progress === 100 && updatedTask.status === 'in_progress') {
+    executeAutomations('task_progress_100', { task: updatedTask });
+  }
 
   res.json({ task: updatedTask });
 });
@@ -1009,9 +1114,21 @@ app.delete('/api/users/:id', authenticate, requireAdmin, (req, res) => {
 // -------------------------------------------------------------
 // SYSTEM / ACTIVITY / VERSION ROUTES
 // -------------------------------------------------------------
-const APP_VERSION = '2.9.0';
+const APP_VERSION = '3.0.0';
 const APP_BUILD_DATE = '22/10/2026';
 const APP_CHANGELOG = [
+  {
+    version: 'v3.0.0',
+    date: '22/10/2026',
+    title: 'Động Cơ Tự Động Hóa Quy Trình Realtime (Workflow Automation Pro)',
+    highlights: [
+      'Trung tâm Tự Động Hóa Workflow Automation với thẻ quy tắc trực quan theo cú pháp KHI (Trigger) -> THÌ (Action)',
+      'Công tắc bật/tắt (Toggle Switch) mượt mà chuẩn iOS trên cả điện thoại và máy tính',
+      'Động cơ tự động hóa nền tảng kích hoạt tức thì khi người dùng hoàn thành việc, đạt 100% tiến độ, gắn cờ khẩn cấp hoặc trễ hạn',
+      'Nút "Chạy Thử Ngay" kèm hiệu ứng tia chớp, âm thanh arpeggio và đồng bộ WebSocket toàn hệ thống',
+      'Khung nhật ký thực thi thời gian thực (Live Execution Feed) và thống kê số giờ lao động tiết kiệm được'
+    ]
+  },
   {
     version: 'v2.9.0',
     date: '22/10/2026',
@@ -1240,6 +1357,95 @@ app.delete('/api/departments/:id', authenticate, requireAdmin, (req, res) => {
   } else {
     res.status(400).json({ error: 'Không thể xóa phòng ban' });
   }
+});
+
+// -------------------------------------------------------------
+// WORKFLOW AUTOMATION ROUTES
+// -------------------------------------------------------------
+app.get('/api/automations', authenticate, (req, res) => {
+  const automations = db.getAutomations();
+  res.json({ automations });
+});
+
+app.post('/api/automations', authenticate, (req, res) => {
+  const rule = db.createAutomation(req.body);
+  db.logActivity({
+    userId: req.user.id,
+    userName: req.user.name,
+    userRole: req.user.role,
+    userAvatar: req.user.avatar || '⚡',
+    action: 'create_automation',
+    category: 'system',
+    details: `Đã tạo quy tắc tự động hóa mới: "${rule.name}" (${rule.triggerLabel})`
+  });
+  broadcast('automation:updated', { rule, action: 'created' });
+  res.status(201).json({ rule });
+});
+
+app.put('/api/automations/:id', authenticate, (req, res) => {
+  const updated = db.updateAutomation(req.params.id, req.body);
+  if (!updated) return res.status(404).json({ error: 'Không tìm thấy quy tắc tự động' });
+  db.logActivity({
+    userId: req.user.id,
+    userName: req.user.name,
+    userRole: req.user.role,
+    userAvatar: req.user.avatar || '⚡',
+    action: 'update_automation',
+    category: 'system',
+    details: `Đã cập nhật quy tắc tự động "${updated.name}" (Trạng thái: ${updated.enabled ? 'Đang bật' : 'Tạm dừng'})`
+  });
+  broadcast('automation:updated', { rule: updated, action: 'updated' });
+  res.json({ rule: updated });
+});
+
+app.delete('/api/automations/:id', authenticate, requireAdmin, (req, res) => {
+  const rule = db.getAutomationById(req.params.id);
+  const ok = db.deleteAutomation(req.params.id);
+  if (!ok) return res.status(404).json({ error: 'Không tìm thấy quy tắc' });
+  db.logActivity({
+    userId: req.user.id,
+    userName: req.user.name,
+    userRole: req.user.role,
+    userAvatar: req.user.avatar || '👑',
+    action: 'delete_automation',
+    category: 'system',
+    details: `Admin đã xóa quy tắc tự động: "${rule ? rule.name : req.params.id}"`
+  });
+  broadcast('automation:updated', { ruleId: req.params.id, action: 'deleted' });
+  res.json({ success: true, message: 'Đã xóa quy tắc thành công' });
+});
+
+app.post('/api/automations/:id/trigger', authenticate, (req, res) => {
+  const rule = db.getAutomationById(req.params.id);
+  if (!rule) return res.status(404).json({ error: 'Không tìm thấy quy tắc' });
+
+  // Record manual test run
+  db.recordAutomationExecution(rule.id);
+  const message = `Bot "${rule.name}" đã kích hoạt thực thi thành công! ${rule.actionLabel}`;
+
+  db.logActivity({
+    userId: req.user.id,
+    userName: req.user.name,
+    userRole: req.user.role,
+    userAvatar: req.user.avatar || '⚡',
+    action: 'trigger_automation',
+    category: 'system',
+    details: `Người dùng đã kích hoạt chạy thử thủ công Bot "${rule.name}"`
+  });
+
+  broadcast('automation:executed', {
+    ruleId: rule.id,
+    ruleName: rule.name,
+    icon: rule.icon,
+    actionDesc: message,
+    timestamp: new Date().toISOString()
+  });
+
+  res.json({
+    success: true,
+    message,
+    rule: db.getAutomationById(rule.id)
+  });
 });
 
 // SPA catch-all

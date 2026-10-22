@@ -344,7 +344,80 @@ function getDefaultData() {
     { id: 'dept-5', name: 'Ban Giám Đốc' }
   ];
 
-  return { users, tasks, comments, notifications, activities, settings, departments };
+  const automations = [
+    {
+      id: 'auto-1',
+      name: 'Đồng bộ tiến độ 100% khi Hoàn thành',
+      description: 'Khi công việc chuyển sang trạng thái "Hoàn thành", tự động chốt tiến độ đạt 100% và ghi nhận thời gian hoàn tất.',
+      icon: '✅',
+      color: '#10b981',
+      enabled: true,
+      trigger: 'task_status_completed',
+      triggerLabel: 'Trạng thái chuyển sang "Hoàn thành"',
+      action: 'set_progress_100',
+      actionLabel: 'Tự động cập nhật tiến độ 100% & ghi giờ hoàn tất',
+      runCount: 24,
+      lastRunAt: getRelativeDate(0, -1)
+    },
+    {
+      id: 'auto-2',
+      name: 'Tự động gửi Duyệt khi đạt 100%',
+      description: 'Khi nhân sự cập nhật tiến độ công việc đạt 100%, tự động chuyển trạng thái từ Đang làm sang "Chờ duyệt".',
+      icon: '⏳',
+      color: '#d97706',
+      enabled: true,
+      trigger: 'task_progress_100',
+      triggerLabel: 'Tiến độ kéo lên mức 100%',
+      action: 'set_status_review',
+      actionLabel: 'Tự động chuyển trạng thái sang "Chờ duyệt"',
+      runCount: 18,
+      lastRunAt: getRelativeDate(0, -3)
+    },
+    {
+      id: 'auto-3',
+      name: 'Báo động đỏ & Gắn cờ việc Khẩn cấp',
+      description: 'Khi một công việc có mức độ ưu tiên "Khẩn cấp" được tạo hoặc cập nhật, tự động gắn tag "Ưu Tiên Số 1" và gửi cảnh báo đỏ cho Admin.',
+      icon: '🚨',
+      color: '#ef4444',
+      enabled: true,
+      trigger: 'task_urgent_created',
+      triggerLabel: 'Công việc mới hoặc sửa đổi có ưu tiên "Khẩn cấp"',
+      action: 'tag_and_alert_admin',
+      actionLabel: 'Gắn thẻ "Ưu Tiên Số 1" & phát cảnh báo âm thanh tới Admin',
+      runCount: 9,
+      lastRunAt: getRelativeDate(-1, -2)
+    },
+    {
+      id: 'auto-4',
+      name: 'Gắn nhãn cảnh báo việc Trễ hạn',
+      description: 'Khi hệ thống phát hiện công việc đã quá hạn chót mà chưa hoàn thành, tự động gắn nhãn "Quá hạn" và thông báo tới người phụ trách.',
+      icon: '⏰',
+      color: '#f97316',
+      enabled: true,
+      trigger: 'task_overdue_detected',
+      triggerLabel: 'Phát hiện công việc quá hạn chót',
+      action: 'tag_overdue_and_notify',
+      actionLabel: 'Gắn nhãn "Quá hạn" & gửi chuông cảnh báo tới nhân sự',
+      runCount: 15,
+      lastRunAt: getRelativeDate(0, -2)
+    },
+    {
+      id: 'auto-5',
+      name: 'Hỗ trợ Phân công việc mới chưa có người nhận',
+      description: 'Khi công việc được tạo nhưng chưa chọn người phụ trách, tự động gắn thẻ "Chờ nhận việc" và thông báo tới toàn bộ phòng ban.',
+      icon: '🎯',
+      color: '#8b5cf6',
+      enabled: true,
+      trigger: 'task_unassigned_created',
+      triggerLabel: 'Công việc mới tạo chưa được phân công',
+      action: 'tag_unassigned_and_notify_dept',
+      actionLabel: 'Gắn nhãn "Chờ nhận việc" & thông báo nội bộ phòng ban',
+      runCount: 12,
+      lastRunAt: getRelativeDate(-2, -4)
+    }
+  ];
+
+  return { users, tasks, comments, notifications, activities, settings, departments, automations };
 }
 
 class Database {
@@ -366,6 +439,10 @@ class Database {
             { id: 'dept-4', name: 'Phòng Vận Hành' },
             { id: 'dept-5', name: 'Ban Giám Đốc' }
           ];
+          this.save();
+        }
+        if (!this.data.automations || !Array.isArray(this.data.automations)) {
+          this.data.automations = getDefaultData().automations || [];
           this.save();
         }
       } else {
@@ -823,6 +900,69 @@ class Database {
       updatedUsersCount,
       updatedTasksCount
     };
+  }
+
+  // --- Automations (Workflow Rules Engine) ---
+  getAutomations() {
+    if (!this.data.automations || !Array.isArray(this.data.automations)) {
+      this.data.automations = getDefaultData().automations || [];
+      this.save();
+    }
+    return this.data.automations;
+  }
+
+  getAutomationById(id) {
+    const list = this.getAutomations();
+    return list.find(a => a.id === id) || null;
+  }
+
+  createAutomation(ruleData) {
+    const list = this.getAutomations();
+    const newRule = {
+      id: `auto-${Date.now()}`,
+      name: ruleData.name || 'Quy tắc tự động mới',
+      description: ruleData.description || 'Tự động hóa quy trình công việc',
+      icon: ruleData.icon || '⚡',
+      color: ruleData.color || '#3b82f6',
+      enabled: ruleData.enabled !== undefined ? ruleData.enabled : true,
+      trigger: ruleData.trigger || 'task_status_completed',
+      triggerLabel: ruleData.triggerLabel || 'Khi sự kiện xảy ra',
+      action: ruleData.action || 'notify',
+      actionLabel: ruleData.actionLabel || 'Tự động thực thi hành động',
+      runCount: 0,
+      lastRunAt: null,
+      createdAt: new Date().toISOString()
+    };
+    list.unshift(newRule);
+    this.save();
+    return newRule;
+  }
+
+  updateAutomation(id, updates) {
+    const list = this.getAutomations();
+    const idx = list.findIndex(a => a.id === id);
+    if (idx === -1) return null;
+    list[idx] = { ...list[idx], ...updates, updatedAt: new Date().toISOString() };
+    this.save();
+    return list[idx];
+  }
+
+  deleteAutomation(id) {
+    const list = this.getAutomations();
+    const idx = list.findIndex(a => a.id === id);
+    if (idx === -1) return false;
+    list.splice(idx, 1);
+    this.save();
+    return true;
+  }
+
+  recordAutomationExecution(id) {
+    const rule = this.getAutomationById(id);
+    if (!rule) return null;
+    rule.runCount = (rule.runCount || 0) + 1;
+    rule.lastRunAt = new Date().toISOString();
+    this.save();
+    return rule;
   }
 
   // Reset database to initial seed data

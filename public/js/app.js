@@ -13,9 +13,11 @@ const App = {
     currentDetailTask: null,
     draggedTaskId: null,
     onlineCount: 1,
-    clientVersion: '2.9.0',
+    clientVersion: '3.0.0',
     serverVersionInfo: null,
     hasNewUpdate: false,
+    automations: [],
+    automationHistory: [],
     calendarState: {
       currentDate: new Date(),
       mode: 'month' // 'day' | 'week' | 'month'
@@ -62,6 +64,16 @@ const App = {
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
         osc.start(now);
         osc.stop(now + 0.4);
+      } else if (type === 'automation' || type === 'magic') {
+        // High sparkling arpeggio chime
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(587.33, now); // D5
+        osc.frequency.setValueAtTime(880, now + 0.08); // A5
+        osc.frequency.setValueAtTime(1174.66, now + 0.16); // D6
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.38);
+        osc.start(now);
+        osc.stop(now + 0.38);
       } else {
         // Soft pop
         osc.frequency.setValueAtTime(440, now);
@@ -474,21 +486,35 @@ const App = {
           this.handleNewActivityEvent(data.activity);
         }
         break;
+
+      case 'automation:executed':
+        this.handleAutomationExecutedEvent(data);
+        break;
+
+      case 'automation:updated':
+        this.loadAutomations().then(() => {
+          if (this.state.activeView === 'automation') {
+            this.renderAutomationView();
+          }
+        });
+        break;
     }
   },
 
   async loadInitialData() {
     try {
-      const [tasksRes, usersRes, notifsRes, deptsRes] = await Promise.all([
+      const [tasksRes, usersRes, notifsRes, deptsRes, autoRes] = await Promise.all([
         API.getTasks(),
         API.getUsers(),
         API.getNotifications(),
-        API.getDepartments()
+        API.getDepartments(),
+        API.getAutomations().catch(() => ({ automations: [] }))
       ]);
       this.state.tasks = tasksRes.tasks || [];
       this.state.users = usersRes.users || [];
       this.state.notifications = notifsRes.notifications || [];
       this.state.departments = (deptsRes && deptsRes.departments) ? deptsRes.departments : [];
+      this.state.automations = (autoRes && autoRes.automations) ? autoRes.automations : [];
       this.populateFilterDropdowns();
       this.populateDepartmentDropdowns();
       this.updateNotificationBadge();
@@ -1139,6 +1165,61 @@ const App = {
         this.performSsoLogin(email, name);
       });
     }
+
+    // ========================================================
+    // AUTOMATION CENTER LISTENERS
+    // ========================================================
+    const btnOpenCreateAutoModal = document.getElementById('btnOpenCreateAutoModal');
+    if (btnOpenCreateAutoModal) {
+      btnOpenCreateAutoModal.addEventListener('click', () => this.openAutomationModal());
+    }
+
+    const btnRunAllAutomations = document.getElementById('btnRunAllAutomations');
+    if (btnRunAllAutomations) {
+      btnRunAllAutomations.addEventListener('click', () => this.runAllAutomations());
+    }
+
+    const automationForm = document.getElementById('automationForm');
+    if (automationForm) {
+      automationForm.addEventListener('submit', (e) => this.handleAutomationFormSubmit(e));
+    }
+
+    const autoGrid = document.getElementById('automationRulesGrid');
+    if (autoGrid) {
+      // Toggle switches
+      autoGrid.addEventListener('change', (e) => {
+        const toggle = e.target.closest('[data-rule-toggle]');
+        if (toggle) {
+          const ruleId = toggle.getAttribute('data-rule-toggle');
+          this.toggleAutomationRule(ruleId, toggle.checked);
+        }
+      });
+
+      // Action buttons
+      autoGrid.addEventListener('click', (e) => {
+        const triggerBtn = e.target.closest('[data-trigger-rule]');
+        if (triggerBtn) {
+          const ruleId = triggerBtn.getAttribute('data-trigger-rule');
+          this.triggerAutomationRule(ruleId);
+          return;
+        }
+
+        const editBtn = e.target.closest('[data-edit-rule]');
+        if (editBtn) {
+          const ruleId = editBtn.getAttribute('data-edit-rule');
+          const rule = (this.state.automations || []).find(r => r.id === ruleId);
+          if (rule) this.openAutomationModal(rule);
+          return;
+        }
+
+        const delBtn = e.target.closest('[data-delete-rule]');
+        if (delBtn) {
+          const ruleId = delBtn.getAttribute('data-delete-rule');
+          this.deleteAutomationRule(ruleId);
+          return;
+        }
+      });
+    }
   },
 
   // -------------------------------------------------------------
@@ -1160,7 +1241,8 @@ const App = {
       reports: '📈 Báo Cáo Thống Kê',
       alerts: '🚨 Trung Tâm Cảnh Báo',
       users: '👥 Quản Trị Nhân Sự',
-      activities: '📜 Nhật Ký Hoạt Động'
+      activities: '📜 Nhật Ký Hoạt Động',
+      automation: '⚡ Tự Động Hóa (Automation)'
     };
     const titleEl = document.getElementById('currentViewTitle');
     if (titleEl) {
@@ -1201,6 +1283,9 @@ const App = {
         break;
       case 'activities':
         this.renderActivitiesView();
+        break;
+      case 'automation':
+        this.renderAutomationView();
         break;
     }
     this.renderKPIs();
@@ -3254,6 +3339,446 @@ const App = {
         btn.disabled = false;
         btn.innerText = '📢 Phát Thông Báo Cập Nhật Realtime Tới Toàn Hệ Thống';
       }
+    }
+  },
+
+  // -------------------------------------------------------------
+  // WORKFLOW AUTOMATION ENGINE & CENTER
+  // -------------------------------------------------------------
+  async renderAutomationView() {
+    const grid = document.getElementById('automationRulesGrid');
+    if (!grid) return;
+
+    if (!this.state.automations || this.state.automations.length === 0) {
+      grid.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--text-secondary);"><span style="display:inline-block; animation:spin 1s infinite linear;">⚡</span> Đang tải các quy tắc tự động hóa...</div>';
+      await this.loadAutomations();
+    }
+
+    this.renderAutomationRulesList();
+    this.updateAutomationMetrics();
+    this.initAutomationLiveFeed();
+  },
+
+  async loadAutomations() {
+    try {
+      const res = await API.getAutomations();
+      this.state.automations = (res && res.automations) ? res.automations : [];
+      return this.state.automations;
+    } catch (e) {
+      console.error('Lỗi khi tải danh sách automations:', e);
+      return [];
+    }
+  },
+
+  renderAutomationRulesList() {
+    const grid = document.getElementById('automationRulesGrid');
+    if (!grid) return;
+
+    const list = this.state.automations || [];
+    if (list.length === 0) {
+      grid.innerHTML = `
+        <div style="grid-column: 1/-1; padding: 48px 20px; text-align: center; color: var(--text-secondary); background: var(--bg-card); border-radius: var(--radius-md); border: 1px dashed var(--border-color);">
+          <div style="font-size: 40px; margin-bottom: 10px;">🤖</div>
+          <div style="font-weight: 700; font-size: 15px; margin-bottom: 6px;">Chưa có quy tắc tự động hóa nào</div>
+          <div style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 16px;">Tạo quy tắc đầu tiên để hệ thống tự động xử lý công việc thay bạn!</div>
+          <button class="btn btn-primary btn-sm" onclick="App.openAutomationModal()">+ Tạo Quy Tắc Đầu Tiên</button>
+        </div>
+      `;
+      return;
+    }
+
+    grid.innerHTML = list.map(rule => this.buildRecipeCardHtml(rule)).join('');
+  },
+
+  buildRecipeCardHtml(rule) {
+    const triggerMap = {
+      task_status_completed: { label: 'Khi công việc chuyển sang "Hoàn thành"', icon: '✅' },
+      task_progress_100: { label: 'Khi tiến độ công việc đạt 100%', icon: '💯' },
+      task_urgent_created: { label: 'Khi tạo việc mới mức "Khẩn cấp"', icon: '🚨' },
+      task_overdue_detected: { label: 'Khi quét phát hiện việc trễ hạn', icon: '⏰' },
+      task_unassigned_created: { label: 'Khi việc mới chưa có người phụ trách', icon: '❓' }
+    };
+
+    const actionMap = {
+      set_progress_100: { label: 'Tự động đặt tiến độ 100% & ghi giờ hoàn tất', icon: '🎯' },
+      set_status_review: { label: 'Tự động chuyển việc sang "Chờ duyệt"', icon: '👀' },
+      tag_and_alert_admin: { label: 'Gắn thẻ "Ưu Tiên Số 1" & báo động đỏ Admin', icon: '📢' },
+      tag_overdue_and_notify: { label: 'Gắn thẻ "Quá hạn" & gửi chuông cảnh báo', icon: '🔔' },
+      tag_unassigned_and_notify_dept: { label: 'Gắn thẻ "Chờ nhận việc" & báo phòng ban', icon: '🏢' }
+    };
+
+    const triggerInfo = triggerMap[rule.trigger] || { label: rule.trigger, icon: '⚡' };
+    const actionInfo = actionMap[rule.action] || { label: rule.action, icon: '⚡' };
+
+    const lastRunStr = rule.lastRunAt 
+      ? `• Cuối: ${this.formatRelativeTime(rule.lastRunAt)}` 
+      : '• Chưa chạy';
+
+    const color = rule.color || '#3b82f6';
+    const icon = rule.icon || '⚡';
+
+    return `
+      <div class="automation-recipe-card ${rule.enabled ? '' : 'disabled'}" data-rule-id="${rule.id}">
+        <div class="recipe-header">
+          <div class="recipe-bot-info">
+            <div class="recipe-bot-avatar" style="background: ${color}20; color: ${color}; border: 1px solid ${color}40;">
+              ${icon}
+            </div>
+            <div>
+              <h4 class="recipe-bot-title" title="${this.escapeHtml(rule.name)}">${this.escapeHtml(rule.name)}</h4>
+              <div class="recipe-bot-meta">Mã bot: <code>${rule.id}</code></div>
+            </div>
+          </div>
+          <label class="toggle-switch-wrap" title="${rule.enabled ? 'Đang bật - Nhấp để tắt' : 'Đang tắt - Nhấp để bật'}">
+            <input type="checkbox" data-rule-toggle="${rule.id}" ${rule.enabled ? 'checked' : ''}>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <p class="recipe-desc-text">${this.escapeHtml(rule.desc || 'Quy tắc tự động hóa theo thời gian thực.')}</p>
+
+        <div class="recipe-flow-box">
+          <div class="flow-step-row">
+            <span class="flow-badge when">KHI</span>
+            <span class="flow-desc">${triggerInfo.icon} ${this.escapeHtml(triggerInfo.label)}</span>
+          </div>
+          <div class="flow-divider-arrow">
+            <span>⚡ TỰ ĐỘNG THỰC THI ➔</span>
+          </div>
+          <div class="flow-step-row">
+            <span class="flow-badge then">THÌ</span>
+            <span class="flow-desc">${actionInfo.icon} ${this.escapeHtml(actionInfo.label)}</span>
+          </div>
+        </div>
+
+        <div class="recipe-footer-bar">
+          <div class="recipe-run-counter">
+            <span>⚡ Đã chạy: <strong>${rule.runCount || 0}</strong> lần</span>
+            <span>${lastRunStr}</span>
+          </div>
+          <div class="recipe-actions">
+            <button type="button" class="btn-trigger-test" data-trigger-rule="${rule.id}" title="Chạy thử nghiệm ngay lập tức">
+              <span>⚡</span><span>Chạy Thử</span>
+            </button>
+            <button type="button" class="btn btn-outline btn-xs" data-edit-rule="${rule.id}" title="Chỉnh sửa quy tắc" style="padding: 4px 8px; font-size: 11px;">
+              ✏️
+            </button>
+            <button type="button" class="btn btn-outline btn-xs" data-delete-rule="${rule.id}" title="Xóa quy tắc" style="padding: 4px 8px; font-size: 11px; color: var(--danger);">
+              🗑️
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  updateAutomationMetrics() {
+    const list = this.state.automations || [];
+    const activeCount = list.filter(r => r.enabled).length;
+    const totalRuns = list.reduce((sum, r) => sum + (r.runCount || 0), 0);
+    const hoursSaved = Math.round(totalRuns * 0.25 * 10) / 10;
+
+    const statActive = document.getElementById('autoStatActive');
+    const statRuns = document.getElementById('autoStatTotalRuns');
+    const statHours = document.getElementById('autoStatHoursSaved');
+    const badgeCount = document.getElementById('automationCountBadge');
+
+    if (statActive) statActive.innerText = activeCount;
+    if (statRuns) statRuns.innerText = totalRuns;
+    if (statHours) statHours.innerText = `~${hoursSaved}h`;
+    if (badgeCount) badgeCount.innerText = `${list.length} quy tắc`;
+  },
+
+  initAutomationLiveFeed() {
+    const feed = document.getElementById('automationLiveFeed');
+    if (!feed) return;
+
+    if (feed.children.length > 0) return; // already populated
+
+    const sampleFeeds = [
+      {
+        ruleIcon: '⚡',
+        ruleName: 'Tự động hoàn tất 100% khi xong việc',
+        taskTitle: 'Thiết kế giao diện Dark Mode',
+        details: 'Cập nhật tiến độ 100% & ghi nhận hoàn tất',
+        timestamp: new Date(Date.now() - 1000 * 60 * 12).toISOString()
+      },
+      {
+        ruleIcon: '🎯',
+        ruleName: 'Gắn cờ kiểm duyệt khi tiến độ chạm 100%',
+        taskTitle: 'Tích hợp API SSO Google Workspace',
+        details: 'Chuyển trạng thái sang "Chờ duyệt"',
+        timestamp: new Date(Date.now() - 1000 * 60 * 35).toISOString()
+      },
+      {
+        ruleIcon: '⏰',
+        ruleName: 'Tự động cảnh báo & gắn tag việc quá hạn',
+        taskTitle: 'Báo cáo doanh thu Quý 3',
+        details: 'Phát hiện quá hạn chót, kích hoạt cảnh báo tới nhân sự',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString()
+      }
+    ];
+
+    feed.innerHTML = sampleFeeds.map(item => {
+      const timeStr = new Date(item.timestamp).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+      return `
+        <div class="auto-feed-item">
+          <div class="auto-feed-left">
+            <span style="font-size:16px;">${item.ruleIcon}</span>
+            <div>
+              <div><strong>${this.escapeHtml(item.ruleName)}</strong> đã thực thi trên <em>"${this.escapeHtml(item.taskTitle)}"</em></div>
+              <div style="font-size:11px; color:var(--text-secondary); margin-top:1px;">${this.escapeHtml(item.details)}</div>
+            </div>
+          </div>
+          <div class="auto-feed-time">${timeStr}</div>
+        </div>
+      `;
+    }).join('');
+  },
+
+  appendAutomationLogFeed(item) {
+    const feed = document.getElementById('automationLiveFeed');
+    if (!feed) return;
+
+    if (feed.querySelector('.feed-empty-state')) {
+      feed.innerHTML = '';
+    }
+
+    const timeStr = new Date(item.timestamp || Date.now()).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const el = document.createElement('div');
+    el.className = 'auto-feed-item';
+    el.innerHTML = `
+      <div class="auto-feed-left">
+        <span style="font-size:16px;">${item.ruleIcon || '⚡'}</span>
+        <div>
+          <div><strong>${this.escapeHtml(item.ruleName || 'Bot Tự Động')}</strong> đã thực thi trên <em>"${this.escapeHtml(item.taskTitle || 'Công việc')}"</em></div>
+          <div style="font-size:11px; color:var(--text-secondary); margin-top:1px;">${this.escapeHtml(item.details || 'Áp dụng quy tắc tự động hóa')}</div>
+        </div>
+      </div>
+      <div class="auto-feed-time">${timeStr}</div>
+    `;
+
+    feed.prepend(el);
+
+    while (feed.children.length > 25) {
+      feed.removeChild(feed.lastChild);
+    }
+  },
+
+  handleAutomationExecutedEvent(data) {
+    if (!data) return;
+    const { ruleId, ruleName, ruleIcon, taskTitle, result, timestamp } = data;
+
+    // Update rule in state
+    if (this.state.automations) {
+      const rule = this.state.automations.find(r => r.id === ruleId);
+      if (rule) {
+        rule.runCount = (rule.runCount || 0) + 1;
+        rule.lastRunAt = timestamp || new Date().toISOString();
+      }
+    }
+
+    // Play sparkle audio
+    this.playSound('automation');
+
+    // Show toast
+    this.showToast(`⚡ Bot "${ruleName || 'Automation'}" vừa tự động chạy trên: ${taskTitle ? '"' + taskTitle + '"' : 'Công việc'}`, 'success');
+
+    // Animate rule card if in DOM
+    const cardEl = document.querySelector(`.automation-recipe-card[data-rule-id="${ruleId}"]`);
+    if (cardEl) {
+      cardEl.classList.remove('anim-executing');
+      void cardEl.offsetWidth; // trigger reflow
+      cardEl.classList.add('anim-executing');
+      setTimeout(() => cardEl.classList.remove('anim-executing'), 1300);
+
+      // update card's run counter in DOM
+      const countEl = cardEl.querySelector('.recipe-run-counter strong');
+      if (countEl) {
+        countEl.innerText = (parseInt(countEl.innerText || '0', 10) + 1);
+      }
+    }
+
+    // Add to live feed
+    this.appendAutomationLogFeed({
+      ruleId,
+      ruleName: ruleName || 'Bot Tự Động',
+      ruleIcon: ruleIcon || '⚡',
+      taskTitle: taskTitle || 'Công việc hệ thống',
+      details: result ? (result.actionTaken || result.message || 'Thực thi quy tắc') : 'Thực thi quy tắc',
+      timestamp: timestamp || new Date().toISOString()
+    });
+
+    // Update metrics widgets
+    this.updateAutomationMetrics();
+  },
+
+  async toggleAutomationRule(id, enabled) {
+    try {
+      await API.updateAutomation(id, { enabled });
+      const rule = (this.state.automations || []).find(r => r.id === id);
+      if (rule) rule.enabled = enabled;
+      const card = document.querySelector(`.automation-recipe-card[data-rule-id="${id}"]`);
+      if (card) {
+        card.classList.toggle('disabled', !enabled);
+      }
+      this.updateAutomationMetrics();
+      this.showToast(enabled ? `⚡ Đã kích hoạt quy tắc tự động` : `⏸️ Đã tạm dừng quy tắc tự động`, 'info');
+    } catch (err) {
+      this.showToast(`Lỗi khi cập nhật quy tắc: ${err.message}`, 'danger');
+      this.renderAutomationView();
+    }
+  },
+
+  async triggerAutomationRule(id) {
+    const btn = document.querySelector(`[data-trigger-rule="${id}"]`);
+    const originalText = btn ? btn.innerHTML : '';
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span style="display:inline-block; animation:spin 1s infinite linear;">⚡</span> Đang chạy...';
+    }
+
+    try {
+      const res = await API.triggerAutomation(id);
+      this.playSound('automation');
+      this.showToast(`⚡ ${res.message || 'Đã kích hoạt tự động hóa thành công!'}`, 'success');
+      if (res.affectedTask) {
+        const idx = this.state.tasks.findIndex(t => t.id === res.affectedTask.id);
+        if (idx !== -1) {
+          this.state.tasks[idx] = res.affectedTask;
+        }
+      }
+    } catch (err) {
+      this.showToast(`Lỗi khi chạy tự động hóa: ${err.message}`, 'danger');
+      this.playSound('danger');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+  },
+
+  async runAllAutomations() {
+    const btn = document.getElementById('btnRunAllAutomations');
+    const list = (this.state.automations || []).filter(r => r.enabled);
+    if (list.length === 0) {
+      this.showToast('Không có quy tắc tự động nào đang được bật!', 'warning');
+      return;
+    }
+
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span>⚡</span><span>Đang chạy quét quy tắc...</span>';
+    }
+
+    try {
+      let runCount = 0;
+      for (const rule of list) {
+        await API.triggerAutomation(rule.id);
+        runCount++;
+        await new Promise(r => setTimeout(r, 250));
+      }
+      this.showToast(`🚀 Đã kiểm tra và kích hoạt thành công ${runCount} quy tắc tự động!`, 'success');
+      this.playSound('success');
+    } catch (err) {
+      this.showToast(`Lỗi khi chạy toàn bộ quy tắc: ${err.message}`, 'danger');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<span>⚡</span><span>Chạy Thử Toàn Bộ</span>';
+      }
+    }
+  },
+
+  openAutomationModal(rule = null) {
+    const modalTitle = document.getElementById('autoModalTitle');
+    const formId = document.getElementById('autoRuleId');
+    const formName = document.getElementById('autoRuleName');
+    const formIcon = document.getElementById('autoRuleIcon');
+    const formColor = document.getElementById('autoRuleColor');
+    const formTrigger = document.getElementById('autoRuleTrigger');
+    const formAction = document.getElementById('autoRuleAction');
+    const formDesc = document.getElementById('autoRuleDesc');
+    const submitBtn = document.getElementById('btnSubmitAutoRule');
+
+    if (rule) {
+      if (modalTitle) modalTitle.innerText = 'Chỉnh Sửa Quy Tắc Tự Động Hóa';
+      if (formId) formId.value = rule.id;
+      if (formName) formName.value = rule.name;
+      if (formIcon) formIcon.value = rule.icon || '⚡';
+      if (formColor) formColor.value = rule.color || '#3b82f6';
+      if (formTrigger) formTrigger.value = rule.trigger;
+      if (formAction) formAction.value = rule.action;
+      if (formDesc) formDesc.value = rule.desc || '';
+      if (submitBtn) submitBtn.innerText = '💾 Lưu Thay Đổi Quy Tắc';
+    } else {
+      if (modalTitle) modalTitle.innerText = 'Tạo Quy Tắc Tự Động Hóa Mới';
+      if (formId) formId.value = '';
+      if (formName) formName.value = '';
+      if (formIcon) formIcon.value = '⚡';
+      if (formColor) formColor.value = '#3b82f6';
+      if (formTrigger) formTrigger.value = 'task_status_completed';
+      if (formAction) formAction.value = 'set_progress_100';
+      if (formDesc) formDesc.value = '';
+      if (submitBtn) submitBtn.innerText = '⚡ Tạo & Kích Hoạt Quy Tắc';
+    }
+
+    this.openModal('automationModal');
+  },
+
+  async handleAutomationFormSubmit(e) {
+    e.preventDefault();
+    const id = document.getElementById('autoRuleId')?.value;
+    const name = document.getElementById('autoRuleName')?.value.trim();
+    const icon = document.getElementById('autoRuleIcon')?.value || '⚡';
+    const color = document.getElementById('autoRuleColor')?.value || '#3b82f6';
+    const trigger = document.getElementById('autoRuleTrigger')?.value;
+    const action = document.getElementById('autoRuleAction')?.value;
+    const desc = document.getElementById('autoRuleDesc')?.value.trim();
+
+    if (!name) {
+      this.showToast('Vui lòng nhập tên quy tắc / bot!', 'warning');
+      return;
+    }
+
+    const payload = {
+      name,
+      icon,
+      color,
+      trigger,
+      action,
+      desc
+    };
+
+    try {
+      if (id) {
+        await API.updateAutomation(id, payload);
+        this.showToast('✅ Đã cập nhật quy tắc tự động hóa!', 'success');
+      } else {
+        await API.createAutomation(payload);
+        this.showToast('⚡ Đã tạo quy tắc tự động hóa mới thành công!', 'success');
+      }
+      this.closeModal('automationModal');
+      await this.loadAutomations();
+      this.renderAutomationView();
+    } catch (err) {
+      this.showToast(`Lỗi lưu quy tắc: ${err.message}`, 'danger');
+    }
+  },
+
+  async deleteAutomationRule(id) {
+    const rule = (this.state.automations || []).find(r => r.id === id);
+    const ruleName = rule ? rule.name : `#${id}`;
+    if (!confirm(`Bạn có chắc chắn muốn xóa vĩnh viễn quy tắc "${ruleName}"?`)) return;
+
+    try {
+      await API.deleteAutomation(id);
+      this.showToast(`🗑️ Đã xóa quy tắc "${ruleName}"`, 'warning');
+      await this.loadAutomations();
+      this.renderAutomationView();
+    } catch (err) {
+      this.showToast(`Lỗi khi xóa quy tắc: ${err.message}`, 'danger');
     }
   },
 

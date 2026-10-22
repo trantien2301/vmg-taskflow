@@ -241,6 +241,37 @@ const API = {
     });
   },
 
+  // Automations (Workflow Rules)
+  async getAutomations() {
+    return this.request('/api/automations');
+  },
+
+  async createAutomation(ruleData) {
+    return this.request('/api/automations', {
+      method: 'POST',
+      body: JSON.stringify(ruleData)
+    });
+  },
+
+  async updateAutomation(id, updates) {
+    return this.request(`/api/automations/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates)
+    });
+  },
+
+  async deleteAutomation(id) {
+    return this.request(`/api/automations/${encodeURIComponent(id)}`, {
+      method: 'DELETE'
+    });
+  },
+
+  async triggerAutomation(id) {
+    return this.request(`/api/automations/${encodeURIComponent(id)}/trigger`, {
+      method: 'POST'
+    });
+  },
+
   // System & Version Updates
   async getVersionInfo() {
     return this.request('/api/system/version');

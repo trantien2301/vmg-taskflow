@@ -288,6 +288,13 @@
           <span>Báo Cáo & Thống Kê</span>
         </a>
 
+        <div class="nav-section-title">Quy Trình & Tự Động Hóa</div>
+        <a class="nav-item" data-view="automation" id="navItemAutomation">
+          <span class="icon">⚡</span>
+          <span>Tự Động Hóa (Bot)</span>
+          <span class="nav-badge success" id="sidebarAutomationBadge" style="font-size:9.5px; font-weight:800; background:#10b981; color:#fff;">PRO</span>
+        </a>
+
         <div class="nav-section-title">Quản Trị Hệ Thống</div>
         <a class="nav-item" data-view="users" id="adminUsersNavItem">
           <span class="icon">👥</span>
@@ -309,7 +316,7 @@
         </div>
         <button class="sidebar-version-pill" id="sidebarVersionBtn" title="Xem thông tin phiên bản & cập nhật">
           <span class="version-dot"></span>
-          <span>TaskFlow Pro <strong id="sidebarVersionText">v2.9.0</strong></span>
+          <span>TaskFlow Pro <strong id="sidebarVersionText">v3.0.0</strong></span>
           <span class="version-badge-new" id="sidebarVersionNewBadge" style="display:none;">MỚI</span>
         </button>
         <button class="btn-logout" id="btnLogoutSidebar">
@@ -356,7 +363,7 @@
 
           <!-- Version Info button -->
           <button class="btn btn-outline btn-sm version-header-btn" id="btnHeaderVersion" title="Xem thông tin phiên bản & cập nhật">
-            🚀 <span class="hide-mobile">v2.9.0</span>
+            🚀 <span class="hide-mobile">v3.0.0</span>
             <span class="header-version-dot" id="headerVersionDot" style="display:none;"></span>
           </button>
 
@@ -808,6 +815,93 @@
             <div id="activityLogContainer" class="activity-log-feed"></div>
           </div>
         </section>
+
+        <!-- VIEW 8: WORKFLOW AUTOMATION -->
+        <section class="view-panel" id="view-automation">
+          <div class="automation-container">
+            <!-- Hero Banner -->
+            <div class="automation-hero-banner">
+              <div class="automation-hero-content">
+                <div class="automation-spark-badge">
+                  <span class="sparkle-anim">⚡</span>
+                  <span>ĐỘNG CƠ TỰ ĐỘNG HÓA THÔNG MINH</span>
+                </div>
+                <h2 class="automation-hero-title">Trung Tâm Tự Động Hóa Quy Trình (Workflow Automation)</h2>
+                <p class="automation-hero-desc">
+                  Thiết lập các bot và quy tắc kích hoạt tự động theo thời gian thực: Đồng bộ tiến độ, phân công việc, gắn cờ khẩn cấp và cảnh báo trễ hạn 24/7.
+                </p>
+                <div class="automation-engine-status">
+                  <span class="engine-pulse-dot"></span>
+                  <span>Trạng thái: <strong>Đang chạy nền trực tuyến & đồng bộ Realtime</strong></span>
+                </div>
+              </div>
+
+              <!-- Metrics Widget -->
+              <div class="automation-metrics-panel">
+                <div class="auto-metric-card">
+                  <span class="auto-metric-icon">🤖</span>
+                  <div class="auto-metric-info">
+                    <div class="auto-metric-val" id="autoStatActive">0</div>
+                    <div class="auto-metric-label">Quy Tắc Đang Bật</div>
+                  </div>
+                </div>
+                <div class="auto-metric-card">
+                  <span class="auto-metric-icon">⚡</span>
+                  <div class="auto-metric-info">
+                    <div class="auto-metric-val" id="autoStatTotalRuns">0</div>
+                    <div class="auto-metric-label">Lượt Tự Động Chạy</div>
+                  </div>
+                </div>
+                <div class="auto-metric-card">
+                  <span class="auto-metric-icon">⏳</span>
+                  <div class="auto-metric-info">
+                    <div class="auto-metric-val" id="autoStatHoursSaved">~0h</div>
+                    <div class="auto-metric-label">Tiết Kiệm Ước Tính</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Toolbar / Action Row -->
+            <div class="automation-toolbar-row">
+              <div class="automation-toolbar-left">
+                <h3 style="margin:0; font-size:15px; font-weight:800; display:flex; align-items:center; gap:8px;">
+                  <span>📋 Danh Sách Bot & Quy Tắc Kích Hoạt</span>
+                  <span class="badge-count" id="automationCountBadge">5 quy tắc</span>
+                </h3>
+              </div>
+              <div class="automation-toolbar-right">
+                <button class="btn btn-primary btn-sm" id="btnOpenCreateAutoModal">
+                  <span>+</span>
+                  <span>Tạo Quy Tắc Mới</span>
+                </button>
+                <button class="btn btn-outline btn-sm" id="btnRunAllAutomations" title="Quét và kiểm tra tự động chạy toàn bộ quy tắc">
+                  <span>⚡</span>
+                  <span>Chạy Thử Toàn Bộ</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Recipe Rules Grid -->
+            <div class="automation-rules-grid" id="automationRulesGrid">
+              <!-- Dynamically injected rules -->
+            </div>
+
+            <!-- Recent Executions Log -->
+            <div class="automation-log-section">
+              <div class="automation-log-header">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="font-size:18px;">📡</span>
+                  <span style="font-size:14px; font-weight:700;">Nhật Ký Thực Thi Tự Động Gần Nhất (Live Executions)</span>
+                </div>
+                <span style="font-size:11.5px; color:var(--text-secondary);" id="autoExecCount">Tự động cập nhật</span>
+              </div>
+              <div class="automation-feed-list" id="automationLiveFeed">
+                <!-- Dynamically injected execution items -->
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   </div>
@@ -1134,7 +1228,7 @@
           <div class="version-status-header">
             <div class="version-pill-large">
               <span class="version-status-pulse" id="versionStatusPulse"></span>
-              <span id="modalCurrentVersion">TaskFlow Pro v2.9.0</span>
+              <span id="modalCurrentVersion">TaskFlow Pro v3.0.0</span>
             </div>
             <span class="version-build-date" id="modalBuildDate">Bản dựng: 22/10/2026</span>
           </div>
@@ -1188,12 +1282,104 @@
     </div>
   </div>
 
+  <!-- MODAL: CREATE / EDIT AUTOMATION RULE -->
+  <div class="modal-overlay" id="automationModal" style="z-index: 10000;">
+    <div class="modal-content" style="max-width: 560px;">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:22px;">⚡</span>
+          <div>
+            <h3 class="modal-title" id="autoModalTitle" style="font-size:16px; margin:0;">Tạo Quy Tắc Tự Động Hóa Mới</h3>
+            <div style="font-size:11.5px; color:var(--text-secondary); margin-top:2px;">Cấu hình điều kiện (KHI) và hành động (THÌ) tự động hóa thông minh</div>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close-modal="automationModal">&times;</button>
+      </div>
+      <form id="automationForm">
+        <div class="modal-body">
+          <input type="hidden" id="autoRuleId">
+
+          <div class="form-group">
+            <label class="form-label">Tên Quy Tắc / Tên Bot *</label>
+            <input type="text" id="autoRuleName" class="form-control" placeholder="Ví dụ: Tự động gắn tag VIP cho việc khẩn cấp" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Biểu Tượng Bot</label>
+              <select id="autoRuleIcon" class="form-control">
+                <option value="⚡">⚡ Tia chớp (Tức thì)</option>
+                <option value="🤖">🤖 Robot (Trợ lý tự động)</option>
+                <option value="🎯">🎯 Mục tiêu (Phân công)</option>
+                <option value="🚨">🚨 Báo động (Khẩn cấp)</option>
+                <option value="⏰">⏰ Đồng hồ (Thời hạn)</option>
+                <option value="✅">✅ Hoàn thành (Nghiệm thu)</option>
+                <option value="🚀">🚀 Tên lửa (Tăng tốc)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Màu Chủ Đạo</label>
+              <select id="autoRuleColor" class="form-control">
+                <option value="#3b82f6">Xanh Lam (Mặc định)</option>
+                <option value="#10b981">Xanh Mint (Thành công)</option>
+                <option value="#f59e0b">Vàng Hổ Phách (Cảnh báo)</option>
+                <option value="#ef4444">Đỏ (Khẩn cấp)</option>
+                <option value="#8b5cf6">Tím (Sáng tạo)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Flow Builder Step 1: WHEN / TRIGGER -->
+          <div class="rule-builder-step trigger">
+            <div class="step-label-badge trigger">KHI (TRIGGER SỰ KIỆN)</div>
+            <div class="form-group" style="margin-bottom:0;">
+              <select id="autoRuleTrigger" class="form-control" required>
+                <option value="task_status_completed">Khi trạng thái công việc đổi thành "Hoàn thành"</option>
+                <option value="task_progress_100">Khi tiến độ công việc đạt 100%</option>
+                <option value="task_urgent_created">Khi tạo hoặc cập nhật việc có ưu tiên "Khẩn cấp"</option>
+                <option value="task_overdue_detected">Khi phát hiện công việc đã quá hạn chót</option>
+                <option value="task_unassigned_created">Khi công việc mới tạo chưa được phân công</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="rule-connector-arrow">
+            <span>➔ ⚡ TỰ ĐỘNG THỰC THI ➔</span>
+          </div>
+
+          <!-- Flow Builder Step 2: THEN / ACTION -->
+          <div class="rule-builder-step action">
+            <div class="step-label-badge action">THÌ (HÀNH ĐỘNG KẾT QUẢ)</div>
+            <div class="form-group" style="margin-bottom:0;">
+              <select id="autoRuleAction" class="form-control" required>
+                <option value="set_progress_100">Tự động cập nhật tiến độ đạt 100% & ghi giờ hoàn tất</option>
+                <option value="set_status_review">Tự động chuyển trạng thái công việc sang "Chờ duyệt"</option>
+                <option value="tag_and_alert_admin">Gắn thẻ "Ưu Tiên Số 1" & phát cảnh báo đỏ tới Quản trị viên</option>
+                <option value="tag_overdue_and_notify">Gắn thẻ "Quá hạn" & gửi chuông cảnh báo tới nhân sự</option>
+                <option value="tag_unassigned_and_notify_dept">Gắn nhãn "Chờ nhận việc" & gửi thông báo nội bộ phòng ban</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top:14px;">
+            <label class="form-label">Mô Tả Quy Tắc (Tùy chọn)</label>
+            <textarea id="autoRuleDesc" class="form-control" rows="2" placeholder="Ghi chú thêm về mục đích quy tắc tự động này..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" data-close-modal="automationModal">Hủy</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitAutoRule">💾 Lưu & Kích Hoạt Quy Tắc</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- TOAST NOTIFICATION POPUPS CONTAINER -->
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- APPLICATION SCRIPTS -->
-  <script src="js/api.js?v=2.9.0"></script>
-  <script src="js/charts.js?v=2.9.0"></script>
-  <script src="js/app.js?v=2.9.0"></script>
+  <script src="js/api.js?v=3.0.0"></script>
+  <script src="js/charts.js?v=3.0.0"></script>
+  <script src="js/app.js?v=3.0.0"></script>
 </body>
 </html>
