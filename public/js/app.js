@@ -13,7 +13,7 @@ const App = {
     currentDetailTask: null,
     draggedTaskId: null,
     onlineCount: 1,
-    clientVersion: '3.0.0',
+    clientVersion: '3.1.0',
     serverVersionInfo: null,
     hasNewUpdate: false,
     automations: [],
@@ -944,6 +944,94 @@ const App = {
       });
     }
 
+    // ========================================================
+    // USER MANAGEMENT & DIRECT PERMISSIONS LISTENERS
+    // ========================================================
+    const userSearchInput = document.getElementById('userSearchInput');
+    if (userSearchInput) {
+      userSearchInput.addEventListener('input', () => this.renderUsersView());
+    }
+
+    const userFilterDept = document.getElementById('userFilterDept');
+    if (userFilterDept) {
+      userFilterDept.addEventListener('change', () => this.renderUsersView());
+    }
+
+    const userFilterRole = document.getElementById('userFilterRole');
+    if (userFilterRole) {
+      userFilterRole.addEventListener('change', () => this.renderUsersView());
+    }
+
+    const userFilterStatus = document.getElementById('userFilterStatus');
+    if (userFilterStatus) {
+      userFilterStatus.addEventListener('change', () => this.renderUsersView());
+    }
+
+    const btnRefreshUsers = document.getElementById('btnRefreshUsers');
+    if (btnRefreshUsers) {
+      btnRefreshUsers.addEventListener('click', () => {
+        this.refreshUsersList();
+        this.showToast('Đã làm mới danh sách nhân sự!', 'info');
+      });
+    }
+
+    const quickPasswordForm = document.getElementById('quickPasswordForm');
+    if (quickPasswordForm) {
+      quickPasswordForm.addEventListener('submit', (e) => this.handleQuickResetPassSubmit(e));
+    }
+
+    const userFormRole = document.getElementById('userFormRole');
+    if (userFormRole) {
+      userFormRole.addEventListener('change', (e) => this.onRoleChangeInModal(e.target.value));
+    }
+
+    const btnResetDefaultPerms = document.getElementById('btnResetDefaultPerms');
+    if (btnResetDefaultPerms) {
+      btnResetDefaultPerms.addEventListener('click', () => this.resetModalPermissionsToDefault());
+    }
+
+    const userTableBody = document.getElementById('userTableBody');
+    if (userTableBody) {
+      userTableBody.addEventListener('change', (e) => {
+        const roleSel = e.target.closest('[data-user-inline-role]');
+        if (roleSel) {
+          const userId = roleSel.getAttribute('data-user-inline-role');
+          this.quickUpdateUserRole(userId, roleSel.value);
+          return;
+        }
+
+        const deptSel = e.target.closest('[data-user-inline-dept]');
+        if (deptSel) {
+          const userId = deptSel.getAttribute('data-user-inline-dept');
+          this.quickUpdateUserDept(userId, deptSel.value);
+          return;
+        }
+      });
+
+      userTableBody.addEventListener('click', (e) => {
+        const toggleBtn = e.target.closest('[data-toggle-user-status]');
+        if (toggleBtn) {
+          const userId = toggleBtn.getAttribute('data-toggle-user-status');
+          this.quickToggleUserStatus(userId);
+          return;
+        }
+
+        const permBtn = e.target.closest('[data-open-perm]');
+        if (permBtn) {
+          const userId = permBtn.getAttribute('data-open-perm');
+          this.openEditUserModal(userId);
+          return;
+        }
+
+        const passBtn = e.target.closest('[data-quick-reset-pass]');
+        if (passBtn) {
+          const userId = passBtn.getAttribute('data-quick-reset-pass');
+          this.openQuickResetPassModal(userId);
+          return;
+        }
+      });
+    }
+
     // Calendar Navigation & Modes Listeners
     const calBtnPrev = document.getElementById('calBtnPrev');
     if (calBtnPrev) {
@@ -1362,6 +1450,15 @@ const App = {
       if (currentVal && depts.includes(currentVal)) {
         regDeptSelect.value = currentVal;
       }
+    }
+
+    // 5. User Management Filter Department dropdown
+    const userFilterDept = document.getElementById('userFilterDept');
+    if (userFilterDept) {
+      const currentVal = userFilterDept.value;
+      userFilterDept.innerHTML = '<option value="all">🏢 Tất cả phòng ban</option>' +
+        depts.map(d => `<option value="${d}">${d}</option>`).join('');
+      userFilterDept.value = currentVal || 'all';
     }
   },
 
@@ -2452,45 +2549,223 @@ const App = {
   },
 
   // -------------------------------------------------------------
-  // USERS MANAGEMENT VIEW (Admin)
+  // USERS MANAGEMENT VIEW & GRANULAR PERMISSIONS (Admin)
   // -------------------------------------------------------------
+  DEFAULT_PERMISSIONS: {
+    admin: {
+      canCreateTask: true,
+      canEditTask: true,
+      canDeleteTask: true,
+      canReviewTask: true,
+      canManageDept: true,
+      canManageUsers: true,
+      canManageAutomation: true,
+      canViewReports: true
+    },
+    manager: {
+      canCreateTask: true,
+      canEditTask: true,
+      canDeleteTask: false,
+      canReviewTask: true,
+      canManageDept: false,
+      canManageUsers: false,
+      canManageAutomation: true,
+      canViewReports: true
+    },
+    user: {
+      canCreateTask: true,
+      canEditTask: true,
+      canDeleteTask: false,
+      canReviewTask: false,
+      canManageDept: false,
+      canManageUsers: false,
+      canManageAutomation: false,
+      canViewReports: true
+    },
+    viewer: {
+      canCreateTask: false,
+      canEditTask: false,
+      canDeleteTask: false,
+      canReviewTask: false,
+      canManageDept: false,
+      canManageUsers: false,
+      canManageAutomation: false,
+      canViewReports: true
+    }
+  },
+
   renderUsersView() {
     const tbody = document.getElementById('userTableBody');
     if (!tbody) return;
 
-    tbody.innerHTML = this.state.users.map(u => {
-      const isMe = this.state.user && this.state.user.id === u.id;
-      const countTasks = this.state.tasks.filter(t => t.assignedTo === u.id).length;
+    this.populateDepartmentDropdowns();
+
+    const users = this.state.users || [];
+    const tasks = this.state.tasks || [];
+    const currentUser = this.state.user || {};
+    const isAdmin = currentUser.role === 'admin' || currentUser.permissions?.canManageUsers;
+
+    // 1. Calculate Metrics
+    const totalUsers = users.length;
+    const adminCount = users.filter(u => u.role === 'admin').length;
+    const managerCount = users.filter(u => u.role === 'manager').length;
+    const staffCount = users.filter(u => u.role === 'user').length;
+    const activeCount = users.filter(u => u.active !== false).length;
+
+    const elTotal = document.getElementById('userStatTotal');
+    const elAdmin = document.getElementById('userStatAdmin');
+    const elManager = document.getElementById('userStatManager');
+    const elStaff = document.getElementById('userStatStaff');
+    const elActive = document.getElementById('userStatActive');
+    const elBadge = document.getElementById('userCountBadge');
+
+    if (elTotal) elTotal.innerText = totalUsers;
+    if (elAdmin) elAdmin.innerText = adminCount;
+    if (elManager) elManager.innerText = managerCount;
+    if (elStaff) elStaff.innerText = staffCount;
+    if (elActive) elActive.innerText = activeCount;
+
+    // 2. Filters
+    const searchVal = (document.getElementById('userSearchInput')?.value || '').trim().toLowerCase();
+    const deptFilter = document.getElementById('userFilterDept')?.value || 'all';
+    const roleFilter = document.getElementById('userFilterRole')?.value || 'all';
+    const statusFilter = document.getElementById('userFilterStatus')?.value || 'all';
+
+    let filtered = users.filter(u => {
+      if (searchVal) {
+        const text = `${u.name || ''} ${u.email || ''} ${u.position || ''} ${u.department || ''}`.toLowerCase();
+        if (!text.includes(searchVal)) return false;
+      }
+      if (deptFilter !== 'all' && u.department !== deptFilter) return false;
+      if (roleFilter !== 'all' && u.role !== roleFilter) return false;
+      if (statusFilter === 'active' && u.active === false) return false;
+      if (statusFilter === 'inactive' && u.active !== false) return false;
+      return true;
+    });
+
+    if (elBadge) elBadge.innerText = `${filtered.length} nhân sự`;
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align:center; padding:48px 20px; color:var(--text-secondary);">
+            <div style="font-size:36px; margin-bottom:8px;">🔍</div>
+            <div style="font-weight:700; font-size:14px; margin-bottom:4px;">Không tìm thấy nhân sự phù hợp</div>
+            <div style="font-size:12px; color:var(--text-muted);">Hãy thử thay đổi từ khóa tìm kiếm hoặc bỏ bớt các bộ lọc phòng ban, vai trò.</div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    const deptsList = (this.state.departments || []).map(d => typeof d === 'string' ? d : d.name);
+
+    tbody.innerHTML = filtered.map(u => {
+      const isMe = currentUser && currentUser.id === u.id;
+      const countTasks = tasks.filter(t => t.assignedTo === u.id).length;
+      const isActive = u.active !== false;
+      const isSso = (u.email || '').toLowerCase().endsWith('@vmg.edu.vn');
+      const avatar = u.avatar || (u.role === 'admin' ? '👑' : (u.role === 'manager' ? '👔' : '👤'));
+
+      // Count permissions granted
+      const perms = u.permissions || this.DEFAULT_PERMISSIONS[u.role] || this.DEFAULT_PERMISSIONS.user;
+      const permGrantedCount = Object.values(perms).filter(Boolean).length;
+
+      // Inline Dept Select
+      const deptOptions = deptsList.map(d => `
+        <option value="${this.escapeHtml(d)}" ${d === u.department ? 'selected' : ''}>${this.escapeHtml(d)}</option>
+      `).join('');
+
+      const deptCell = isAdmin ? `
+        <select class="inline-dept-select" data-user-inline-dept="${u.id}" title="Nhấp để chuyển phòng ban trực tiếp">
+          ${deptOptions}
+        </select>
+      ` : `<span>${this.escapeHtml(u.department || 'Chưa phân bổ')}</span>`;
+
+      // Inline Role Select
+      const roleCell = isAdmin ? `
+        <select class="inline-role-select ${u.role}" data-user-inline-role="${u.id}" title="Nhấp để đổi vai trò trực tiếp">
+          <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>👑 ADMIN</option>
+          <option value="manager" ${u.role === 'manager' ? 'selected' : ''}>👔 MANAGER</option>
+          <option value="user" ${u.role === 'user' ? 'selected' : ''}>👤 MEMBER</option>
+          <option value="viewer" ${u.role === 'viewer' ? 'selected' : ''}>👁️ VIEWER</option>
+        </select>
+      ` : `
+        <span class="user-role-tag ${u.role}">${(u.role || 'user').toUpperCase()}</span>
+      `;
+
+      // Status 1-Click Toggle
+      const statusPill = isAdmin && !isMe ? `
+        <span class="status-pill-toggle ${isActive ? 'active' : 'inactive'}" data-toggle-user-status="${u.id}" title="Nhấp 1-chạm để ${isActive ? 'tạm khóa' : 'mở khóa'} tài khoản này">
+          ${isActive ? '🟢 Hoạt động' : '🔴 Đã khóa'}
+        </span>
+      ` : `
+        <span class="status-pill-toggle ${isActive ? 'active' : 'inactive'}" style="cursor:default;">
+          ${isActive ? '🟢 Hoạt động' : '🔴 Đã khóa'}
+        </span>
+      `;
 
       return `
-        <tr>
+        <tr data-user-row="${u.id}">
           <td>
             <div style="display:flex; align-items:center; gap:10px;">
-              <span style="font-size:20px;">${u.avatar || '👤'}</span>
+              <span style="font-size:22px; flex-shrink:0;">${avatar}</span>
               <div>
-                <div style="font-weight:600;">${u.name} ${isMe ? '<span style="font-size:10px; color:var(--primary); font-weight:700;">(BẠN)</span>' : ''}</div>
-                <div style="font-size:11px; color:var(--text-secondary);">${u.position || 'Nhân viên'}</div>
+                <div style="font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:6px;">
+                  <span>${this.escapeHtml(u.name)}</span>
+                  ${isMe ? '<span style="font-size:10px; background:var(--primary); color:white; padding:1px 5px; border-radius:4px; font-weight:800;">BẠN</span>' : ''}
+                </div>
+                <div style="font-size:11.5px; color:var(--text-secondary); margin-top:1px;">
+                  ${this.escapeHtml(u.position || 'Chuyên viên')}
+                </div>
               </div>
             </div>
           </td>
-          <td>${u.email}</td>
-          <td>${u.department}</td>
           <td>
-            <span class="user-role-tag ${u.role}">
-              ${u.role.toUpperCase()}
-            </span>
-          </td>
-          <td><strong>${countTasks}</strong> việc</td>
-          <td>
-            <span style="font-size:12px; font-weight:600; color:${u.active ? 'var(--success)' : 'var(--danger)'};">
-              ${u.active ? '● Hoạt động' : '● Đã khóa'}
-            </span>
+            <div style="font-size:12.5px; font-weight:600; color:var(--text-primary);">
+              ${this.escapeHtml(u.email)}
+            </div>
+            <div style="display:flex; align-items:center; gap:6px; margin-top:2px;">
+              ${isSso ? '<span style="font-size:9.5px; font-weight:800; background:rgba(59,130,246,0.15); color:#2563eb; padding:1px 4px; border-radius:3px;">GOOGLE SSO</span>' : ''}
+              ${u.phone ? `<span style="font-size:11px; color:var(--text-muted);">📞 ${this.escapeHtml(u.phone)}</span>` : ''}
+            </div>
           </td>
           <td>
-            ${this.state.user.role === 'admin' ? `
-              <button class="btn btn-outline btn-sm" onclick="App.openEditUserModal('${u.id}')">Sửa</button>
-              ${!isMe ? `<button class="btn btn-outline btn-sm" style="color:var(--danger);" onclick="App.deleteUser('${u.id}')">Xóa</button>` : ''}
-            ` : ''}
+            ${deptCell}
+          </td>
+          <td>
+            <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-start;">
+              ${roleCell}
+              <span style="font-size:10.5px; color:var(--text-muted); cursor:pointer; text-decoration:underline;" data-open-perm="${u.id}" title="Xem & điều chỉnh ma trận quyền">
+                ⚡ ${permGrantedCount}/8 quyền
+              </span>
+            </div>
+          </td>
+          <td>
+            <span style="font-weight:700; font-size:13px; color:var(--text-primary);">${countTasks}</span>
+            <span style="font-size:11.5px; color:var(--text-muted);"> việc</span>
+          </td>
+          <td>
+            ${statusPill}
+          </td>
+          <td style="text-align:right;">
+            <div class="user-action-btn-group">
+              ${isAdmin ? `
+                <button type="button" class="btn btn-outline btn-xs btn-perm-action" data-open-perm="${u.id}" title="Phân quyền chi tiết & Sửa">
+                  <span>⚡</span><span>Sửa & Phân quyền</span>
+                </button>
+                <button type="button" class="btn btn-outline btn-xs" data-quick-reset-pass="${u.id}" title="Đặt lại mật khẩu">
+                  🔑
+                </button>
+                ${!isMe ? `
+                  <button type="button" class="btn btn-outline btn-xs" style="color:var(--danger);" onclick="App.deleteUser('${u.id}')" title="Xóa tài khoản nhân sự">
+                    🗑️
+                  </button>
+                ` : ''}
+              ` : `
+                <span style="font-size:11px; color:var(--text-muted);">Chỉ xem</span>
+              `}
+            </div>
           </td>
         </tr>
       `;
@@ -2500,16 +2775,24 @@ const App = {
   openAddUserModal() {
     this.populateDepartmentDropdowns();
     document.getElementById('userModalTitle').innerText = 'Thêm Thành Viên Mới';
+    document.getElementById('userModalHeaderAvatar').innerText = '👤';
     document.getElementById('userFormId').value = '';
     document.getElementById('userFormName').value = '';
     document.getElementById('userFormEmail').value = '';
     document.getElementById('userFormPassword').value = '123456';
+    document.getElementById('userFormPhone').value = '';
     document.getElementById('userFormRole').value = 'user';
+    document.getElementById('userFormActive').value = 'true';
+
     const firstDept = (this.state.departments && this.state.departments[0])
       ? (typeof this.state.departments[0] === 'string' ? this.state.departments[0] : this.state.departments[0].name)
       : 'Phòng Kỹ Thuật';
     document.getElementById('userFormDept').value = firstDept;
     document.getElementById('userFormPosition').value = 'Chuyên viên';
+
+    // Set default permissions for 'user'
+    this.setModalPermissionCheckboxes(this.DEFAULT_PERMISSIONS.user);
+
     this.openModal('userModal');
   },
 
@@ -2518,49 +2801,195 @@ const App = {
     const user = this.state.users.find(u => u.id === userId);
     if (!user) return;
 
-    document.getElementById('userModalTitle').innerText = 'Chỉnh Sửa Thông Tin Thành Viên';
+    document.getElementById('userModalTitle').innerText = `Phân Quyền & Chỉnh Sửa: ${user.name}`;
+    document.getElementById('userModalHeaderAvatar').innerText = user.avatar || (user.role === 'admin' ? '👑' : (user.role === 'manager' ? '👔' : '👤'));
     document.getElementById('userFormId').value = user.id;
     document.getElementById('userFormName').value = user.name;
     document.getElementById('userFormEmail').value = user.email;
     document.getElementById('userFormPassword').value = ''; // Leave blank to keep
-    document.getElementById('userFormRole').value = user.role;
+    document.getElementById('userFormPhone').value = user.phone || '';
+    document.getElementById('userFormRole').value = user.role || 'user';
     document.getElementById('userFormDept').value = user.department;
     document.getElementById('userFormPosition').value = user.position || '';
+    document.getElementById('userFormActive').value = String(user.active !== false);
+
+    // Populate permission checkboxes
+    const perms = user.permissions || this.DEFAULT_PERMISSIONS[user.role] || this.DEFAULT_PERMISSIONS.user;
+    this.setModalPermissionCheckboxes(perms);
+
     this.openModal('userModal');
+  },
+
+  setModalPermissionCheckboxes(perms = {}) {
+    const keys = [
+      'canCreateTask', 'canEditTask', 'canDeleteTask', 'canReviewTask',
+      'canManageDept', 'canManageUsers', 'canManageAutomation', 'canViewReports'
+    ];
+    keys.forEach(k => {
+      const el = document.getElementById(`perm_${k}`);
+      if (el) {
+        el.checked = Boolean(perms[k]);
+      }
+    });
+  },
+
+  getModalPermissionCheckboxes() {
+    const keys = [
+      'canCreateTask', 'canEditTask', 'canDeleteTask', 'canReviewTask',
+      'canManageDept', 'canManageUsers', 'canManageAutomation', 'canViewReports'
+    ];
+    const perms = {};
+    keys.forEach(k => {
+      const el = document.getElementById(`perm_${k}`);
+      perms[k] = el ? el.checked : false;
+    });
+    return perms;
+  },
+
+  onRoleChangeInModal(newRole) {
+    const defaultPerms = this.DEFAULT_PERMISSIONS[newRole] || this.DEFAULT_PERMISSIONS.user;
+    this.setModalPermissionCheckboxes(defaultPerms);
+  },
+
+  resetModalPermissionsToDefault() {
+    const role = document.getElementById('userFormRole')?.value || 'user';
+    const defaultPerms = this.DEFAULT_PERMISSIONS[role] || this.DEFAULT_PERMISSIONS.user;
+    this.setModalPermissionCheckboxes(defaultPerms);
+    this.showToast(`↺ Đã khôi phục quyền mặc định cho vai trò "${role.toUpperCase()}"`, 'info');
   },
 
   async handleUserFormSubmit(e) {
     e.preventDefault();
     const id = document.getElementById('userFormId').value;
-    const name = document.getElementById('userFormName').value;
-    const email = document.getElementById('userFormEmail').value;
+    const name = document.getElementById('userFormName').value.trim();
+    const email = document.getElementById('userFormEmail').value.trim().toLowerCase();
     const password = document.getElementById('userFormPassword').value;
     const role = document.getElementById('userFormRole').value;
     const department = document.getElementById('userFormDept').value;
-    const position = document.getElementById('userFormPosition').value;
+    const position = document.getElementById('userFormPosition').value.trim();
+    const phone = document.getElementById('userFormPhone').value.trim();
+    const active = document.getElementById('userFormActive').value === 'true';
+
+    const permissions = this.getModalPermissionCheckboxes();
 
     try {
       if (id) {
-        const payload = { name, email, role, department, position };
+        const payload = { name, email, role, department, position, phone, active, permissions };
         if (password) payload.password = password;
         await API.updateUser(id, payload);
-        this.showToast('✅ Đã cập nhật thành viên thành công!', 'success');
+        this.showToast(`✅ Đã cập nhật phân quyền và tài khoản "${name}" thành công!`, 'success');
+        this.playSound('success');
       } else {
-        await API.createUser({ name, email, password, role, department, position });
-        this.showToast('✅ Đã tạo thành viên mới thành công!', 'success');
+        await API.createUser({ name, email, password: password || '123456', role, department, position, phone, active, permissions });
+        this.showToast(`✅ Đã tạo thành viên mới "${name}" thành công!`, 'success');
+        this.playSound('success');
       }
       this.closeModal('userModal');
       await this.refreshUsersList();
     } catch (err) {
       this.showToast(`Lỗi: ${err.message}`, 'danger');
+      this.playSound('danger');
+    }
+  },
+
+  openQuickResetPassModal(userId) {
+    const user = (this.state.users || []).find(u => u.id === userId);
+    if (!user) return;
+
+    document.getElementById('quickPassUserId').value = user.id;
+    document.getElementById('quickPassUserName').innerText = user.name;
+    document.getElementById('quickPassUserEmail').innerText = `${user.email} (${user.department})`;
+    document.getElementById('quickNewPassword').value = '123456';
+
+    this.openModal('quickPasswordModal');
+  },
+
+  async handleQuickResetPassSubmit(e) {
+    e.preventDefault();
+    const userId = document.getElementById('quickPassUserId').value;
+    const newPassword = document.getElementById('quickNewPassword').value.trim();
+
+    if (!newPassword || newPassword.length < 6) {
+      this.showToast('Mật khẩu mới phải có ít nhất 6 ký tự!', 'warning');
+      return;
+    }
+
+    try {
+      const res = await API.resetUserPassword(userId, newPassword);
+      this.showToast(res.message || '✅ Đã đặt lại mật khẩu thành công!', 'success');
+      this.playSound('success');
+      this.closeModal('quickPasswordModal');
+    } catch (err) {
+      this.showToast(`Lỗi đặt lại mật khẩu: ${err.message}`, 'danger');
+      this.playSound('danger');
+    }
+  },
+
+  async quickToggleUserStatus(userId) {
+    const user = (this.state.users || []).find(u => u.id === userId);
+    if (!user) return;
+
+    const newActive = user.active === false;
+    const actionText = newActive ? 'kích hoạt mở khóa' : 'tạm khóa';
+
+    if (!confirm(`Bạn có chắc chắn muốn ${actionText} tài khoản của "${user.name}"?`)) return;
+
+    try {
+      await API.toggleUserStatus(userId, newActive);
+      user.active = newActive;
+      this.showToast(`✅ Đã ${actionText} tài khoản "${user.name}"!`, 'info');
+      this.playSound('info');
+      this.renderUsersView();
+    } catch (err) {
+      this.showToast(`Lỗi: ${err.message}`, 'danger');
+    }
+  },
+
+  async quickUpdateUserRole(userId, newRole) {
+    const user = (this.state.users || []).find(u => u.id === userId);
+    if (!user) return;
+
+    try {
+      const res = await API.updateUser(userId, { role: newRole });
+      if (res && res.user) {
+        user.role = res.user.role;
+        user.avatar = res.user.avatar;
+        user.permissions = res.user.permissions;
+      }
+      this.showToast(`👑 Đã cập nhật vai trò "${user.name}" thành [${newRole.toUpperCase()}]!`, 'success');
+      this.playSound('success');
+      this.renderUsersView();
+    } catch (err) {
+      this.showToast(`Lỗi cập nhật vai trò: ${err.message}`, 'danger');
+      this.renderUsersView();
+    }
+  },
+
+  async quickUpdateUserDept(userId, newDept) {
+    const user = (this.state.users || []).find(u => u.id === userId);
+    if (!user) return;
+
+    try {
+      await API.updateUser(userId, { department: newDept });
+      user.department = newDept;
+      this.showToast(`🏢 Đã chuyển phòng ban của "${user.name}" sang "${newDept}"!`, 'success');
+      this.playSound('success');
+      this.renderUsersView();
+    } catch (err) {
+      this.showToast(`Lỗi chuyển phòng ban: ${err.message}`, 'danger');
+      this.renderUsersView();
     }
   },
 
   async deleteUser(userId) {
-    if (!confirm('Bạn có chắc chắn muốn xóa thành viên này khỏi hệ thống?')) return;
+    const user = (this.state.users || []).find(u => u.id === userId);
+    const userName = user ? user.name : `#${userId}`;
+    if (!confirm(`Bạn có chắc chắn muốn xóa vĩnh viễn tài khoản nhân sự "${userName}" khỏi hệ thống?`)) return;
+
     try {
       await API.deleteUser(userId);
-      this.showToast('Đã xóa thành viên!', 'warning');
+      this.showToast(`🗑️ Đã xóa thành viên "${userName}"!`, 'warning');
+      this.playSound('info');
       await this.refreshUsersList();
     } catch (err) {
       this.showToast(`Lỗi xóa: ${err.message}`, 'danger');

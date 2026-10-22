@@ -420,6 +420,49 @@ function getDefaultData() {
   return { users, tasks, comments, notifications, activities, settings, departments, automations };
 }
 
+const DEFAULT_PERMISSIONS = {
+  admin: {
+    canCreateTask: true,
+    canEditTask: true,
+    canDeleteTask: true,
+    canReviewTask: true,
+    canManageDept: true,
+    canManageUsers: true,
+    canManageAutomation: true,
+    canViewReports: true
+  },
+  manager: {
+    canCreateTask: true,
+    canEditTask: true,
+    canDeleteTask: false,
+    canReviewTask: true,
+    canManageDept: false,
+    canManageUsers: false,
+    canManageAutomation: true,
+    canViewReports: true
+  },
+  user: {
+    canCreateTask: true,
+    canEditTask: true,
+    canDeleteTask: false,
+    canReviewTask: false,
+    canManageDept: false,
+    canManageUsers: false,
+    canManageAutomation: false,
+    canViewReports: true
+  },
+  viewer: {
+    canCreateTask: false,
+    canEditTask: false,
+    canDeleteTask: false,
+    canReviewTask: false,
+    canManageDept: false,
+    canManageUsers: false,
+    canManageAutomation: false,
+    canViewReports: true
+  }
+};
+
 class Database {
   constructor() {
     this.data = null;
@@ -444,6 +487,25 @@ class Database {
         if (!this.data.automations || !Array.isArray(this.data.automations)) {
           this.data.automations = getDefaultData().automations || [];
           this.save();
+        }
+
+        // Ensure user permissions and active status
+        if (this.data.users && Array.isArray(this.data.users)) {
+          let modified = false;
+          this.data.users.forEach(u => {
+            if (typeof u.active === 'undefined') {
+              u.active = true;
+              modified = true;
+            }
+            if (!u.permissions) {
+              const role = u.role || 'user';
+              u.permissions = { ...(DEFAULT_PERMISSIONS[role] || DEFAULT_PERMISSIONS.user) };
+              modified = true;
+            }
+          });
+          if (modified) {
+            this.save();
+          }
         }
       } else {
         this.data = getDefaultData();
@@ -489,17 +551,23 @@ class Database {
 
   createUser(userData) {
     const id = `usr-${Date.now()}`;
+    const role = userData.role || 'user';
+    const permissions = userData.permissions
+      ? { ...(DEFAULT_PERMISSIONS[role] || DEFAULT_PERMISSIONS.user), ...userData.permissions }
+      : { ...(DEFAULT_PERMISSIONS[role] || DEFAULT_PERMISSIONS.user) };
+
     const newUser = {
       id,
       name: userData.name,
       email: userData.email.toLowerCase(),
       password: bcrypt.hashSync(userData.password || '123456', 10),
-      role: userData.role || 'user',
+      role: role,
+      permissions: permissions,
       department: userData.department || 'Phòng Kỹ Thuật',
       position: userData.position || 'Nhân viên',
-      avatar: userData.avatar || (userData.role === 'admin' ? '👑' : '👤'),
+      avatar: userData.avatar || (role === 'admin' ? '👑' : (role === 'manager' ? '👔' : '👤')),
       phone: userData.phone || '',
-      active: true,
+      active: typeof userData.active === 'boolean' ? userData.active : true,
       createdAt: new Date().toISOString()
     };
     this.data.users.push(newUser);
@@ -516,10 +584,33 @@ class Database {
     if (updates.password) {
       updates.password = bcrypt.hashSync(updates.password, 10);
     }
+
+    const current = this.data.users[idx];
+    const newRole = updates.role || current.role || 'user';
+
+    // If role changed and no explicit permissions provided, update permissions to default of new role
+    let newPermissions = current.permissions || { ...(DEFAULT_PERMISSIONS[current.role] || DEFAULT_PERMISSIONS.user) };
+    if (updates.role && updates.role !== current.role && !updates.permissions) {
+      newPermissions = { ...(DEFAULT_PERMISSIONS[updates.role] || DEFAULT_PERMISSIONS.user) };
+    } else if (updates.permissions) {
+      newPermissions = { ...newPermissions, ...updates.permissions };
+    }
+
+    let newAvatar = current.avatar;
+    if (updates.role && updates.role !== current.role) {
+      if (updates.role === 'admin') newAvatar = '👑';
+      else if (updates.role === 'manager') newAvatar = '👔';
+      else if (updates.role === 'viewer') newAvatar = '👁️';
+      else newAvatar = '👤';
+    }
+
     this.data.users[idx] = {
-      ...this.data.users[idx],
-      ...updates
+      ...current,
+      ...updates,
+      avatar: updates.avatar || newAvatar,
+      permissions: newPermissions
     };
+
     this.save();
     const ret = { ...this.data.users[idx] };
     delete ret.password;

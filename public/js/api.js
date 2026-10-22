@@ -216,6 +216,20 @@ const API = {
     });
   },
 
+  async resetUserPassword(id, newPassword) {
+    return this.request(`/api/users/${id}/reset-password`, {
+      method: 'POST',
+      body: JSON.stringify({ newPassword })
+    });
+  },
+
+  async toggleUserStatus(id, active) {
+    return this.request(`/api/users/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ active })
+    });
+  },
+
   // Departments
   async getDepartments() {
     return this.request('/api/departments');

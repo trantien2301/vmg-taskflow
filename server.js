@@ -1057,19 +1057,36 @@ app.post('/api/users', authenticate, requireAdmin, (req, res) => {
 });
 
 app.put('/api/users/:id', authenticate, (req, res) => {
-  // Only Admin can edit other users; regular users can only edit themselves (and cannot change their own role)
-  if (req.user.role !== 'admin' && req.user.id !== req.params.id) {
+  const isManagerOrAdmin = req.user.role === 'admin' || req.user.permissions?.canManageUsers;
+  if (!isManagerOrAdmin && req.user.id !== req.params.id) {
     return res.status(403).json({ error: 'Không có quyền sửa thông tin người dùng này' });
   }
 
   const updates = { ...req.body };
-  if (req.user.role !== 'admin') {
+  if (!isManagerOrAdmin) {
     delete updates.role;
     delete updates.active;
+    delete updates.permissions;
   }
+
+  const targetOld = db.getUserById(req.params.id);
+  if (!targetOld) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
 
   const updatedUser = db.updateUser(req.params.id, updates);
   if (!updatedUser) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
+
+  let detailMsg = `Đã cập nhật thông tin hồ sơ cá nhân`;
+  if (req.user.id !== updatedUser.id) {
+    const roleChanged = updates.role && updates.role !== targetOld.role;
+    const statusChanged = typeof updates.active === 'boolean' && updates.active !== targetOld.active;
+    if (roleChanged || updates.permissions) {
+      detailMsg = `Admin đã phân quyền cho nhân sự: "${updatedUser.name}" [Vai trò: ${updatedUser.role.toUpperCase()}]`;
+    } else if (statusChanged) {
+      detailMsg = `Admin đã ${updatedUser.active ? 'kích hoạt' : 'tạm khóa'} tài khoản nhân sự: "${updatedUser.name}"`;
+    } else {
+      detailMsg = `Admin đã chỉnh sửa thông tin nhân sự: "${updatedUser.name}" (${updatedUser.email})`;
+    }
+  }
 
   db.logActivity({
     userId: req.user.id,
@@ -1078,14 +1095,66 @@ app.put('/api/users/:id', authenticate, (req, res) => {
     userAvatar: req.user.avatar || '👤',
     action: 'update_user',
     category: 'user',
-    details: req.user.id === updatedUser.id
-      ? `Đã cập nhật thông tin hồ sơ cá nhân`
-      : `Admin đã chỉnh sửa thông tin nhân sự: "${updatedUser.name}" (${updatedUser.email})`
+    details: detailMsg
   });
 
   broadcast('user:updated', { user: updatedUser });
 
   res.json({ user: updatedUser });
+});
+
+app.post('/api/users/:id/reset-password', authenticate, requireAdmin, (req, res) => {
+  const { newPassword } = req.body || {};
+  if (!newPassword || newPassword.trim().length < 6) {
+    return res.status(400).json({ error: 'Mật khẩu mới phải có ít nhất 6 ký tự' });
+  }
+
+  const user = db.getUserById(req.params.id);
+  if (!user) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
+
+  db.updateUser(req.params.id, { password: newPassword.trim() });
+
+  db.logActivity({
+    userId: req.user.id,
+    userName: req.user.name,
+    userRole: req.user.role,
+    userAvatar: req.user.avatar || '👑',
+    action: 'reset_password',
+    category: 'user',
+    details: `Admin đã đặt lại mật khẩu mới cho tài khoản "${user.name}" (${user.email})`
+  });
+
+  res.json({ success: true, message: `Đã đặt lại mật khẩu cho tài khoản "${user.name}" thành công!` });
+});
+
+app.patch('/api/users/:id/status', authenticate, requireAdmin, (req, res) => {
+  const { active } = req.body;
+  if (typeof active !== 'boolean') {
+    return res.status(400).json({ error: 'Trạng thái active không hợp lệ' });
+  }
+
+  if (req.params.id === req.user.id && !active) {
+    return res.status(400).json({ error: 'Không thể tự khóa tài khoản quản trị của chính bạn' });
+  }
+
+  const user = db.getUserById(req.params.id);
+  if (!user) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
+
+  const updatedUser = db.updateUser(req.params.id, { active });
+
+  db.logActivity({
+    userId: req.user.id,
+    userName: req.user.name,
+    userRole: req.user.role,
+    userAvatar: req.user.avatar || '👑',
+    action: 'toggle_user_status',
+    category: 'user',
+    details: `Admin đã ${active ? 'kích hoạt mở khóa' : 'tạm khóa'} tài khoản "${user.name}" (${user.email})`
+  });
+
+  broadcast('user:updated', { user: updatedUser });
+
+  res.json({ success: true, user: updatedUser });
 });
 
 app.delete('/api/users/:id', authenticate, requireAdmin, (req, res) => {
@@ -1114,9 +1183,21 @@ app.delete('/api/users/:id', authenticate, requireAdmin, (req, res) => {
 // -------------------------------------------------------------
 // SYSTEM / ACTIVITY / VERSION ROUTES
 // -------------------------------------------------------------
-const APP_VERSION = '3.0.0';
+const APP_VERSION = '3.1.0';
 const APP_BUILD_DATE = '22/10/2026';
 const APP_CHANGELOG = [
+  {
+    version: 'v3.1.0',
+    date: '22/10/2026',
+    title: 'Hệ Thống Phân Quyền Nâng Cao & Quản Trị Trực Tiếp Từng Tài Khoản Nhân Sự',
+    highlights: [
+      'Bổ sung cấp bậc vai trò đa tầng: Quản Trị Viên (Admin), Trưởng Phòng / Quản Lý (Manager), Nhân Viên (Member), Khách Chỉ Xem (Viewer)',
+      'Ma trận 8 quyền hạn chi tiết cho từng account: Tạo việc, Sửa việc, Xóa việc, Nghiệm thu/Duyệt việc, Quản lý phòng ban, Phân quyền nhân sự, Cấu hình Automation, Xem báo cáo KPI',
+      'Thao tác nhanh trực tiếp trên từng dòng: Đổi vai trò trực tiếp (Inline Role), chuyển phòng ban trực tiếp (Inline Dept), khóa/mở khóa tài khoản tức thì',
+      'Tính năng đặt lại mật khẩu nhanh 1-Click cho nhân sự dành riêng cho Quản trị viên',
+      'Bảng điều khiển đo lường nhân sự thời gian thực và bộ lọc tìm kiếm đa tiêu chí'
+    ]
+  },
   {
     version: 'v3.0.0',
     date: '22/10/2026',
