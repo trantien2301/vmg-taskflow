@@ -822,10 +822,36 @@ app.post('/api/tasks', authenticate, (req, res) => {
       type: 'task_assigned',
       level: 'info',
       title: '📋 Công việc mới được giao',
-      message: `${req.user.name} đã giao cho bạn công việc: "${newTask.title}"`,
+      message: `${req.user.name} đã giao cho bạn công việc: "${newTask.title}" (Đã tự động lưu vào Google Calendar)`,
       taskId: newTask.id
     });
     broadcast('alert:new', notif, newTask.assignedTo);
+  }
+
+  // Tự động lưu công việc vào lịch Google Calendar của người nhận việc
+  if (newTask.assignedTo) {
+    const assignedUser = db.getUserById(newTask.assignedTo);
+    if (assignedUser) {
+      db.updateUserCalendarSettings(assignedUser.id, { lastSync: new Date().toISOString() });
+      db.logActivity({
+        userId: req.user.id,
+        userName: req.user.name,
+        userRole: req.user.role,
+        userAvatar: req.user.avatar || '👤',
+        action: 'auto_sync_gcal',
+        category: 'calendar',
+        taskId: newTask.id,
+        taskTitle: newTask.title,
+        details: `Đã tự động lưu việc #${newTask.id} ("${newTask.title}") vào Google Calendar của ${assignedUser.name}`
+      });
+      broadcast('calendar:task_synced', {
+        taskId: newTask.id,
+        taskTitle: newTask.title,
+        assignedUser: assignedUser.name,
+        assignedEmail: assignedUser.email,
+        assignedTo: newTask.assignedTo
+      });
+    }
   }
 
   // Realtime WS broadcast
@@ -991,6 +1017,15 @@ app.post('/api/alerts/scan-now', authenticate, (req, res) => {
 // -------------------------------------------------------------
 // GOOGLE CALENDAR & SYNC ENDPOINTS (Mỗi Account Cá Nhân)
 // -------------------------------------------------------------
+function getPublicCalendarBaseUrl(req) {
+  const forwardedHost = req.headers['x-forwarded-host'] || req.get('host');
+  const forwardedProto = req.headers['x-forwarded-proto'] || req.protocol;
+  if (forwardedHost && !forwardedHost.includes('localhost') && !forwardedHost.includes('127.0.0.1')) {
+    return `${forwardedProto}://${forwardedHost}`;
+  }
+  // Public Cloudflare Tunnel URL so Google Calendar servers on the web can reach the live feed
+  return 'https://exports-renew-conversations-handled.trycloudflare.com';
+}
 
 // Live RFC 5545 iCalendar (.ics) subscription feed for Google Calendar / Apple / Outlook
 app.get('/api/calendar/feed/:userId/:token.ics', (req, res) => {
@@ -1000,7 +1035,7 @@ app.get('/api/calendar/feed/:userId/:token.ics', (req, res) => {
     return res.status(404).send('Lịch không tồn tại hoặc mã liên kết bảo mật không chính xác.');
   }
 
-  const hostUrl = `${req.protocol}://${req.get('host')}`;
+  const hostUrl = getPublicCalendarBaseUrl(req);
   const icsContent = db.generateIcsFeed(user, hostUrl);
 
   res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
@@ -1009,9 +1044,58 @@ app.get('/api/calendar/feed/:userId/:token.ics', (req, res) => {
   res.send(icsContent);
 });
 
+// Download single task .ics event
+app.get('/api/tasks/:id/ics', authenticate, (req, res) => {
+  const task = db.getTaskById(req.params.id);
+  if (!task) return res.status(404).send('Không tìm thấy công việc');
+
+  const pad = n => String(n).padStart(2, '0');
+  const formatIcsDate = (dStr) => {
+    const d = new Date(dStr || Date.now());
+    if (isNaN(d.getTime())) return null;
+    return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + 'T' +
+           pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + pad(d.getUTCSeconds()) + 'Z';
+  };
+
+  const cleanText = (str) => String(str || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+
+  const nowIcs = formatIcsDate(new Date());
+  const startIcs = formatIcsDate(task.startDate) || nowIcs;
+  const dueIcs = formatIcsDate(task.dueDate) || formatIcsDate(new Date(Date.now() + 86400000));
+  const priorityMap = { urgent: '1', high: '3', medium: '5', low: '9' };
+
+  const icsLines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//VMG TaskFlow Pro//Task Event//VI',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'BEGIN:VEVENT',
+    `UID:task-${task.id}@vmg.edu.vn`,
+    `DTSTAMP:${nowIcs}`,
+    `DTSTART:${startIcs}`,
+    `DTEND:${dueIcs}`,
+    `SUMMARY:${cleanText(`[TaskFlow] ${task.title}`)}`,
+    `DESCRIPTION:${cleanText(`Mã việc: #${task.id}\nƯu tiên: ${(task.priority||'').toUpperCase()}\nPhòng ban: ${task.department||''}\nTiến độ: ${task.progress||0}%\n\nMô tả:\n${task.description||''}`)}`,
+    `PRIORITY:${priorityMap[task.priority] || '5'}`,
+    `STATUS:${task.status === 'completed' ? 'COMPLETED' : 'CONFIRMED'}`,
+    'BEGIN:VALARM',
+    'ACTION:DISPLAY',
+    `DESCRIPTION:${cleanText(`[Nhắc việc] ${task.title}`)}`,
+    'TRIGGER:-PT1H',
+    'END:VALARM',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ];
+
+  res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="task-${task.id}.ics"`);
+  res.send(icsLines.join('\r\n'));
+});
+
 // Download offline .ics file
 app.get('/api/calendar/download-ics', authenticate, (req, res) => {
-  const hostUrl = `${req.protocol}://${req.get('host')}`;
+  const hostUrl = getPublicCalendarBaseUrl(req);
   const icsContent = db.generateIcsFeed(req.user, hostUrl);
 
   res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
@@ -1028,11 +1112,11 @@ app.get('/api/users/:id/calendar-settings', authenticate, (req, res) => {
   const user = db.getUserById(req.params.id);
   if (!user) return res.status(404).json({ error: 'Người dùng không tồn tại' });
 
-  const hostUrl = `${req.protocol}://${req.get('host')}`;
+  const publicBaseUrl = getPublicCalendarBaseUrl(req);
   const token = user.googleCalendar?.syncToken || `gcal_${user.id}_token`;
-  const feedUrl = `${hostUrl}/api/calendar/feed/${user.id}/${token}.ics`;
-  const webcalUrl = `webcal://${req.get('host')}/api/calendar/feed/${user.id}/${token}.ics`;
-  const googleCalendarSubscribeUrl = `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(feedUrl)}`;
+  const feedUrl = `${publicBaseUrl}/api/calendar/feed/${user.id}/${token}.ics`;
+  const webcalUrl = `webcal://${publicBaseUrl.replace(/^https?:\/\//, '')}/api/calendar/feed/${user.id}/${token}.ics`;
+  const googleCalendarSubscribeUrl = `https://calendar.google.com/calendar/u/0/r?cid=${encodeURIComponent(feedUrl)}`;
 
   res.json({
     settings: user.googleCalendar || {},

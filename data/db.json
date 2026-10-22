@@ -71,7 +71,7 @@
         ],
         "notifyBrowser": true,
         "notifySound": true,
-        "lastSync": null
+        "lastSync": "2026-10-22T16:53:38.426Z"
       }
     },
     {
@@ -631,6 +631,23 @@
     }
   ],
   "tasks": [
+    {
+      "id": "TSK-936",
+      "title": "Kiểm tra tính năng tự động lưu lịch Google Calendar 1792688018386",
+      "description": "Công việc test tự động đồng bộ và lưu trên lịch Google Calendar của tài khoản",
+      "status": "todo",
+      "priority": "high",
+      "department": "Phòng Kinh Doanh",
+      "assignedTo": "usr-4",
+      "createdBy": "usr-1",
+      "startDate": "2026-10-22T16:53:38.404Z",
+      "dueDate": "2026-10-24T16:53:38.386Z",
+      "progress": 0,
+      "tags": [],
+      "completedAt": null,
+      "createdAt": "2026-10-22T16:53:38.404Z",
+      "updatedAt": "2026-10-22T16:53:38.404Z"
+    },
     {
       "id": "TSK-109",
       "title": "Kiểm tra đồng bộ Realtime",
@@ -17355,6 +17372,17 @@
   ],
   "notifications": [
     {
+      "id": "ntf-1792688018419-911",
+      "userId": "usr-4",
+      "type": "task_assigned",
+      "level": "info",
+      "title": "📋 Công việc mới được giao",
+      "message": "Trần Quản Trị đã giao cho bạn công việc: \"Kiểm tra tính năng tự động lưu lịch Google Calendar 1792688018386\" (Đã tự động lưu vào Google Calendar)",
+      "taskId": "TSK-936",
+      "read": false,
+      "createdAt": "2026-10-22T16:53:38.419Z"
+    },
+    {
       "id": "ntf-1792686336615-84",
       "userId": "usr-1",
       "type": "alert",
@@ -19542,20 +19570,48 @@
       "taskId": "TSK-794",
       "read": false,
       "createdAt": "2026-10-22T16:25:35.027Z"
-    },
-    {
-      "id": "ntf-1792686335018-160",
-      "userId": "usr-dept-1792670222600-fdsg",
-      "type": "alert",
-      "level": "danger",
-      "title": "🚨 CÔNG VIỆC ĐÃ QUÁ HẠN!",
-      "message": "Công việc \"Chuẩn bị nội dung Đào tạo TPVH\" đã quá hạn 2 ngày (Hạn: 21/10/2026)! Vui lòng hoàn tất ngay.",
-      "taskId": "TSK-794",
-      "read": false,
-      "createdAt": "2026-10-22T16:25:35.018Z"
     }
   ],
   "activities": [
+    {
+      "id": "act-1792688018434-s0d4i",
+      "userId": "usr-1",
+      "userName": "Trần Quản Trị",
+      "userRole": "admin",
+      "userAvatar": "👑",
+      "action": "auto_sync_gcal",
+      "category": "calendar",
+      "details": "Đã tự động lưu việc #TSK-936 (\"Kiểm tra tính năng tự động lưu lịch Google Calendar 1792688018386\") vào Google Calendar của Lê Tuyết Mai",
+      "taskId": "TSK-936",
+      "taskTitle": "Kiểm tra tính năng tự động lưu lịch Google Calendar 1792688018386",
+      "timestamp": "2026-10-22T16:53:38.434Z"
+    },
+    {
+      "id": "act-1792688018404-znl7v",
+      "userId": "usr-1",
+      "userName": "Trần Quản Trị",
+      "userRole": "admin",
+      "userAvatar": "👑",
+      "action": "create_task",
+      "category": "task",
+      "details": "Đã tạo công việc mới: \"Kiểm tra tính năng tự động lưu lịch Google Calendar 1792688018386\" (HIGH - Phân công: Lê Tuyết Mai)",
+      "taskId": "TSK-936",
+      "taskTitle": "Kiểm tra tính năng tự động lưu lịch Google Calendar 1792688018386",
+      "timestamp": "2026-10-22T16:53:38.404Z"
+    },
+    {
+      "id": "act-1792688018358-gkldd",
+      "userId": "usr-1",
+      "userName": "Trần Quản Trị",
+      "userRole": "admin",
+      "userAvatar": "👑",
+      "action": "auth_login",
+      "category": "auth",
+      "details": "Quản trị viên (Admin) đã đăng nhập vào hệ thống (admin@company.com)",
+      "taskId": null,
+      "taskTitle": null,
+      "timestamp": "2026-10-22T16:53:38.358Z"
+    },
     {
       "id": "act-1792686360060-efcep",
       "userId": "usr-4",
@@ -26016,45 +26072,6 @@
       "taskId": null,
       "taskTitle": null,
       "timestamp": "2026-10-22T11:59:17.429Z"
-    },
-    {
-      "id": "act-1792670357408-mg478",
-      "userId": "bot-auto",
-      "userName": "⚡ Bot Tự Động",
-      "userRole": "admin",
-      "userAvatar": "👑",
-      "action": "update_task",
-      "category": "task",
-      "details": "Đã cập nhật công việc: \"HỌP CHECK CHẤT LƯỢNG DV, GIÁO VIÊN LKH_XLO\"",
-      "taskId": "TSK-604",
-      "taskTitle": "HỌP CHECK CHẤT LƯỢNG DV, GIÁO VIÊN LKH_XLO",
-      "timestamp": "2026-10-22T11:59:17.408Z"
-    },
-    {
-      "id": "act-1792670357384-h4y0e",
-      "userId": "bot-auto",
-      "userName": "🤖 Gắn nhãn cảnh báo việc Trễ hạn",
-      "userRole": "admin",
-      "userAvatar": "⏰",
-      "action": "automation_executed",
-      "category": "system",
-      "details": "Tự động gắn thẻ \"Quá hạn\" cho công việc trễ hạn #TSK-603",
-      "taskId": null,
-      "taskTitle": null,
-      "timestamp": "2026-10-22T11:59:17.384Z"
-    },
-    {
-      "id": "act-1792670357362-maaoe",
-      "userId": "bot-auto",
-      "userName": "⚡ Bot Tự Động",
-      "userRole": "admin",
-      "userAvatar": "👑",
-      "action": "update_task",
-      "category": "task",
-      "details": "Đã cập nhật công việc: \"HỌP BAN ĐIỀU HÀNH\"",
-      "taskId": "TSK-603",
-      "taskTitle": "HỌP BAN ĐIỀU HÀNH",
-      "timestamp": "2026-10-22T11:59:17.362Z"
     }
   ],
   "settings": {

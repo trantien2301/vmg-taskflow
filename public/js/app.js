@@ -3740,12 +3740,15 @@ const App = {
     };
 
     try {
+      const assignedUser = this.state.users.find(u => u.id === assignedTo);
+      const assignedName = assignedUser ? assignedUser.name : 'nhân sự';
+
       if (id) {
         await API.updateTask(id, payload);
-        this.showToast('✅ Đã cập nhật công việc!', 'success');
+        this.showToast(`✅ Đã cập nhật công việc & tự động đồng bộ vào Google Calendar của ${assignedName}!`, 'success');
       } else {
         await API.createTask(payload);
-        this.showToast('🎉 Đã tạo công việc mới thành công!', 'success');
+        this.showToast(`🎉 Đã giao việc thành công & Tự động lưu vào Google Calendar của ${assignedName}!`, 'success');
       }
       this.closeModal('taskModal');
       this.renderView();
@@ -4928,8 +4931,14 @@ const App = {
     const startUtc = formatIcsUtc(task.startDate) || formatIcsUtc(new Date());
     const dueUtc = formatIcsUtc(task.dueDate) || formatIcsUtc(new Date(Date.now() + 86400000));
     const title = encodeURIComponent(`[TaskFlow] ${task.title}`);
+
+    // Look up assigned user to pre-fill as Guest in Google Calendar so it automatically saves to their calendar
+    const assignedUser = this.state.users.find(u => u.id === task.assignedTo);
+    const guestParam = assignedUser && assignedUser.email ? `&add=${encodeURIComponent(assignedUser.email)}` : '';
+
     const details = encodeURIComponent(
       `Mã công việc: #${task.id}\n` +
+      `Người phụ trách: ${assignedUser ? assignedUser.name + ' (' + assignedUser.email + ')' : 'Chưa giao'}\n` +
       `Mức độ ưu tiên: ${(task.priority || 'medium').toUpperCase()}\n` +
       `Phòng ban: ${task.department || ''}\n` +
       `Tiến độ: ${task.progress || 0}%\n` +
@@ -4938,9 +4947,36 @@ const App = {
       `---\nĐược tạo tự động từ TaskFlow Pro Webapp`
     );
 
-    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startUtc}/${dueUtc}&details=${details}`;
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startUtc}/${dueUtc}&details=${details}${guestParam}`;
     window.open(url, '_blank');
-    this.showToast(`📅 Đang mở Google Calendar để thêm công việc #${task.id}...`, 'info');
+    this.showToast(`📅 Đang mở Google Calendar (Tự động mời khách ${assignedUser?.name || 'nhân sự'})...`, 'info');
+  },
+
+  downloadTaskIcs(taskId = null) {
+    const id = taskId || this.state.currentDetailTask?.id;
+    if (!id) return;
+    const token = API.getToken();
+    const url = `/api/tasks/${id}/ics`;
+    fetch(url, { headers: { 'Authorization': `Bearer ${token}` } })
+      .then(res => {
+        if (!res.ok) throw new Error('Không thể tải file lịch');
+        return res.blob();
+      })
+      .then(blob => {
+        const objUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = objUrl;
+        link.download = `Task-${id}.ics`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(objUrl);
+        this.showToast(`📥 Đã tải file lịch công việc #${id}! Mở file để lưu ngay vào Lịch của bạn.`, 'success');
+        this.playSound('success');
+      })
+      .catch(err => {
+        this.showToast(`Lỗi tải lịch: ${err.message}`, 'danger');
+      });
   },
 
   handleCalendarReminderEvent(data) {

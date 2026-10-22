@@ -1172,6 +1172,22 @@
               <select class="form-control" id="taskFormAssignee"></select>
             </div>
           </div>
+
+          <!-- AUTO-SAVE TO GOOGLE CALENDAR -->
+          <div style="background:linear-gradient(135deg, rgba(66, 133, 244, 0.08), rgba(52, 168, 83, 0.08)); border:1px solid rgba(66, 133, 244, 0.25); border-radius:var(--radius-sm); padding:10px 14px; margin-top:14px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:22px;">📅</span>
+              <div>
+                <label for="taskFormSyncGcal" style="font-size:12.5px; font-weight:700; color:var(--text-main); margin:0; cursor:pointer;">
+                  Tự động lưu vào Google Calendar của nhân sự nhận việc
+                </label>
+                <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">
+                  Khi giao việc, lịch sẽ tự động lưu và gửi thông báo nhắc hạn chót đến tài khoản đó
+                </div>
+              </div>
+            </div>
+            <input type="checkbox" id="taskFormSyncGcal" checked style="width:18px; height:18px; cursor:pointer; accent-color:#2563eb;">
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline" data-close-modal="taskModal">Hủy bỏ</button>
@@ -1250,6 +1266,9 @@
         </button>
         <button class="btn btn-outline" id="detailGoogleCalBtn" onclick="App.openCurrentTaskGoogleCalendar()" title="Thêm công việc này vào Google Calendar của bạn" style="color:#2563eb; border-color:#93c5fd; font-weight:600;">
           📅 Google Calendar
+        </button>
+        <button class="btn btn-outline" id="detailDownloadIcsBtn" onclick="App.downloadTaskIcs()" title="Tải file lịch .ics để mở ngay trong ứng dụng Lịch máy tính hoặc điện thoại" style="font-weight:600;">
+          📥 Tải .ICS
         </button>
         <button class="btn btn-outline" id="detailEditTaskBtn">Chỉnh Sửa</button>
         <button class="btn btn-primary" data-close-modal="taskDetailModal">Đóng</button>
@@ -1799,20 +1818,21 @@
           </div>
 
           <!-- 1-Click Subscribe Button Banner -->
-          <div style="background:linear-gradient(135deg, rgba(66,133,244,0.08), rgba(52,168,83,0.08)); border:1px solid rgba(66,133,244,0.25); border-radius:var(--radius-sm); padding:14px; margin-bottom:16px;">
-            <div style="font-weight:700; font-size:13px; color:var(--text-main); margin-bottom:4px; display:flex; align-items:center; gap:6px;">
-              <span>⚡</span>
-              <span>Đăng Ký Đồng Bộ 1-Click Vào Google Calendar</span>
+          <div style="background:linear-gradient(135deg, rgba(66,133,244,0.1), rgba(52,168,83,0.1)); border:1.5px solid #4285f4; border-radius:var(--radius-sm); padding:16px; margin-bottom:16px;">
+            <div style="font-weight:700; font-size:13.5px; color:#1d4ed8; margin-bottom:6px; display:flex; align-items:center; gap:8px;">
+              <span style="font-size:18px;">⚡</span>
+              <span>KÍCH HOẠT TỰ ĐỘNG LƯU VIỆC VÀO GOOGLE CALENDAR (Chỉ 1 lần duy nhất):</span>
             </div>
-            <div style="font-size:12px; color:var(--text-secondary); line-height:1.45; margin-bottom:12px;">
-              Bấm nút bên dưới để Google Calendar tự động thêm lịch công việc của bạn. Mọi deadline, nhiệm vụ mới sẽ tự động cập nhật lên điện thoại và máy tính!
+            <div style="font-size:12px; color:var(--text-main); line-height:1.5; margin-bottom:12px;">
+              Bấm nút <strong>"🚀 Thêm Trực Tiếp Vào Google Calendar"</strong> bên dưới. Google Calendar sẽ hỏi xác nhận <em>"Thêm lịch TaskFlow?"</em> ➔ Chọn <strong>"Thêm"</strong>.<br>
+              <strong style="color:#059669;">✔️ Kết quả:</strong> Từ nay trở đi, <strong>mỗi khi bạn được giao việc mới hoặc đổi hạn chót trên Web App, công việc đó sẽ TỰ ĐỘNG LƯU VÀ XUẤT HIỆN TRÊN LỊCH GOOGLE CALENDAR của bạn 100%</strong> mà không cần mở tab Google hay bấm "Lưu" thủ công nữa!
             </div>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
-              <a href="#" id="gcalSubscribeLinkBtn" target="_blank" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; font-weight:600; text-decoration:none; padding:7px 14px;">
-                <span>🚀 Thêm Trực Tiếp Vào Google Calendar</span>
+              <a href="#" id="gcalSubscribeLinkBtn" target="_blank" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; font-weight:700; text-decoration:none; padding:8px 16px; font-size:12.5px; box-shadow:0 3px 10px rgba(37,99,235,0.3);">
+                <span>🚀 Thêm Trực Tiếp Vào Google Calendar (Tự Động Lưu Mãi Mãi)</span>
               </a>
-              <button type="button" class="btn btn-outline btn-sm" onclick="App.downloadIcsFile()" style="display:inline-flex; align-items:center; gap:6px;">
-                <span>📥 Tải File .ICS (Offline)</span>
+              <button type="button" class="btn btn-outline btn-sm" onclick="App.downloadIcsFile()" style="display:inline-flex; align-items:center; gap:6px; font-weight:600;">
+                <span>📥 Tải File .ICS Đồng Bộ</span>
               </button>
             </div>
           </div>
