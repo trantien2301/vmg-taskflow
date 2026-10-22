@@ -309,7 +309,7 @@
         </div>
         <button class="sidebar-version-pill" id="sidebarVersionBtn" title="Xem thông tin phiên bản & cập nhật">
           <span class="version-dot"></span>
-          <span>TaskFlow Pro <strong id="sidebarVersionText">v2.8.5</strong></span>
+          <span>TaskFlow Pro <strong id="sidebarVersionText">v2.9.0</strong></span>
           <span class="version-badge-new" id="sidebarVersionNewBadge" style="display:none;">MỚI</span>
         </button>
         <button class="btn-logout" id="btnLogoutSidebar">
@@ -356,7 +356,7 @@
 
           <!-- Version Info button -->
           <button class="btn btn-outline btn-sm version-header-btn" id="btnHeaderVersion" title="Xem thông tin phiên bản & cập nhật">
-            🚀 <span class="hide-mobile">v2.8.5</span>
+            🚀 <span class="hide-mobile">v2.9.0</span>
             <span class="header-version-dot" id="headerVersionDot" style="display:none;"></span>
           </button>
 
@@ -569,7 +569,39 @@
 
         <!-- VIEW 3: CALENDAR / TIMELINE -->
         <section class="view-panel" id="view-calendar">
-          <div id="calendarTimelineList"></div>
+          <div class="calendar-wrapper">
+            <!-- Calendar Navigation Header -->
+            <div class="calendar-header-toolbar">
+              <div class="calendar-nav-controls">
+                <div class="btn-group-nav">
+                  <button class="btn btn-outline btn-sm" id="calBtnPrev" title="Thời gian trước">◀</button>
+                  <button class="btn btn-outline btn-sm" id="calBtnToday">Hôm Nay</button>
+                  <button class="btn btn-outline btn-sm" id="calBtnNext" title="Thời gian sau">▶</button>
+                </div>
+                <h2 class="calendar-title-display" id="calDateDisplay">Tháng 10, 2026</h2>
+              </div>
+
+              <div class="calendar-mode-switcher">
+                <button class="cal-mode-btn" data-cal-mode="day" id="calModeDay">
+                  <span>☀️</span>
+                  <span>Ngày</span>
+                </button>
+                <button class="cal-mode-btn" data-cal-mode="week" id="calModeWeek">
+                  <span>📆</span>
+                  <span>Tuần</span>
+                </button>
+                <button class="cal-mode-btn active" data-cal-mode="month" id="calModeMonth">
+                  <span>📅</span>
+                  <span>Tháng</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Calendar View Content Container -->
+            <div class="calendar-view-body" id="calendarViewBody">
+              <!-- Dynamically populated based on active mode -->
+            </div>
+          </div>
         </section>
 
         <!-- VIEW 4: ALERTS CENTER -->
@@ -1102,7 +1134,7 @@
           <div class="version-status-header">
             <div class="version-pill-large">
               <span class="version-status-pulse" id="versionStatusPulse"></span>
-              <span id="modalCurrentVersion">TaskFlow Pro v2.8.5</span>
+              <span id="modalCurrentVersion">TaskFlow Pro v2.9.0</span>
             </div>
             <span class="version-build-date" id="modalBuildDate">Bản dựng: 22/10/2026</span>
           </div>
@@ -1160,8 +1192,8 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- APPLICATION SCRIPTS -->
-  <script src="js/api.js?v=2.8.5"></script>
-  <script src="js/charts.js?v=2.8.5"></script>
-  <script src="js/app.js?v=2.8.5"></script>
+  <script src="js/api.js?v=2.9.0"></script>
+  <script src="js/charts.js?v=2.9.0"></script>
+  <script src="js/app.js?v=2.9.0"></script>
 </body>
 </html>

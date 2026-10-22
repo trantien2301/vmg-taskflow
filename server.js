@@ -1009,9 +1009,21 @@ app.delete('/api/users/:id', authenticate, requireAdmin, (req, res) => {
 // -------------------------------------------------------------
 // SYSTEM / ACTIVITY / VERSION ROUTES
 // -------------------------------------------------------------
-const APP_VERSION = '2.8.5';
+const APP_VERSION = '2.9.0';
 const APP_BUILD_DATE = '22/10/2026';
 const APP_CHANGELOG = [
+  {
+    version: 'v2.9.0',
+    date: '22/10/2026',
+    title: 'Lịch & Thời Hạn Đa Chế Độ: Ngày, Tuần, Tháng',
+    highlights: [
+      'Bổ sung thanh điều hướng chuyển đổi 3 chế độ linh hoạt: Ngày (Day), Tuần (Week), Tháng (Month)',
+      'Chế độ Tháng hiển thị toàn cảnh ngày trong tháng kèm chip việc theo trạng thái và độ ưu tiên',
+      'Chế độ Tuần hiển thị cột 7 ngày chi tiết tiến độ công việc và trạng thái hạn chót',
+      'Chế độ Ngày tập trung bảng điều khiển công việc hôm nay, phân loại việc cần làm, đang làm và cảnh báo quá hạn',
+      'Hỗ trợ nút "Hôm Nay", chuyển tiếp thời gian Trước/Sau và 1-click chuyển nhanh từ ô Tháng sang Ngày'
+    ]
+  },
   {
     version: 'v2.8.5',
     date: '22/10/2026',

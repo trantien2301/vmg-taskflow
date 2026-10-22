@@ -13,9 +13,13 @@ const App = {
     currentDetailTask: null,
     draggedTaskId: null,
     onlineCount: 1,
-    clientVersion: '2.8.5',
+    clientVersion: '2.9.0',
     serverVersionInfo: null,
     hasNewUpdate: false,
+    calendarState: {
+      currentDate: new Date(),
+      mode: 'month' // 'day' | 'week' | 'month'
+    },
     filters: {
       status: 'all',
       priority: 'all',
@@ -914,6 +918,29 @@ const App = {
       });
     }
 
+    // Calendar Navigation & Modes Listeners
+    const calBtnPrev = document.getElementById('calBtnPrev');
+    if (calBtnPrev) {
+      calBtnPrev.addEventListener('click', () => this.navigateCalendar(-1));
+    }
+
+    const calBtnToday = document.getElementById('calBtnToday');
+    if (calBtnToday) {
+      calBtnToday.addEventListener('click', () => this.navigateCalendarToday());
+    }
+
+    const calBtnNext = document.getElementById('calBtnNext');
+    if (calBtnNext) {
+      calBtnNext.addEventListener('click', () => this.navigateCalendar(1));
+    }
+
+    document.querySelectorAll('.cal-mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mode = btn.getAttribute('data-cal-mode');
+        if (mode) this.switchCalendarMode(mode);
+      });
+    });
+
     // ========================================================
     // REGISTRATION (@vmg.edu.vn ONLY) LISTENERS
     // ========================================================
@@ -1753,70 +1780,453 @@ const App = {
   },
 
   // -------------------------------------------------------------
-  // CALENDAR / TIMELINE VIEW
+  // CALENDAR / TIMELINE VIEW (DAY, WEEK, MONTH MODES)
   // -------------------------------------------------------------
   renderCalendarView() {
-    const tasks = this.state.tasks;
-    const container = document.getElementById('calendarTimelineList');
+    this.renderActiveCalendarMode();
+  },
+
+  renderActiveCalendarMode() {
+    const container = document.getElementById('calendarViewBody');
+    const titleEl = document.getElementById('calDateDisplay');
     if (!container) return;
 
-    const now = new Date();
-    now.setHours(0,0,0,0);
+    if (!this.state.calendarState) {
+      this.state.calendarState = { currentDate: new Date(), mode: 'month' };
+    }
 
-    const overdueList = [];
-    const todayList = [];
-    const weekList = [];
-    const futureList = [];
-    const completedList = [];
+    const { currentDate, mode } = this.state.calendarState;
 
-    tasks.forEach(t => {
-      if (t.status === 'completed') {
-        completedList.push(t);
-        return;
-      }
-      if (!t.dueDate) {
-        futureList.push(t);
-        return;
-      }
-      const due = new Date(t.dueDate);
-      due.setHours(0,0,0,0);
-      const diffDays = Math.round((due.getTime() - now.getTime()) / (1000 * 3600 * 24));
-
-      if (diffDays < 0) overdueList.push(t);
-      else if (diffDays === 0) todayList.push(t);
-      else if (diffDays <= 7) weekList.push(t);
-      else futureList.push(t);
+    // Update active button state
+    document.querySelectorAll('.cal-mode-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-cal-mode') === mode);
     });
 
-    const renderSection = (title, items, badgeClass, icon) => {
-      if (items.length === 0) return '';
-      return `
-        <div style="margin-bottom:24px;">
-          <div style="font-size:15px; font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
-            <span>${icon}</span>
-            <span>${title}</span>
-            <span class="col-count" style="background:${badgeClass}; color:#fff;">${items.length}</span>
+    const dayNames = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+
+    // Update navigation title based on active mode
+    if (titleEl) {
+      if (mode === 'month') {
+        titleEl.innerText = `Tháng ${currentDate.getMonth() + 1}, ${currentDate.getFullYear()}`;
+      } else if (mode === 'week') {
+        const weekDays = this.getWeekDays(currentDate);
+        const start = weekDays[0];
+        const end = weekDays[6];
+        const startStr = `${start.getDate()}/${start.getMonth() + 1}`;
+        const endStr = `${end.getDate()}/${end.getMonth() + 1}/${end.getFullYear()}`;
+        titleEl.innerText = `Tuần: ${startStr} - ${endStr}`;
+      } else if (mode === 'day') {
+        const dayName = dayNames[currentDate.getDay()];
+        const dateStr = `${currentDate.getDate()} Tháng ${currentDate.getMonth() + 1}, ${currentDate.getFullYear()}`;
+        titleEl.innerText = `${dayName}, ${dateStr}`;
+      }
+    }
+
+    if (mode === 'month') {
+      this.renderMonthCalendar(container, currentDate);
+    } else if (mode === 'week') {
+      this.renderWeekCalendar(container, currentDate);
+    } else if (mode === 'day') {
+      this.renderDayCalendar(container, currentDate);
+    }
+  },
+
+  navigateCalendar(direction) {
+    if (!this.state.calendarState) {
+      this.state.calendarState = { currentDate: new Date(), mode: 'month' };
+    }
+    const { currentDate, mode } = this.state.calendarState;
+
+    if (mode === 'month') {
+      currentDate.setMonth(currentDate.getMonth() + direction);
+    } else if (mode === 'week') {
+      currentDate.setDate(currentDate.getDate() + (direction * 7));
+    } else if (mode === 'day') {
+      currentDate.setDate(currentDate.getDate() + direction);
+    }
+
+    this.renderActiveCalendarMode();
+  },
+
+  navigateCalendarToday() {
+    if (!this.state.calendarState) {
+      this.state.calendarState = { currentDate: new Date(), mode: 'month' };
+    }
+    this.state.calendarState.currentDate = new Date();
+    this.renderActiveCalendarMode();
+  },
+
+  switchCalendarMode(mode) {
+    if (!this.state.calendarState) {
+      this.state.calendarState = { currentDate: new Date(), mode: 'month' };
+    }
+    this.state.calendarState.mode = mode;
+    this.renderActiveCalendarMode();
+  },
+
+  switchCalendarToDate(date) {
+    if (!this.state.calendarState) {
+      this.state.calendarState = { currentDate: new Date(), mode: 'month' };
+    }
+    this.state.calendarState.currentDate = new Date(date);
+    this.state.calendarState.mode = 'day';
+    this.renderActiveCalendarMode();
+  },
+
+  toLocalDateKey(dateObjOrString) {
+    if (!dateObjOrString) return '';
+    const d = new Date(dateObjOrString);
+    if (isNaN(d.getTime())) return '';
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  },
+
+  getWeekDays(baseDate) {
+    const d = new Date(baseDate);
+    const dayOfWeek = (d.getDay() + 6) % 7; // Monday as 0, Sunday as 6
+    const monday = new Date(d);
+    monday.setDate(d.getDate() - dayOfWeek);
+    monday.setHours(0, 0, 0, 0);
+
+    const weekDays = [];
+    for (let i = 0; i < 7; i++) {
+      const nextDay = new Date(monday);
+      nextDay.setDate(monday.getDate() + i);
+      weekDays.push(nextDay);
+    }
+    return weekDays;
+  },
+
+  // --- MONTH VIEW ---
+  renderMonthCalendar(container, currentDate) {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    const firstDay = new Date(year, month, 1);
+    const firstDayIndex = (firstDay.getDay() + 6) % 7; // Mon = 0
+    const totalDaysInMonth = new Date(year, month + 1, 0).getDate();
+    const prevMonthDays = new Date(year, month, 0).getDate();
+
+    const todayKey = this.toLocalDateKey(new Date());
+
+    // Map tasks by local date key
+    const tasksByDate = {};
+    (this.state.tasks || []).forEach(t => {
+      if (!t.dueDate) return;
+      const key = this.toLocalDateKey(t.dueDate);
+      if (!tasksByDate[key]) tasksByDate[key] = [];
+      tasksByDate[key].push(t);
+    });
+
+    const weekdayHeaders = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'];
+    let gridHtml = '<div class="cal-month-grid">';
+
+    // 1. Weekday headers
+    weekdayHeaders.forEach((name, idx) => {
+      const isWeekend = idx >= 5;
+      gridHtml += `<div class="cal-month-weekday-header ${isWeekend ? 'weekend' : ''}">${name}</div>`;
+    });
+
+    // 2. Previous month trailing days
+    for (let i = firstDayIndex - 1; i >= 0; i--) {
+      const dayNum = prevMonthDays - i;
+      const cellDate = new Date(year, month - 1, dayNum);
+      const cellKey = this.toLocalDateKey(cellDate);
+      const cellTasks = tasksByDate[cellKey] || [];
+      gridHtml += this.buildMonthCellHtml(dayNum, cellDate, cellTasks, true, cellKey === todayKey);
+    }
+
+    // 3. Current month days
+    for (let d = 1; d <= totalDaysInMonth; d++) {
+      const cellDate = new Date(year, month, d);
+      const cellKey = this.toLocalDateKey(cellDate);
+      const cellTasks = tasksByDate[cellKey] || [];
+      gridHtml += this.buildMonthCellHtml(d, cellDate, cellTasks, false, cellKey === todayKey);
+    }
+
+    // 4. Next month leading days (to complete 35 or 42 cells)
+    const totalRendered = firstDayIndex + totalDaysInMonth;
+    const nextDaysNeeded = (totalRendered % 7 === 0) ? 0 : 7 - (totalRendered % 7);
+    for (let n = 1; n <= nextDaysNeeded; n++) {
+      const cellDate = new Date(year, month + 1, n);
+      const cellKey = this.toLocalDateKey(cellDate);
+      const cellTasks = tasksByDate[cellKey] || [];
+      gridHtml += this.buildMonthCellHtml(n, cellDate, cellTasks, true, cellKey === todayKey);
+    }
+
+    gridHtml += '</div>';
+    container.innerHTML = gridHtml;
+
+    // Attach listeners
+    container.querySelectorAll('.cal-month-cell').forEach(cell => {
+      cell.addEventListener('click', (e) => {
+        // If clicking a task chip, detail is already handled
+        if (e.target.closest('.cal-task-chip')) return;
+        const dateStr = cell.getAttribute('data-cell-date');
+        if (dateStr) {
+          this.switchCalendarToDate(dateStr);
+        }
+      });
+    });
+
+    container.querySelectorAll('.cal-task-chip').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const taskId = chip.getAttribute('data-task-id');
+        if (taskId) this.openTaskDetail(taskId);
+      });
+    });
+  },
+
+  buildMonthCellHtml(dayNum, cellDate, tasks, isOtherMonth, isToday) {
+    const dateKey = this.toLocalDateKey(cellDate);
+    const maxVisible = 2;
+    const visibleTasks = tasks.slice(0, maxVisible);
+    const extraCount = tasks.length - maxVisible;
+
+    let tasksHtml = '';
+    visibleTasks.forEach(t => {
+      tasksHtml += `
+        <div class="cal-task-chip status-${this.escapeHtml(t.status)}" data-task-id="${this.escapeHtml(t.id)}" title="${this.escapeHtml(t.id)}: ${this.escapeHtml(t.title)} (${t.progress}%)">
+          <span class="cal-chip-dot ${this.escapeHtml(t.priority)}"></span>
+          <span class="cal-chip-text">#${this.escapeHtml(t.id)} ${this.escapeHtml(t.title)}</span>
+        </div>
+      `;
+    });
+
+    if (extraCount > 0) {
+      tasksHtml += `
+        <div class="cal-more-link" title="Xem thêm ${extraCount} công việc">
+          +${extraCount} việc khác
+        </div>
+      `;
+    }
+
+    return `
+      <div class="cal-month-cell ${isOtherMonth ? 'other-month' : ''} ${isToday ? 'is-today' : ''}" data-cell-date="${dateKey}">
+        <div class="cal-cell-header">
+          <span class="cal-day-num">${dayNum}</span>
+          ${tasks.length > 0 ? `<span class="cal-cell-badge">${tasks.length}</span>` : ''}
+        </div>
+        <div class="cal-cell-tasks-wrap">
+          ${tasksHtml}
+        </div>
+      </div>
+    `;
+  },
+
+  // --- WEEK VIEW ---
+  renderWeekCalendar(container, currentDate) {
+    const weekDays = this.getWeekDays(currentDate);
+    const todayKey = this.toLocalDateKey(new Date());
+
+    const weekdayNames = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'];
+
+    const tasksByDate = {};
+    (this.state.tasks || []).forEach(t => {
+      if (!t.dueDate) return;
+      const key = this.toLocalDateKey(t.dueDate);
+      if (!tasksByDate[key]) tasksByDate[key] = [];
+      tasksByDate[key].push(t);
+    });
+
+    let weekHtml = '<div class="cal-week-grid">';
+
+    weekDays.forEach((day, idx) => {
+      const dayKey = this.toLocalDateKey(day);
+      const isToday = dayKey === todayKey;
+      const dayTasks = tasksByDate[dayKey] || [];
+      const dateDisplay = `${day.getDate()}/${day.getMonth() + 1}`;
+
+      weekHtml += `
+        <div class="cal-week-col ${isToday ? 'is-today' : ''}">
+          <div class="cal-week-header">
+            <div class="cal-week-day-title">
+              <span class="cal-week-dayname">${weekdayNames[idx]} ${isToday ? '⭐' : ''}</span>
+              <span class="cal-week-date">${dateDisplay}</span>
+            </div>
+            <span class="cal-week-badge">${dayTasks.length} việc</span>
           </div>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:12px;">
-            ${items.map(t => this.createTaskCardHtml(t)).join('')}
+          <div class="cal-week-tasks-list">
+            ${dayTasks.length === 0 ? `
+              <div class="cal-week-empty">
+                <div>✨ Không có hạn chót</div>
+              </div>
+            ` : dayTasks.map(t => this.buildWeekTaskCardHtml(t)).join('')}
           </div>
         </div>
       `;
-    };
+    });
 
-    container.innerHTML = 
-      renderSection('Đã Quá Hạn - Cần Xử Lý Ngay', overdueList, 'var(--danger)', '🚨') +
-      renderSection('Đến Hạn Hôm Nay', todayList, '#ea580c', '⏰') +
-      renderSection('Đến Hạn Trong Tuần Này', weekList, '#2563eb', '📅') +
-      renderSection('Công Việc Kế Hoạch Tương Lai', futureList, '#64748b', '📌') +
-      renderSection('Đã Hoàn Thành', completedList, '#059669', '✅');
+    weekHtml += '</div>';
+    container.innerHTML = weekHtml;
+
+    // Attach listeners
+    container.querySelectorAll('.cal-week-task-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const taskId = card.getAttribute('data-task-id');
+        if (taskId) this.openTaskDetail(taskId);
+      });
+    });
+  },
+
+  buildWeekTaskCardHtml(task) {
+    const statusMap = { todo: 'Cần làm', in_progress: 'Đang làm', review: 'Chờ duyệt', completed: 'Hoàn thành' };
+    const priorityLabels = { urgent: 'Khẩn cấp', high: 'Cao', medium: 'Trung bình', low: 'Thấp' };
+    const isCompleted = task.status === 'completed';
+    const now = new Date();
+    const isOverdue = !isCompleted && task.dueDate && new Date(task.dueDate) < now;
+
+    return `
+      <div class="cal-week-task-card" data-task-id="${this.escapeHtml(task.id)}">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+          <span style="font-size:11px; font-weight:800; color:var(--primary);">#${this.escapeHtml(task.id)}</span>
+          <span class="priority-tag ${this.escapeHtml(task.priority)}" style="font-size:10px; padding:1px 6px;">
+            ${priorityLabels[task.priority] || task.priority}
+          </span>
+        </div>
+        <div style="font-size:12px; font-weight:700; color:var(--text-primary); margin-bottom:6px; line-height:1.4;">
+          ${this.escapeHtml(task.title)}
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-secondary);">
+          <span style="display:inline-flex; align-items:center; gap:4px;">
+            <span class="status-dot status-${this.escapeHtml(task.status)}" style="width:6px; height:6px;"></span>
+            ${statusMap[task.status] || task.status}
+          </span>
+          <span style="font-weight:700; color:${isOverdue ? 'var(--danger)' : 'var(--text-muted)'};">
+            ${isOverdue ? '🚨 Quá hạn' : `${task.progress}%`}
+          </span>
+        </div>
+      </div>
+    `;
+  },
+
+  // --- DAY VIEW ---
+  renderDayCalendar(container, currentDate) {
+    const dateKey = this.toLocalDateKey(currentDate);
+    const dayNames = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+    const dayName = dayNames[currentDate.getDay()];
+    const fullDateStr = `${currentDate.getDate()} Tháng ${currentDate.getMonth() + 1}, ${currentDate.getFullYear()}`;
+
+    const tasks = this.state.tasks || [];
+    const now = new Date();
+
+    // Tasks due on this day
+    const dueTodayTasks = tasks.filter(t => t.dueDate && this.toLocalDateKey(t.dueDate) === dateKey);
+
+    // Overdue tasks (active and due before today)
+    const overdueTasks = tasks.filter(t => {
+      if (t.status === 'completed' || !t.dueDate) return false;
+      const tKey = this.toLocalDateKey(t.dueDate);
+      return tKey < dateKey;
+    });
+
+    // In progress tasks
+    const inProgressTasks = tasks.filter(t => t.status === 'in_progress' && (!t.dueDate || this.toLocalDateKey(t.dueDate) !== dateKey));
+
+    // Stats
+    const totalDue = dueTodayTasks.length;
+    const completedCount = dueTodayTasks.filter(t => t.status === 'completed').length;
+    const inProgCount = dueTodayTasks.filter(t => t.status === 'in_progress').length;
+    const reviewCount = dueTodayTasks.filter(t => t.status === 'review').length;
+
+    let dayHtml = `
+      <div class="cal-day-container">
+        <!-- Hero Header Card -->
+        <div class="cal-day-hero">
+          <div class="cal-day-hero-info">
+            <h3>☀️ ${dayName}, ${fullDateStr}</h3>
+            <p>Tổng quan tiến độ và danh sách hạn chót công việc cần xử lý trong ngày</p>
+          </div>
+          <div class="cal-day-stats-chips">
+            <div class="cal-day-chip" title="Tổng việc đến hạn ngày này">
+              <span>📋 Đến hạn:</span> <strong>${totalDue}</strong>
+            </div>
+            <div class="cal-day-chip" title="Đang làm" style="color:#2563eb;">
+              <span>⚡ Đang làm:</span> <strong>${inProgCount}</strong>
+            </div>
+            <div class="cal-day-chip" title="Chờ duyệt" style="color:#d97706;">
+              <span>⏳ Chờ duyệt:</span> <strong>${reviewCount}</strong>
+            </div>
+            <div class="cal-day-chip" title="Đã hoàn thành" style="color:#059669;">
+              <span>✅ Đã xong:</span> <strong>${completedCount}</strong>
+            </div>
+          </div>
+        </div>
+    `;
+
+    // Section 1: Due Today
+    dayHtml += `
+      <div class="cal-day-section">
+        <div class="cal-day-section-title">
+          <span>⏰ Hạn Chót Trong Ngày (${dueTodayTasks.length})</span>
+        </div>
+        ${dueTodayTasks.length === 0 ? `
+          <div style="background:var(--bg-card); border:1px dashed var(--border-color); border-radius:8px; padding:24px; text-align:center; color:var(--text-secondary);">
+            <div style="font-size:28px; margin-bottom:6px;">🌴</div>
+            <div style="font-weight:700; margin-bottom:2px;">Không có hạn chót nào trong ngày này</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Mọi tiến độ công việc đang được kiểm soát tốt.</div>
+            <button class="btn btn-outline btn-sm" onclick="App.openTaskModalWithDate('${dateKey}')">
+              + Thêm Việc Cho Ngày Này
+            </button>
+          </div>
+        ` : `
+          <div class="cal-day-tasks-grid">
+            ${dueTodayTasks.map(t => this.createTaskCardHtml(t)).join('')}
+          </div>
+        `}
+      </div>
+    `;
+
+    // Section 2: Overdue (if any)
+    if (overdueTasks.length > 0) {
+      dayHtml += `
+        <div class="cal-day-section" style="margin-top:12px;">
+          <div class="cal-day-section-title" style="color:var(--danger);">
+            <span>🚨 Danh Sách Việc Đã Quá Hạn Cần Ưu Tiên (${overdueTasks.length})</span>
+          </div>
+          <div class="cal-day-tasks-grid">
+            ${overdueTasks.map(t => this.createTaskCardHtml(t)).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // Section 3: Other Active Tasks
+    if (inProgressTasks.length > 0) {
+      dayHtml += `
+        <div class="cal-day-section" style="margin-top:12px;">
+          <div class="cal-day-section-title" style="color:#2563eb;">
+            <span>🔄 Công Việc Đang Triển Khai Song Song (${inProgressTasks.length})</span>
+          </div>
+          <div class="cal-day-tasks-grid">
+            ${inProgressTasks.slice(0, 6).map(t => this.createTaskCardHtml(t)).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    dayHtml += '</div>';
+    container.innerHTML = dayHtml;
 
     // Attach card click listeners
     container.querySelectorAll('.task-card').forEach(card => {
-      card.addEventListener('click', () => {
-        this.openTaskDetail(card.getAttribute('data-task-id'));
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.card-action-btn')) return;
+        const taskId = card.getAttribute('data-task-id');
+        if (taskId) this.openTaskDetail(taskId);
       });
     });
+  },
+
+  openTaskModalWithDate(dateStr) {
+    this.openTaskModal();
+    const dateInput = document.getElementById('taskFormDueDate');
+    if (dateInput && dateStr) {
+      dateInput.value = dateStr;
+    }
   },
 
   // -------------------------------------------------------------
