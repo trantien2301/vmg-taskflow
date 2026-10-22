@@ -1116,13 +1116,15 @@ app.get('/api/users/:id/calendar-settings', authenticate, (req, res) => {
   const token = user.googleCalendar?.syncToken || `gcal_${user.id}_token`;
   const feedUrl = `${publicBaseUrl}/api/calendar/feed/${user.id}/${token}.ics`;
   const webcalUrl = `webcal://${publicBaseUrl.replace(/^https?:\/\//, '')}/api/calendar/feed/${user.id}/${token}.ics`;
-  const googleCalendarSubscribeUrl = `https://calendar.google.com/calendar/u/0/r?cid=${encodeURIComponent(feedUrl)}`;
+  const googleCalendarSubscribeUrl = `https://calendar.google.com/calendar/render?cid=${encodeURIComponent(webcalUrl)}`;
+  const googleCalendarAddByUrl = `https://calendar.google.com/calendar/u/0/r/settings/addbyurl`;
 
   res.json({
     settings: user.googleCalendar || {},
     feedUrl,
     webcalUrl,
-    googleCalendarSubscribeUrl
+    googleCalendarSubscribeUrl,
+    googleCalendarAddByUrl
   });
 });
 

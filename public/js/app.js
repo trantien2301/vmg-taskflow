@@ -4847,11 +4847,26 @@ const App = {
   },
 
   openGoogleCalendarSubscribe() {
-    const linkBtn = document.getElementById('gcalSubscribeLinkBtn');
-    if (linkBtn && linkBtn.href && linkBtn.href !== '#') {
-      window.open(linkBtn.href, '_blank');
-      API.syncCalendarNow().catch(() => {});
+    const feedInput = document.getElementById('gcalFeedUrlInput');
+    const feedUrl = feedInput ? feedInput.value : '';
+
+    if (feedUrl) {
+      navigator.clipboard.writeText(feedUrl).catch(() => {
+        if (feedInput) {
+          feedInput.select();
+          document.execCommand('copy');
+        }
+      });
     }
+
+    const linkBtn = document.getElementById('gcalSubscribeLinkBtn');
+    const targetUrl = (linkBtn && linkBtn.href && linkBtn.href !== '#')
+      ? linkBtn.href
+      : 'https://calendar.google.com/calendar/u/0/r/settings/addbyurl';
+
+    window.open(targetUrl, '_blank');
+    this.showToast('📋 Đã tự động sao chép Link Lịch! Google Calendar đang mở, chỉ cần dán (Ctrl+V) vào ô URL rồi bấm "Thêm lịch" là hoàn tất.', 'info');
+    API.syncCalendarNow().catch(() => {});
   },
 
   async saveGoogleCalendarSettings() {

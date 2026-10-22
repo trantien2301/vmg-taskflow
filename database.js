@@ -977,24 +977,56 @@ class Database {
       tasks = tasks.filter(t => t.department === user.department);
     }
 
+    const nowMs = Date.now();
+    const thirtyDaysAgo = nowMs - 30 * 86400 * 1000;
+
+    // Filter to active tasks and completed tasks in the last 30 days for optimal calendar performance
+    tasks = tasks.filter(t => {
+      if (t.status !== 'completed') return true;
+      if (!t.completedAt) return true;
+      return new Date(t.completedAt).getTime() >= thirtyDaysAgo;
+    });
+
     const pad = n => String(n).padStart(2, '0');
-    const formatIcsDate = (dStr) => {
-      const d = new Date(dStr || Date.now());
-      if (isNaN(d.getTime())) return null;
+    const formatIcsDate = (d) => {
       return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + 'T' +
              pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + pad(d.getUTCSeconds()) + 'Z';
     };
 
     const cleanText = (str) => {
       if (!str) return '';
-      return String(str).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+      return String(str)
+        .replace(/\r/g, '')
+        .replace(/\\/g, '\\\\')
+        .replace(/;/g, '\\;')
+        .replace(/,/g, '\\,')
+        .replace(/\n/g, '\\n');
     };
 
-    const nowIcs = formatIcsDate(new Date());
+    // RFC 5545 line folding at 75 octets
+    const foldLine = (line) => {
+      if (line.length <= 75) return line;
+      let result = '';
+      let remaining = line;
+      let first = true;
+      while (remaining.length > 0) {
+        if (first) {
+          result += remaining.substring(0, 75);
+          remaining = remaining.substring(75);
+          first = false;
+        } else {
+          result += '\r\n ' + remaining.substring(0, 74);
+          remaining = remaining.substring(74);
+        }
+      }
+      return result;
+    };
+
+    const nowIcs = formatIcsDate(new Date(nowMs));
     const calName = cleanText(`TaskFlow - ${user.name} (${user.department})`);
     const reminderTimes = user.googleCalendar?.reminderTimes || [1440, 120, 30];
 
-    let lines = [
+    let rawLines = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
       'PRODID:-//VMG TaskFlow Pro//Google Calendar Sync//VI',
@@ -1007,8 +1039,37 @@ class Database {
     ];
 
     tasks.forEach(task => {
-      const startIcs = formatIcsDate(task.startDate) || nowIcs;
-      const dueIcs = formatIcsDate(task.dueDate) || formatIcsDate(new Date(Date.now() + 86400000));
+      let startTime, endTime;
+      const rawStart = task.startDate ? new Date(task.startDate).getTime() : null;
+      const rawDue = task.dueDate ? new Date(task.dueDate).getTime() : null;
+
+      if (rawStart && rawDue && !isNaN(rawStart) && !isNaN(rawDue)) {
+        if (rawDue > rawStart) {
+          startTime = new Date(rawStart);
+          endTime = new Date(rawDue);
+        } else {
+          // If due date is earlier or same as start date, set start to 2 hours before due
+          endTime = new Date(rawDue);
+          startTime = new Date(rawDue - 2 * 3600 * 1000);
+        }
+      } else if (rawDue && !isNaN(rawDue)) {
+        endTime = new Date(rawDue);
+        startTime = new Date(rawDue - 2 * 3600 * 1000);
+      } else if (rawStart && !isNaN(rawStart)) {
+        startTime = new Date(rawStart);
+        endTime = new Date(rawStart + 2 * 3600 * 1000);
+      } else {
+        startTime = new Date(nowMs);
+        endTime = new Date(nowMs + 2 * 3600 * 1000);
+      }
+
+      // Strictly guarantee endTime is after startTime (RFC 5545 requirement)
+      if (endTime.getTime() <= startTime.getTime()) {
+        endTime = new Date(startTime.getTime() + 3600 * 1000);
+      }
+
+      const startIcs = formatIcsDate(startTime);
+      const dueIcs = formatIcsDate(endTime);
       const uid = `task-${task.id}@vmg.edu.vn`;
       const priorityMap = { urgent: '1', high: '3', medium: '5', low: '9' };
       const statusMap = { todo: 'Chưa làm', in_progress: 'Đang làm', review: 'Chờ duyệt', completed: 'Hoàn thành' };
@@ -1024,18 +1085,18 @@ class Database {
         `Xem trên Web App: ${baseUrl}/#task=${task.id}`
       );
 
-      lines.push('BEGIN:VEVENT');
-      lines.push(`UID:${uid}`);
-      lines.push(`DTSTAMP:${nowIcs}`);
-      lines.push(`DTSTART:${startIcs}`);
-      lines.push(`DTEND:${dueIcs}`);
-      lines.push(`SUMMARY:${summary}`);
-      lines.push(`DESCRIPTION:${desc}`);
-      lines.push(`PRIORITY:${priorityMap[task.priority] || '5'}`);
-      lines.push(`STATUS:${task.status === 'completed' ? 'COMPLETED' : 'CONFIRMED'}`);
+      rawLines.push('BEGIN:VEVENT');
+      rawLines.push(`UID:${uid}`);
+      rawLines.push(`DTSTAMP:${nowIcs}`);
+      rawLines.push(`DTSTART:${startIcs}`);
+      rawLines.push(`DTEND:${dueIcs}`);
+      rawLines.push(`SUMMARY:${summary}`);
+      rawLines.push(`DESCRIPTION:${desc}`);
+      rawLines.push(`PRIORITY:${priorityMap[task.priority] || '5'}`);
+      rawLines.push(`STATUS:${task.status === 'completed' ? 'COMPLETED' : 'CONFIRMED'}`);
 
-      // Add VALARM triggers based on user's reminder preferences
-      if (task.status !== 'completed' && Array.isArray(reminderTimes)) {
+      // Add VALARM triggers based on user's reminder preferences (for active tasks)
+      if (task.status !== 'completed' && Array.isArray(reminderTimes) && endTime.getTime() > nowMs) {
         reminderTimes.forEach(m => {
           let trigger = `-PT${m}M`;
           let descLabel = `Hạn chót trong ${m} phút`;
@@ -1047,19 +1108,21 @@ class Database {
             descLabel = `Hạn chót trong ${m / 60} giờ`;
           }
 
-          lines.push('BEGIN:VALARM');
-          lines.push('ACTION:DISPLAY');
-          lines.push(`DESCRIPTION:${cleanText(`[Nhắc Lịch] ${task.title} - ${descLabel}`)}`);
-          lines.push(`TRIGGER:${trigger}`);
-          lines.push('END:VALARM');
+          rawLines.push('BEGIN:VALARM');
+          rawLines.push('ACTION:DISPLAY');
+          rawLines.push(`DESCRIPTION:${cleanText(`[Nhắc Lịch] ${task.title} - ${descLabel}`)}`);
+          rawLines.push(`TRIGGER:${trigger}`);
+          rawLines.push('END:VALARM');
         });
       }
 
-      lines.push('END:VEVENT');
+      rawLines.push('END:VEVENT');
     });
 
-    lines.push('END:VCALENDAR');
-    return lines.join('\r\n');
+    rawLines.push('END:VCALENDAR');
+
+    // Apply RFC 5545 line folding
+    return rawLines.map(foldLine).join('\r\n');
   }
 
   // --- Departments ---
