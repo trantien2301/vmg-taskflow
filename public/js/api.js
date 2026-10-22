@@ -232,7 +232,18 @@ const API = {
     });
   },
 
-  // System
+  // System & Version Updates
+  async getVersionInfo() {
+    return this.request('/api/system/version');
+  },
+
+  async publishUpdate(customMessage = '') {
+    return this.request('/api/system/publish-update', {
+      method: 'POST',
+      body: JSON.stringify({ customMessage })
+    });
+  },
+
   async getActivities() {
     return this.request('/api/activities');
   },

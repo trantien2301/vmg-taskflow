@@ -13,6 +13,9 @@ const App = {
     currentDetailTask: null,
     draggedTaskId: null,
     onlineCount: 1,
+    clientVersion: '2.8.0',
+    serverVersionInfo: null,
+    hasNewUpdate: false,
     filters: {
       status: 'all',
       priority: 'all',
@@ -71,6 +74,9 @@ const App = {
   async init() {
     this.initTheme();
     this.setupEventListeners();
+
+    // Check version and updates from server
+    this.checkAppUpdates(false);
 
     // Fetch initial departments for registration / app dropdowns
     try {
@@ -448,6 +454,10 @@ const App = {
       case 'system:reset':
         this.showToast(`♻️ ${data.message}`, 'warning');
         this.loadInitialData().then(() => this.renderView());
+        break;
+
+      case 'system:new_version_available':
+        this.handleNewVersionEvent(data);
         break;
     }
   },
@@ -831,6 +841,42 @@ const App = {
     const btnLogoutHeader = document.getElementById('btnLogoutHeader');
     if (btnLogoutHeader) {
       btnLogoutHeader.addEventListener('click', () => this.logout());
+    }
+
+    // Version & Updates Listeners
+    const sidebarVersionBtn = document.getElementById('sidebarVersionBtn');
+    if (sidebarVersionBtn) {
+      sidebarVersionBtn.addEventListener('click', () => this.openVersionModal());
+    }
+
+    const btnHeaderVersion = document.getElementById('btnHeaderVersion');
+    if (btnHeaderVersion) {
+      btnHeaderVersion.addEventListener('click', () => this.openVersionModal());
+    }
+
+    const btnApplyUpdateNow = document.getElementById('btnApplyUpdateNow');
+    if (btnApplyUpdateNow) {
+      btnApplyUpdateNow.addEventListener('click', () => this.applyAppUpdate());
+    }
+
+    const btnDismissUpdateBanner = document.getElementById('btnDismissUpdateBanner');
+    if (btnDismissUpdateBanner) {
+      btnDismissUpdateBanner.addEventListener('click', () => this.dismissUpdateBanner());
+    }
+
+    const btnCheckUpdateManual = document.getElementById('btnCheckUpdateManual');
+    if (btnCheckUpdateManual) {
+      btnCheckUpdateManual.addEventListener('click', () => this.checkAppUpdates(true));
+    }
+
+    const btnForceReloadCache = document.getElementById('btnForceReloadCache');
+    if (btnForceReloadCache) {
+      btnForceReloadCache.addEventListener('click', () => this.applyAppUpdate());
+    }
+
+    const btnAdminBroadcastUpdate = document.getElementById('btnAdminBroadcastUpdate');
+    if (btnAdminBroadcastUpdate) {
+      btnAdminBroadcastUpdate.addEventListener('click', () => this.broadcastVersionUpdate());
     }
 
     // ========================================================
@@ -2334,6 +2380,244 @@ const App = {
   closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) modal.classList.remove('show');
+  },
+
+  // -------------------------------------------------------------
+  // APP VERSION & UPDATE MANAGEMENT
+  // -------------------------------------------------------------
+  async checkAppUpdates(isManual = false) {
+    try {
+      const data = await API.getVersionInfo();
+      this.state.serverVersionInfo = data;
+
+      // Update version text in sidebar & modal
+      const sidebarVersionText = document.getElementById('sidebarVersionText');
+      if (sidebarVersionText) sidebarVersionText.innerText = `v${this.state.clientVersion}`;
+
+      const modalCurrentVersion = document.getElementById('modalCurrentVersion');
+      if (modalCurrentVersion) modalCurrentVersion.innerText = `TaskFlow Pro v${this.state.clientVersion}`;
+
+      const modalBuildDate = document.getElementById('modalBuildDate');
+      if (modalBuildDate && data.buildDate) {
+        modalBuildDate.innerText = `Bản dựng: ${data.buildDate}`;
+      }
+
+      // Check if server version is different or higher than current client version
+      const serverVer = data.version;
+      const clientVer = this.state.clientVersion;
+      const hasUpdate = Boolean(serverVer && serverVer !== clientVer);
+
+      this.state.hasNewUpdate = hasUpdate;
+
+      const sidebarBadge = document.getElementById('sidebarVersionNewBadge');
+      const headerDot = document.getElementById('headerVersionDot');
+      const banner = document.getElementById('appUpdateBanner');
+      const statusDesc = document.getElementById('versionStatusDesc');
+      const statusPulse = document.getElementById('versionStatusPulse');
+      const statusCard = document.getElementById('versionStatusCard');
+
+      if (hasUpdate) {
+        if (sidebarBadge) sidebarBadge.style.display = 'inline-block';
+        if (headerDot) headerDot.style.display = 'block';
+        if (banner) {
+          const bannerTitle = document.getElementById('updateBannerTitle');
+          const bannerDesc = document.getElementById('updateBannerDesc');
+          if (bannerTitle) bannerTitle.innerText = `Đã có bản cập nhật mới v${serverVer}!`;
+          if (bannerDesc) bannerDesc.innerText = `Phiên bản hiện tại: v${clientVer}. Vui lòng làm mới trang để nhận tính năng mới.`;
+          banner.style.display = 'flex';
+        }
+        if (statusDesc) {
+          statusDesc.innerHTML = `⚠️ <strong>Có phiên bản mới: v${serverVer}</strong> (Hiện tại: v${clientVer}). Vui lòng nhấn "Làm Mới & Xóa Cache" để đồng bộ ngay.`;
+        }
+        if (statusPulse) {
+          statusPulse.classList.add('outdated');
+        }
+        if (statusCard) {
+          statusCard.classList.add('has-update');
+        }
+
+        if (isManual) {
+          this.showToast(`🚀 Đã có phiên bản mới v${serverVer}! Nhấn 'Làm Mới & Xóa Cache' để cập nhật.`, 'warning');
+          this.playSound('alert');
+        }
+      } else {
+        if (sidebarBadge) sidebarBadge.style.display = 'none';
+        if (headerDot) headerDot.style.display = 'none';
+        if (statusDesc) {
+          statusDesc.innerHTML = `✅ Hệ thống đang đồng bộ với phiên bản mới nhất từ máy chủ (v${clientVer}). Tất cả tài nguyên đã được tối ưu hóa.`;
+        }
+        if (statusPulse) {
+          statusPulse.classList.remove('outdated');
+        }
+        if (statusCard) {
+          statusCard.classList.remove('has-update');
+        }
+
+        if (isManual) {
+          this.showToast(`✅ Bạn đang sử dụng phiên bản mới nhất (v${clientVer})!`, 'success');
+          this.playSound('success');
+        }
+      }
+
+      this.renderChangelog(data.changelog || []);
+      return data;
+    } catch (e) {
+      console.warn('Lỗi khi kiểm tra phiên bản:', e);
+      if (isManual) {
+        this.showToast('Không thể kết nối máy chủ để kiểm tra phiên bản!', 'danger');
+      }
+    }
+  },
+
+  handleNewVersionEvent(data) {
+    this.state.hasNewUpdate = true;
+    const banner = document.getElementById('appUpdateBanner');
+    const sidebarBadge = document.getElementById('sidebarVersionNewBadge');
+    const headerDot = document.getElementById('headerVersionDot');
+    const updateTitle = document.getElementById('updateBannerTitle');
+    const updateDesc = document.getElementById('updateBannerDesc');
+
+    if (sidebarBadge) sidebarBadge.style.display = 'inline-block';
+    if (headerDot) headerDot.style.display = 'block';
+
+    if (updateTitle && data.version) {
+      updateTitle.innerText = `Đã có bản phát hành mới v${data.version}!`;
+    }
+    if (updateDesc && data.message) {
+      updateDesc.innerText = data.message;
+    }
+    if (banner) {
+      banner.style.display = 'flex';
+    }
+
+    this.showToast(`📢 Cập Nhật Hệ Thống: ${data.message || `Đã có bản cập nhật v${data.version || ''}`}`, 'info');
+    this.playSound('info');
+
+    // Update modal elements if open
+    const statusDesc = document.getElementById('versionStatusDesc');
+    const statusPulse = document.getElementById('versionStatusPulse');
+    const statusCard = document.getElementById('versionStatusCard');
+    if (statusDesc && data.version) {
+      statusDesc.innerHTML = `⚠️ <strong>Có phiên bản mới từ máy chủ: v${data.version}</strong>. ${data.message || ''}`;
+    }
+    if (statusPulse) statusPulse.classList.add('outdated');
+    if (statusCard) statusCard.classList.add('has-update');
+  },
+
+  dismissUpdateBanner() {
+    const banner = document.getElementById('appUpdateBanner');
+    if (banner) banner.style.display = 'none';
+  },
+
+  async openVersionModal() {
+    // Show admin broadcast zone if user is admin
+    const adminSection = document.getElementById('adminBroadcastSection');
+    if (adminSection) {
+      adminSection.style.display = (this.state.user && this.state.user.role === 'admin') ? 'block' : 'none';
+    }
+
+    // Refresh version info silently
+    await this.checkAppUpdates(false);
+    this.openModal('versionModal');
+  },
+
+  renderChangelog(changelog) {
+    const container = document.getElementById('modalChangelogList');
+    const countEl = document.getElementById('changelogCount');
+    if (!container) return;
+
+    if (!changelog || changelog.length === 0) {
+      container.innerHTML = '<div style="font-size:12px; color:var(--text-secondary); text-align:center; padding:16px;">Không có thông tin lịch sử phiên bản.</div>';
+      return;
+    }
+
+    if (countEl) countEl.innerText = `${changelog.length} bản phát hành`;
+
+    container.innerHTML = changelog.map((item, idx) => {
+      const isLatest = idx === 0;
+      const bulletsHtml = (item.highlights || [])
+        .map(h => `<li>${this.escapeHtml(h)}</li>`)
+        .join('');
+
+      return `
+        <div class="changelog-item">
+          <div class="changelog-item-header">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="changelog-version-tag ${isLatest ? 'current' : ''}">${this.escapeHtml(item.version)}</span>
+              ${isLatest ? '<span style="font-size:10.5px; font-weight:700; color:#10b981; background:rgba(16,185,129,0.12); padding:1px 6px; border-radius:4px;">MỚI NHẤT</span>' : ''}
+            </div>
+            <span class="changelog-date">📅 ${this.escapeHtml(item.date)}</span>
+          </div>
+          <div class="changelog-title">${this.escapeHtml(item.title)}</div>
+          <ul class="changelog-bullets">
+            ${bulletsHtml}
+          </ul>
+        </div>
+      `;
+    }).join('');
+  },
+
+  async applyAppUpdate() {
+    this.showToast('⚡ Đang làm sạch bộ nhớ đệm (Cache) và tải phiên bản mới nhất...', 'info');
+
+    // 1. Delete all browser CacheStorage
+    if ('caches' in window) {
+      try {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(name => caches.delete(name)));
+      } catch (err) {
+        console.warn('Lỗi khi xóa CacheStorage:', err);
+      }
+    }
+
+    // 2. Unregister any Service Workers
+    if ('serviceWorker' in navigator) {
+      try {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (let registration of registrations) {
+          await registration.unregister();
+        }
+      } catch (err) {
+        console.warn('Lỗi khi unregister serviceWorker:', err);
+      }
+    }
+
+    // 3. Save latest version locally
+    if (this.state.serverVersionInfo && this.state.serverVersionInfo.version) {
+      localStorage.setItem('taskflow_app_version', this.state.serverVersionInfo.version);
+    }
+
+    // 4. Force hard reload with timestamp cache-buster
+    setTimeout(() => {
+      const targetUrl = window.location.origin + window.location.pathname + '?reload=' + Date.now();
+      window.location.replace(targetUrl);
+    }, 400);
+  },
+
+  async broadcastVersionUpdate() {
+    const input = document.getElementById('adminUpdateMessage');
+    const customMessage = input ? input.value.trim() : '';
+
+    const btn = document.getElementById('btnAdminBroadcastUpdate');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerText = 'Đang phát thông báo...';
+    }
+
+    try {
+      const res = await API.publishUpdate(customMessage);
+      this.showToast(res.message || 'Đã phát thông báo cập nhật Realtime thành công!', 'success');
+      this.playSound('success');
+      if (input) input.value = '';
+    } catch (err) {
+      this.showToast(`Lỗi khi phát thông báo: ${err.message}`, 'danger');
+      this.playSound('danger');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerText = '📢 Phát Thông Báo Cập Nhật Realtime Tới Toàn Hệ Thống';
+      }
+    }
   },
 
   showToast(message, type = 'info') {

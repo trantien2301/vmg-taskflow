@@ -307,6 +307,11 @@
             <span class="user-role-tag admin" id="sidebarUserRole">ADMIN</span>
           </div>
         </div>
+        <button class="sidebar-version-pill" id="sidebarVersionBtn" title="Xem thông tin phiên bản & cập nhật">
+          <span class="version-dot"></span>
+          <span>TaskFlow Pro <strong id="sidebarVersionText">v2.8.0</strong></span>
+          <span class="version-badge-new" id="sidebarVersionNewBadge" style="display:none;">MỚI</span>
+        </button>
         <button class="btn-logout" id="btnLogoutSidebar">
           <span>🚪</span>
           <span>Đăng Xuất</span>
@@ -316,6 +321,25 @@
 
     <!-- MAIN CONTENT WRAPPER -->
     <div class="main-wrapper">
+      <!-- APP UPDATE BANNER -->
+      <div class="app-update-banner" id="appUpdateBanner" style="display: none;">
+        <div class="app-update-banner-content">
+          <span class="app-update-banner-icon">🚀</span>
+          <div class="app-update-banner-text">
+            <strong id="updateBannerTitle">Đã có bản cập nhật TaskFlow Pro mới!</strong>
+            <span id="updateBannerDesc">Làm mới trình duyệt để trải nghiệm tính năng và cải tiến mới nhất.</span>
+          </div>
+        </div>
+        <div class="app-update-banner-actions">
+          <button class="btn btn-sm btn-primary" id="btnApplyUpdateNow">
+            🔄 Cập Nhật Ngay
+          </button>
+          <button class="btn btn-sm btn-outline banner-close-btn" id="btnDismissUpdateBanner" title="Đóng thông báo">
+            ✕
+          </button>
+        </div>
+      </div>
+
       <!-- TOP HEADER -->
       <header class="top-header">
         <div class="header-left">
@@ -329,6 +353,12 @@
             <div class="status-dot" id="statusDot"></div>
             <span id="statusText"><span class="hide-mobile">Trực tuyến: </span>1 <span class="hide-mobile">người</span><span class="show-mobile-only">online</span></span>
           </div>
+
+          <!-- Version Info button -->
+          <button class="btn btn-outline btn-sm version-header-btn" id="btnHeaderVersion" title="Xem thông tin phiên bản & cập nhật">
+            🚀 <span class="hide-mobile">v2.8.0</span>
+            <span class="header-version-dot" id="headerVersionDot" style="display:none;"></span>
+          </button>
 
           <!-- Scan Alerts Now button -->
           <button class="btn btn-outline btn-sm" id="scanAlertsBtn" title="Kiểm tra hạn chót ngay tức thì">
@@ -986,12 +1016,85 @@
     </div>
   </div>
 
+  <!-- MODAL: APP VERSION & UPDATES -->
+  <div class="modal-overlay" id="versionModal" style="z-index: 10000;">
+    <div class="modal-content" style="max-width: 640px;">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:22px;">🚀</span>
+          <div>
+            <h3 class="modal-title" style="font-size:16px; margin:0;">Thông Tin Phiên Bản & Cập Nhật Hệ Thống</h3>
+            <div style="font-size:11.5px; color:var(--text-secondary); margin-top:2px;">TaskFlow Pro - Nền tảng quản lý dự án & công việc doanh nghiệp</div>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close-modal="versionModal">&times;</button>
+      </div>
+      <div class="modal-body" style="padding-top:14px;">
+        <!-- Status Card -->
+        <div class="version-status-card" id="versionStatusCard">
+          <div class="version-status-header">
+            <div class="version-pill-large">
+              <span class="version-status-pulse" id="versionStatusPulse"></span>
+              <span id="modalCurrentVersion">TaskFlow Pro v2.8.0</span>
+            </div>
+            <span class="version-build-date" id="modalBuildDate">Bản dựng: 22/10/2026</span>
+          </div>
+          <div class="version-status-desc" id="versionStatusDesc">
+            ✅ Hệ thống đang đồng bộ với phiên bản mới nhất từ máy chủ.
+          </div>
+          <div class="version-actions-bar">
+            <button class="btn btn-outline btn-sm" id="btnCheckUpdateManual">
+              🔄 Kiểm Tra Cập Nhật
+            </button>
+            <button class="btn btn-primary btn-sm" id="btnForceReloadCache" title="Xóa toàn bộ Cache và tải lại mã nguồn mới nhất">
+              ⚡ Làm Mới & Xóa Cache (1-Click)
+            </button>
+          </div>
+        </div>
+
+        <!-- Admin Broadcast Tool (visible to admin only) -->
+        <div class="admin-broadcast-card" id="adminBroadcastSection" style="display: none; margin-top: 14px;">
+          <div class="admin-broadcast-header">
+            <span style="font-size:16px;">📢</span>
+            <strong>Dành Cho Quản Trị Viên (Admin)</strong>
+          </div>
+          <p style="font-size:12px; color:var(--text-secondary); margin:6px 0 10px 0;">
+            Phát thông báo đẩy Realtime qua WebSocket tới tất cả người dùng trực tuyến để nhắc họ cập nhật giao diện phiên bản mới.
+          </p>
+          <div class="input-with-icon" style="margin-bottom:8px;">
+            <span class="input-icon">💬</span>
+            <input type="text" id="adminUpdateMessage" class="form-control" placeholder="Lời nhắn thông báo cập nhật (để trống sẽ dùng mặc định)...">
+          </div>
+          <button class="btn btn-warning btn-sm" id="btnAdminBroadcastUpdate" style="width:100%; justify-content:center;">
+            📢 Phát Thông Báo Cập Nhật Realtime Tới Toàn Hệ Thống
+          </button>
+        </div>
+
+        <!-- Changelog Section -->
+        <div style="margin-top: 18px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <label class="form-label" style="margin:0; font-size:13px; font-weight:700;">
+              📜 Lịch Sử Phiên Bản & Tính Năng Mới (Changelog)
+            </label>
+            <span style="font-size:11px; color:var(--text-secondary);" id="changelogCount">Đang tải...</span>
+          </div>
+          <div class="changelog-list" id="modalChangelogList">
+            <!-- Changelog items dynamically injected -->
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" data-close-modal="versionModal">Đóng</button>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST NOTIFICATION POPUPS CONTAINER -->
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- APPLICATION SCRIPTS -->
-  <script src="js/api.js?v=2.7"></script>
-  <script src="js/charts.js?v=2.7"></script>
-  <script src="js/app.js?v=2.7"></script>
+  <script src="js/api.js?v=2.8.0"></script>
+  <script src="js/charts.js?v=2.8.0"></script>
+  <script src="js/app.js?v=2.8.0"></script>
 </body>
 </html>

@@ -923,8 +923,92 @@ app.delete('/api/users/:id', authenticate, requireAdmin, (req, res) => {
 });
 
 // -------------------------------------------------------------
-// SYSTEM / ACTIVITY ROUTES
+// SYSTEM / ACTIVITY / VERSION ROUTES
 // -------------------------------------------------------------
+const APP_VERSION = '2.8.0';
+const APP_BUILD_DATE = '22/10/2026';
+const APP_CHANGELOG = [
+  {
+    version: 'v2.8.0',
+    date: '22/10/2026',
+    title: 'Hệ thống Quản lý & Cập nhật Phiên bản Tự động',
+    highlights: [
+      'Tự động kiểm tra và cảnh báo khi có phiên bản mới từ máy chủ',
+      'Nút "Làm mới & Xóa Cache" 1-click cập nhật ngay lập tức giao diện và mã nguồn mới',
+      'Hiển thị Changelog lịch sử nâng cấp tính năng trực quan, minh bạch',
+      'Admin có thể phát thông báo cập nhật Realtime qua WebSocket tới toàn bộ nhân sự'
+    ]
+  },
+  {
+    version: 'v2.7.0',
+    date: '19/10/2026',
+    title: 'Bảng màu 4 Cột Kanban Nhận Diện Giai Đoạn',
+    highlights: [
+      'Gán bảng màu trực quan cho 4 giai đoạn: Cần Làm (Xám/Slate), Đang Làm (Xanh Lam), Chờ Duyệt (Vàng Cam), Hoàn Thành (Xanh Mint)',
+      'Tương phản cao với thẻ việc nền trắng, giúp theo dõi trạng thái dự án dễ dàng',
+      'Đồng bộ giao diện Dark Mode và Mobile Navigation Tabs'
+    ]
+  },
+  {
+    version: 'v2.6.0',
+    date: '19/10/2026',
+    title: 'Chỉnh Sửa & Điều Chỉnh Phòng Ban Cho Admin',
+    highlights: [
+      'Tính năng sửa tên phòng ban trực tiếp (Inline Editing) với phím Enter/Escape',
+      'Cập nhật đồng bộ liên hoàn (Cascading update) cho toàn bộ nhân sự và công việc liên quan'
+    ]
+  },
+  {
+    version: 'v2.5.0',
+    date: '19/10/2026',
+    title: 'Đăng Nhập & Đăng Ký SSO Google Workspace',
+    highlights: [
+      'Tích hợp SSO 1-click dành riêng cho tên miền nội bộ @vmg.edu.vn',
+      'Tự động cấp tài khoản an toàn (Auto-provisioning) và hỗ trợ khôi phục mật khẩu OTP'
+    ]
+  },
+  {
+    version: 'v2.0.0',
+    date: '18/10/2026',
+    title: 'Nâng Cấp Toàn Diện WebSocket Realtime & Báo Cáo KPI',
+    highlights: [
+      'Đồng bộ tức thì mọi thao tác tạo, sửa, đổi trạng thái qua WebSocket',
+      'Bảng điều khiển KPI tự động quét cảnh báo trễ hạn',
+      'Biểu đồ tiến độ dự án, phân tích hiệu suất nhân sự và xuất báo cáo CSV'
+    ]
+  }
+];
+
+app.get('/api/system/version', (req, res) => {
+  res.json({
+    version: APP_VERSION,
+    buildDate: APP_BUILD_DATE,
+    changelog: APP_CHANGELOG,
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.post('/api/system/publish-update', authenticate, requireAdmin, (req, res) => {
+  const { customMessage } = req.body || {};
+  const updatePayload = {
+    version: APP_VERSION,
+    buildDate: APP_BUILD_DATE,
+    message: customMessage || `Đã có bản cập nhật mới TaskFlow Pro v${APP_VERSION}! Vui lòng làm mới trang để áp dụng.`,
+    publishedBy: req.user.name,
+    timestamp: new Date().toISOString()
+  };
+
+  db.logActivity({
+    userId: req.user.id,
+    userName: req.user.name,
+    action: 'publish_update',
+    details: `Đã phát thông báo cập nhật phiên bản mới v${APP_VERSION} tới toàn bộ hệ thống`
+  });
+
+  broadcast('system:new_version_available', updatePayload);
+  res.json({ success: true, message: `Đã phát thông báo phiên bản v${APP_VERSION} thành công!`, payload: updatePayload });
+});
+
 app.get('/api/activities', authenticate, (req, res) => {
   const activities = db.getActivities(50);
   res.json({ activities });
