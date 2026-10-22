@@ -17372,7 +17372,7 @@
   ],
   "notifications": [
     {
-      "id": "ntf-1792688065356-815",
+      "id": "ntf-1792688952846-949",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17380,10 +17380,10 @@
       "message": "Công việc \"Làm việc tại PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-933",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.356Z"
+      "createdAt": "2026-10-22T17:09:12.846Z"
     },
     {
-      "id": "ntf-1792688065349-506",
+      "id": "ntf-1792688952839-719",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17391,10 +17391,10 @@
       "message": "Công việc \"Làm việc tại PVT\" đã quá hạn 13 ngày (Hạn: 10/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-933",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.349Z"
+      "createdAt": "2026-10-22T17:09:12.839Z"
     },
     {
-      "id": "ntf-1792688065343-672",
+      "id": "ntf-1792688952830-427",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17402,10 +17402,10 @@
       "message": "Công việc \"Làm việc tại PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-932",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.343Z"
+      "createdAt": "2026-10-22T17:09:12.830Z"
     },
     {
-      "id": "ntf-1792688065336-676",
+      "id": "ntf-1792688952822-985",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17413,10 +17413,10 @@
       "message": "Công việc \"Làm việc tại PVT\" đã quá hạn 14 ngày (Hạn: 9/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-932",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.336Z"
+      "createdAt": "2026-10-22T17:09:12.822Z"
     },
     {
-      "id": "ntf-1792688065329-52",
+      "id": "ntf-1792688952813-320",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17424,10 +17424,10 @@
       "message": "Công việc \"Làm việc tại PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-931",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.329Z"
+      "createdAt": "2026-10-22T17:09:12.813Z"
     },
     {
-      "id": "ntf-1792688065323-183",
+      "id": "ntf-1792688952799-584",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17435,10 +17435,10 @@
       "message": "Công việc \"Làm việc tại PVT\" đã quá hạn 13 ngày (Hạn: 10/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-931",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.323Z"
+      "createdAt": "2026-10-22T17:09:12.799Z"
     },
     {
-      "id": "ntf-1792688065316-83",
+      "id": "ntf-1792688952790-493",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17446,10 +17446,10 @@
       "message": "Công việc \"Làm việc tại PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-930",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.316Z"
+      "createdAt": "2026-10-22T17:09:12.790Z"
     },
     {
-      "id": "ntf-1792688065309-934",
+      "id": "ntf-1792688952778-773",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17457,10 +17457,10 @@
       "message": "Công việc \"Làm việc tại PVT\" đã quá hạn 14 ngày (Hạn: 9/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-930",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.309Z"
+      "createdAt": "2026-10-22T17:09:12.778Z"
     },
     {
-      "id": "ntf-1792688065302-465",
+      "id": "ntf-1792688952766-352",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17468,10 +17468,10 @@
       "message": "Công việc \"Làm việc tại PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-929",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.302Z"
+      "createdAt": "2026-10-22T17:09:12.766Z"
     },
     {
-      "id": "ntf-1792688065295-522",
+      "id": "ntf-1792688952757-262",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17479,10 +17479,10 @@
       "message": "Công việc \"Làm việc tại PVT\" đã quá hạn 15 ngày (Hạn: 8/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-929",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.295Z"
+      "createdAt": "2026-10-22T17:09:12.757Z"
     },
     {
-      "id": "ntf-1792688065289-427",
+      "id": "ntf-1792688952745-280",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17490,10 +17490,10 @@
       "message": "Công việc \"Làm việc tại PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-928",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.289Z"
+      "createdAt": "2026-10-22T17:09:12.745Z"
     },
     {
-      "id": "ntf-1792688065282-254",
+      "id": "ntf-1792688952736-550",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17501,10 +17501,10 @@
       "message": "Công việc \"Làm việc tại PVT\" đã quá hạn 16 ngày (Hạn: 7/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-928",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.282Z"
+      "createdAt": "2026-10-22T17:09:12.736Z"
     },
     {
-      "id": "ntf-1792688065276-761",
+      "id": "ntf-1792688952727-843",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17512,10 +17512,10 @@
       "message": "Công việc \"Làm việc tại PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-927",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.276Z"
+      "createdAt": "2026-10-22T17:09:12.727Z"
     },
     {
-      "id": "ntf-1792688065270-329",
+      "id": "ntf-1792688952717-970",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17523,10 +17523,10 @@
       "message": "Công việc \"Làm việc tại PVT\" đã quá hạn 15 ngày (Hạn: 8/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-927",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.270Z"
+      "createdAt": "2026-10-22T17:09:12.717Z"
     },
     {
-      "id": "ntf-1792688065263-70",
+      "id": "ntf-1792688952709-634",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17534,10 +17534,10 @@
       "message": "Công việc \"Họp kinh doanh\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-926",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.263Z"
+      "createdAt": "2026-10-22T17:09:12.709Z"
     },
     {
-      "id": "ntf-1792688065257-711",
+      "id": "ntf-1792688952700-980",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17545,10 +17545,10 @@
       "message": "Công việc \"Họp kinh doanh\" đã quá hạn 17 ngày (Hạn: 6/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-926",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.257Z"
+      "createdAt": "2026-10-22T17:09:12.700Z"
     },
     {
-      "id": "ntf-1792688065250-637",
+      "id": "ntf-1792688952691-835",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17556,10 +17556,10 @@
       "message": "Công việc \"Làm việc tại PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-925",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.250Z"
+      "createdAt": "2026-10-22T17:09:12.691Z"
     },
     {
-      "id": "ntf-1792688065243-95",
+      "id": "ntf-1792688952680-994",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17567,10 +17567,10 @@
       "message": "Công việc \"Làm việc tại PVT\" đã quá hạn 18 ngày (Hạn: 5/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-925",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.243Z"
+      "createdAt": "2026-10-22T17:09:12.680Z"
     },
     {
-      "id": "ntf-1792688065237-270",
+      "id": "ntf-1792688952672-891",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17578,10 +17578,10 @@
       "message": "Công việc \"Làm việc tại PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-924",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.237Z"
+      "createdAt": "2026-10-22T17:09:12.672Z"
     },
     {
-      "id": "ntf-1792688065230-612",
+      "id": "ntf-1792688952663-932",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17589,10 +17589,10 @@
       "message": "Công việc \"Làm việc tại PVT\" đã quá hạn 16 ngày (Hạn: 7/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-924",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.230Z"
+      "createdAt": "2026-10-22T17:09:12.663Z"
     },
     {
-      "id": "ntf-1792688065224-273",
+      "id": "ntf-1792688952653-94",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17600,10 +17600,10 @@
       "message": "Công việc \"Họp trung tâm về quy trình thu tiền\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-923",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.224Z"
+      "createdAt": "2026-10-22T17:09:12.653Z"
     },
     {
-      "id": "ntf-1792688065217-736",
+      "id": "ntf-1792688952643-476",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17611,10 +17611,10 @@
       "message": "Công việc \"Họp trung tâm về quy trình thu tiền\" đã quá hạn 17 ngày (Hạn: 6/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-923",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.217Z"
+      "createdAt": "2026-10-22T17:09:12.643Z"
     },
     {
-      "id": "ntf-1792688065211-717",
+      "id": "ntf-1792688952630-288",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17622,10 +17622,10 @@
       "message": "Công việc \"Làm việc tại PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-922",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.211Z"
+      "createdAt": "2026-10-22T17:09:12.630Z"
     },
     {
-      "id": "ntf-1792688065204-897",
+      "id": "ntf-1792688952616-412",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17633,10 +17633,10 @@
       "message": "Công việc \"Làm việc tại PVT\" đã quá hạn 18 ngày (Hạn: 5/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-922",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.204Z"
+      "createdAt": "2026-10-22T17:09:12.616Z"
     },
     {
-      "id": "ntf-1792688065197-297",
+      "id": "ntf-1792688952607-470",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17644,10 +17644,10 @@
       "message": "Công việc \"Làm việc tại VP PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-921",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.197Z"
+      "createdAt": "2026-10-22T17:09:12.607Z"
     },
     {
-      "id": "ntf-1792688065190-223",
+      "id": "ntf-1792688952598-474",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17655,10 +17655,10 @@
       "message": "Công việc \"Làm việc tại VP PVT\" đã quá hạn 20 ngày (Hạn: 3/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-921",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.190Z"
+      "createdAt": "2026-10-22T17:09:12.598Z"
     },
     {
-      "id": "ntf-1792688065184-898",
+      "id": "ntf-1792688952590-837",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17666,10 +17666,10 @@
       "message": "Công việc \"Làm việc tại VP PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-919",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.184Z"
+      "createdAt": "2026-10-22T17:09:12.590Z"
     },
     {
-      "id": "ntf-1792688065177-382",
+      "id": "ntf-1792688952582-454",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17677,10 +17677,10 @@
       "message": "Công việc \"Làm việc tại VP PVT\" đã quá hạn 21 ngày (Hạn: 2/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-919",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.177Z"
+      "createdAt": "2026-10-22T17:09:12.582Z"
     },
     {
-      "id": "ntf-1792688065171-799",
+      "id": "ntf-1792688952574-902",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17688,10 +17688,10 @@
       "message": "Công việc \"Làm việc tại VP PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-918",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.171Z"
+      "createdAt": "2026-10-22T17:09:12.574Z"
     },
     {
-      "id": "ntf-1792688065164-963",
+      "id": "ntf-1792688952566-28",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17699,10 +17699,10 @@
       "message": "Công việc \"Làm việc tại VP PVT\" đã quá hạn 22 ngày (Hạn: 1/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-918",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.164Z"
+      "createdAt": "2026-10-22T17:09:12.566Z"
     },
     {
-      "id": "ntf-1792688065158-295",
+      "id": "ntf-1792688952559-169",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17710,10 +17710,10 @@
       "message": "Công việc \"Làm việc tại VP PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-917",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.158Z"
+      "createdAt": "2026-10-22T17:09:12.559Z"
     },
     {
-      "id": "ntf-1792688065151-31",
+      "id": "ntf-1792688952551-390",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17721,10 +17721,10 @@
       "message": "Công việc \"Làm việc tại VP PVT\" đã quá hạn 22 ngày (Hạn: 1/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-917",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.151Z"
+      "createdAt": "2026-10-22T17:09:12.551Z"
     },
     {
-      "id": "ntf-1792688065144-729",
+      "id": "ntf-1792688952542-85",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17732,10 +17732,10 @@
       "message": "Công việc \"Họp TCVH + TGĐ về việc giảm chi phí\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-916",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.144Z"
+      "createdAt": "2026-10-22T17:09:12.542Z"
     },
     {
-      "id": "ntf-1792688065138-216",
+      "id": "ntf-1792688952533-671",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17743,10 +17743,10 @@
       "message": "Công việc \"Họp TCVH + TGĐ về việc giảm chi phí\" đã quá hạn 23 ngày (Hạn: 30/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-916",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.138Z"
+      "createdAt": "2026-10-22T17:09:12.533Z"
     },
     {
-      "id": "ntf-1792688065131-436",
+      "id": "ntf-1792688952527-86",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17754,10 +17754,10 @@
       "message": "Công việc \"Họp GĐ KV2 - Phương án cho Hùng Vương\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-915",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.131Z"
+      "createdAt": "2026-10-22T17:09:12.527Z"
     },
     {
-      "id": "ntf-1792688065124-42",
+      "id": "ntf-1792688952518-718",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17765,10 +17765,10 @@
       "message": "Công việc \"Họp GĐ KV2 - Phương án cho Hùng Vương\" đã quá hạn 23 ngày (Hạn: 30/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-915",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.124Z"
+      "createdAt": "2026-10-22T17:09:12.518Z"
     },
     {
-      "id": "ntf-1792688065116-968",
+      "id": "ntf-1792688952512-434",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17776,10 +17776,10 @@
       "message": "Công việc \"Họp GĐ KV1 - Phương án cho TBM và PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-914",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.116Z"
+      "createdAt": "2026-10-22T17:09:12.512Z"
     },
     {
-      "id": "ntf-1792688065108-488",
+      "id": "ntf-1792688952504-318",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17787,10 +17787,10 @@
       "message": "Công việc \"Họp GĐ KV1 - Phương án cho TBM và PVT\" đã quá hạn 24 ngày (Hạn: 29/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-914",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.108Z"
+      "createdAt": "2026-10-22T17:09:12.504Z"
     },
     {
-      "id": "ntf-1792688065097-959",
+      "id": "ntf-1792688952497-93",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17798,10 +17798,10 @@
       "message": "Công việc \"Họp GĐKV3 - Kế hoạch BPC\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-913",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.097Z"
+      "createdAt": "2026-10-22T17:09:12.497Z"
     },
     {
-      "id": "ntf-1792688065090-630",
+      "id": "ntf-1792688952490-702",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17809,10 +17809,10 @@
       "message": "Công việc \"Họp GĐKV3 - Kế hoạch BPC\" đã quá hạn 24 ngày (Hạn: 29/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-913",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.090Z"
+      "createdAt": "2026-10-22T17:09:12.490Z"
     },
     {
-      "id": "ntf-1792688065084-995",
+      "id": "ntf-1792688952482-737",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17820,10 +17820,10 @@
       "message": "Công việc \"Họp định kỳ KD\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-912",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.084Z"
+      "createdAt": "2026-10-22T17:09:12.482Z"
     },
     {
-      "id": "ntf-1792688065077-892",
+      "id": "ntf-1792688952475-947",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17831,10 +17831,10 @@
       "message": "Công việc \"Họp định kỳ KD\" đã quá hạn 24 ngày (Hạn: 29/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-912",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.077Z"
+      "createdAt": "2026-10-22T17:09:12.475Z"
     },
     {
-      "id": "ntf-1792688065071-552",
+      "id": "ntf-1792688952466-519",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17842,10 +17842,10 @@
       "message": "Công việc \"Làm việc tại VP PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-911",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.071Z"
+      "createdAt": "2026-10-22T17:09:12.466Z"
     },
     {
-      "id": "ntf-1792688065063-491",
+      "id": "ntf-1792688952459-707",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17853,10 +17853,10 @@
       "message": "Công việc \"Làm việc tại VP PVT\" đã quá hạn 25 ngày (Hạn: 28/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-911",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.063Z"
+      "createdAt": "2026-10-22T17:09:12.459Z"
     },
     {
-      "id": "ntf-1792688065057-336",
+      "id": "ntf-1792688952450-390",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17864,10 +17864,10 @@
       "message": "Công việc \"Họp với CRM, Admin về phần mềm EMS\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-910",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.057Z"
+      "createdAt": "2026-10-22T17:09:12.450Z"
     },
     {
-      "id": "ntf-1792688065049-195",
+      "id": "ntf-1792688952444-811",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17875,10 +17875,10 @@
       "message": "Công việc \"Họp với CRM, Admin về phần mềm EMS\" đã quá hạn 25 ngày (Hạn: 28/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-910",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.049Z"
+      "createdAt": "2026-10-22T17:09:12.444Z"
     },
     {
-      "id": "ntf-1792688065043-635",
+      "id": "ntf-1792688952436-182",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17886,10 +17886,10 @@
       "message": "Công việc \"Làm việc tại VP PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-908",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.043Z"
+      "createdAt": "2026-10-22T17:09:12.436Z"
     },
     {
-      "id": "ntf-1792688065036-757",
+      "id": "ntf-1792688952429-241",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17897,10 +17897,10 @@
       "message": "Công việc \"Làm việc tại VP PVT\" đã quá hạn 28 ngày (Hạn: 25/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-908",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.036Z"
+      "createdAt": "2026-10-22T17:09:12.429Z"
     },
     {
-      "id": "ntf-1792688065029-259",
+      "id": "ntf-1792688952422-117",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17908,10 +17908,10 @@
       "message": "Công việc \"Làm việc tại VP PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-907",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.029Z"
+      "createdAt": "2026-10-22T17:09:12.422Z"
     },
     {
-      "id": "ntf-1792688065023-1",
+      "id": "ntf-1792688952414-791",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17919,10 +17919,10 @@
       "message": "Công việc \"Làm việc tại VP PVT\" đã quá hạn 28 ngày (Hạn: 25/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-907",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.023Z"
+      "createdAt": "2026-10-22T17:09:12.414Z"
     },
     {
-      "id": "ntf-1792688065015-241",
+      "id": "ntf-1792688952406-428",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17930,10 +17930,10 @@
       "message": "Công việc \"Làm việc tại VP PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-906",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.015Z"
+      "createdAt": "2026-10-22T17:09:12.406Z"
     },
     {
-      "id": "ntf-1792688065009-572",
+      "id": "ntf-1792688952398-581",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17941,10 +17941,10 @@
       "message": "Công việc \"Làm việc tại VP PVT\" đã quá hạn 29 ngày (Hạn: 24/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-906",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.009Z"
+      "createdAt": "2026-10-22T17:09:12.398Z"
     },
     {
-      "id": "ntf-1792688065002-935",
+      "id": "ntf-1792688952392-973",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17952,10 +17952,10 @@
       "message": "Công việc \"Làm việc tại VP PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-905",
       "read": false,
-      "createdAt": "2026-10-22T16:54:25.002Z"
+      "createdAt": "2026-10-22T17:09:12.392Z"
     },
     {
-      "id": "ntf-1792688064994-922",
+      "id": "ntf-1792688952383-153",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17963,10 +17963,10 @@
       "message": "Công việc \"Làm việc tại VP PVT\" đã quá hạn 29 ngày (Hạn: 24/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-905",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.994Z"
+      "createdAt": "2026-10-22T17:09:12.383Z"
     },
     {
-      "id": "ntf-1792688064989-945",
+      "id": "ntf-1792688952374-46",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17974,10 +17974,10 @@
       "message": "Công việc \"Đi TT LDN\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-904",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.989Z"
+      "createdAt": "2026-10-22T17:09:12.374Z"
     },
     {
-      "id": "ntf-1792688064981-554",
+      "id": "ntf-1792688952366-879",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -17985,10 +17985,10 @@
       "message": "Công việc \"Đi TT LDN\" đã quá hạn 30 ngày (Hạn: 23/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-904",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.981Z"
+      "createdAt": "2026-10-22T17:09:12.366Z"
     },
     {
-      "id": "ntf-1792688064975-639",
+      "id": "ntf-1792688952359-418",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -17996,10 +17996,10 @@
       "message": "Công việc \"Đi TT LDN\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-903",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.975Z"
+      "createdAt": "2026-10-22T17:09:12.359Z"
     },
     {
-      "id": "ntf-1792688064967-681",
+      "id": "ntf-1792688952351-958",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -18007,10 +18007,10 @@
       "message": "Công việc \"Đi TT LDN\" đã quá hạn 30 ngày (Hạn: 23/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-903",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.967Z"
+      "createdAt": "2026-10-22T17:09:12.351Z"
     },
     {
-      "id": "ntf-1792688064960-772",
+      "id": "ntf-1792688952345-622",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18018,10 +18018,10 @@
       "message": "Công việc \"Họp công nợ B2C\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-902",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.960Z"
+      "createdAt": "2026-10-22T17:09:12.345Z"
     },
     {
-      "id": "ntf-1792688064954-377",
+      "id": "ntf-1792688952337-929",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -18029,10 +18029,10 @@
       "message": "Công việc \"Họp công nợ B2C\" đã quá hạn 31 ngày (Hạn: 22/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-902",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.954Z"
+      "createdAt": "2026-10-22T17:09:12.337Z"
     },
     {
-      "id": "ntf-1792688064946-217",
+      "id": "ntf-1792688952330-700",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18040,10 +18040,10 @@
       "message": "Công việc \"Họp công nợ B2C\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-901",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.946Z"
+      "createdAt": "2026-10-22T17:09:12.330Z"
     },
     {
-      "id": "ntf-1792688064940-118",
+      "id": "ntf-1792688952323-693",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -18051,10 +18051,10 @@
       "message": "Công việc \"Họp công nợ B2C\" đã quá hạn 31 ngày (Hạn: 22/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-901",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.940Z"
+      "createdAt": "2026-10-22T17:09:12.323Z"
     },
     {
-      "id": "ntf-1792688064932-727",
+      "id": "ntf-1792688952314-848",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18062,10 +18062,10 @@
       "message": "Công việc \"Họp công nợ B2C\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-900",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.932Z"
+      "createdAt": "2026-10-22T17:09:12.314Z"
     },
     {
-      "id": "ntf-1792688064926-380",
+      "id": "ntf-1792688952307-385",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -18073,10 +18073,10 @@
       "message": "Công việc \"Họp công nợ B2C\" đã quá hạn 32 ngày (Hạn: 21/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-900",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.926Z"
+      "createdAt": "2026-10-22T17:09:12.307Z"
     },
     {
-      "id": "ntf-1792688064920-669",
+      "id": "ntf-1792688952299-169",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18084,10 +18084,10 @@
       "message": "Công việc \"Họp KD\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-899",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.920Z"
+      "createdAt": "2026-10-22T17:09:12.299Z"
     },
     {
-      "id": "ntf-1792688064911-379",
+      "id": "ntf-1792688952293-285",
       "userId": "usr-dept-1792670222814-f0hg",
       "type": "alert",
       "level": "danger",
@@ -18095,10 +18095,10 @@
       "message": "Công việc \"Họp KD\" đã quá hạn 32 ngày (Hạn: 21/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-899",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.911Z"
+      "createdAt": "2026-10-22T17:09:12.293Z"
     },
     {
-      "id": "ntf-1792688064903-616",
+      "id": "ntf-1792688952285-733",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18106,10 +18106,10 @@
       "message": "Công việc \"10:00 Họp HT Group: Hàn Quốc\" phụ trách bởi Nguyễn Văn Minh đã trễ hạn!",
       "taskId": "TSK-896",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.903Z"
+      "createdAt": "2026-10-22T17:09:12.285Z"
     },
     {
-      "id": "ntf-1792688064895-356",
+      "id": "ntf-1792688952278-56",
       "userId": "usr-dept-1792670222744-r3ww",
       "type": "alert",
       "level": "danger",
@@ -18117,10 +18117,10 @@
       "message": "Công việc \"10:00 Họp HT Group: Hàn Quốc\" đã quá hạn 2 ngày (Hạn: 21/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-896",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.895Z"
+      "createdAt": "2026-10-22T17:09:12.278Z"
     },
     {
-      "id": "ntf-1792688064889-859",
+      "id": "ntf-1792688952270-46",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18128,10 +18128,10 @@
       "message": "Công việc \"3:00 Họp vendor MKT\" phụ trách bởi Nguyễn Văn Minh đã trễ hạn!",
       "taskId": "TSK-895",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.889Z"
+      "createdAt": "2026-10-22T17:09:12.270Z"
     },
     {
-      "id": "ntf-1792688064879-441",
+      "id": "ntf-1792688952263-327",
       "userId": "usr-dept-1792670222744-r3ww",
       "type": "alert",
       "level": "danger",
@@ -18139,10 +18139,10 @@
       "message": "Công việc \"3:00 Họp vendor MKT\" đã quá hạn 3 ngày (Hạn: 20/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-895",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.879Z"
+      "createdAt": "2026-10-22T17:09:12.263Z"
     },
     {
-      "id": "ntf-1792688064872-612",
+      "id": "ntf-1792688952255-998",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18150,10 +18150,10 @@
       "message": "Công việc \"8:30 Họp giao ban\" phụ trách bởi Nguyễn Văn Minh đã trễ hạn!",
       "taskId": "TSK-894",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.872Z"
+      "createdAt": "2026-10-22T17:09:12.255Z"
     },
     {
-      "id": "ntf-1792688064865-959",
+      "id": "ntf-1792688952247-838",
       "userId": "usr-dept-1792670222744-r3ww",
       "type": "alert",
       "level": "danger",
@@ -18161,10 +18161,10 @@
       "message": "Công việc \"8:30 Họp giao ban\" đã quá hạn 3 ngày (Hạn: 20/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-894",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.865Z"
+      "createdAt": "2026-10-22T17:09:12.247Z"
     },
     {
-      "id": "ntf-1792688064858-894",
+      "id": "ntf-1792688952240-598",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18172,10 +18172,10 @@
       "message": "Công việc \"4:00 Họp với GĐK R&amp;D\" phụ trách bởi Nguyễn Văn Minh đã trễ hạn!",
       "taskId": "TSK-893",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.858Z"
+      "createdAt": "2026-10-22T17:09:12.240Z"
     },
     {
-      "id": "ntf-1792688064851-427",
+      "id": "ntf-1792688952230-217",
       "userId": "usr-dept-1792670222744-r3ww",
       "type": "alert",
       "level": "danger",
@@ -18183,10 +18183,10 @@
       "message": "Công việc \"4:00 Họp với GĐK R&amp;D\" đã quá hạn 4 ngày (Hạn: 19/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-893",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.851Z"
+      "createdAt": "2026-10-22T17:09:12.230Z"
     },
     {
-      "id": "ntf-1792688064844-289",
+      "id": "ntf-1792688952219-126",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18194,10 +18194,10 @@
       "message": "Công việc \"8:30 Họp KHKD\" phụ trách bởi Nguyễn Văn Minh đã trễ hạn!",
       "taskId": "TSK-892",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.844Z"
+      "createdAt": "2026-10-22T17:09:12.219Z"
     },
     {
-      "id": "ntf-1792688064837-741",
+      "id": "ntf-1792688952212-967",
       "userId": "usr-dept-1792670222744-r3ww",
       "type": "alert",
       "level": "danger",
@@ -18205,10 +18205,10 @@
       "message": "Công việc \"8:30 Họp KHKD\" đã quá hạn 4 ngày (Hạn: 19/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-892",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.837Z"
+      "createdAt": "2026-10-22T17:09:12.212Z"
     },
     {
-      "id": "ntf-1792688064829-523",
+      "id": "ntf-1792688952205-546",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "warning",
@@ -18216,10 +18216,10 @@
       "message": "Công việc \"Training khảo thí cho trung tâm\" chỉ còn 7 giờ nữa là đến hạn chót!",
       "taskId": "TSK-889",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.829Z"
+      "createdAt": "2026-10-22T17:09:12.205Z"
     },
     {
-      "id": "ntf-1792688064822-460",
+      "id": "ntf-1792688952197-567",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18227,10 +18227,10 @@
       "message": "Công việc \"Đi gặp đối tác Trung tâm\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-888",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.822Z"
+      "createdAt": "2026-10-22T17:09:12.197Z"
     },
     {
-      "id": "ntf-1792688064814-743",
+      "id": "ntf-1792688952190-440",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18238,10 +18238,10 @@
       "message": "Công việc \"Đi gặp đối tác Trung tâm\" đã quá hạn 1 ngày (Hạn: 22/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-888",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.814Z"
+      "createdAt": "2026-10-22T17:09:12.190Z"
     },
     {
-      "id": "ntf-1792688064808-848",
+      "id": "ntf-1792688952183-483",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18249,10 +18249,10 @@
       "message": "Công việc \"Chốt chỉnh sửa Sale Kit sản phẩm Khảo thí\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-887",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.808Z"
+      "createdAt": "2026-10-22T17:09:12.183Z"
     },
     {
-      "id": "ntf-1792688064801-543",
+      "id": "ntf-1792688952176-316",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18260,10 +18260,10 @@
       "message": "Công việc \"Chốt chỉnh sửa Sale Kit sản phẩm Khảo thí\" đã quá hạn 1 ngày (Hạn: 22/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-887",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.801Z"
+      "createdAt": "2026-10-22T17:09:12.176Z"
     },
     {
-      "id": "ntf-1792688064794-175",
+      "id": "ntf-1792688952167-330",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18271,10 +18271,10 @@
       "message": "Công việc \"KH kinh doanh Khảo thí 2027\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-886",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.794Z"
+      "createdAt": "2026-10-22T17:09:12.167Z"
     },
     {
-      "id": "ntf-1792688064788-417",
+      "id": "ntf-1792688952160-958",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18282,10 +18282,10 @@
       "message": "Công việc \"KH kinh doanh Khảo thí 2027\" đã quá hạn 2 ngày (Hạn: 21/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-886",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.788Z"
+      "createdAt": "2026-10-22T17:09:12.160Z"
     },
     {
-      "id": "ntf-1792688064780-943",
+      "id": "ntf-1792688952152-914",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18293,10 +18293,10 @@
       "message": "Công việc \"Tính KPI Khảo Thí\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-885",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.780Z"
+      "createdAt": "2026-10-22T17:09:12.152Z"
     },
     {
-      "id": "ntf-1792688064774-609",
+      "id": "ntf-1792688952145-645",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18304,10 +18304,10 @@
       "message": "Công việc \"Tính KPI Khảo Thí\" đã quá hạn 2 ngày (Hạn: 21/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-885",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.774Z"
+      "createdAt": "2026-10-22T17:09:12.145Z"
     },
     {
-      "id": "ntf-1792688064766-687",
+      "id": "ntf-1792688952138-399",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18315,10 +18315,10 @@
       "message": "Công việc \"Xử lý Payment Lệ phí thi Tháng 9-10/2026 trên EMS\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-884",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.766Z"
+      "createdAt": "2026-10-22T17:09:12.138Z"
     },
     {
-      "id": "ntf-1792688064759-963",
+      "id": "ntf-1792688952131-732",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18326,10 +18326,10 @@
       "message": "Công việc \"Xử lý Payment Lệ phí thi Tháng 9-10/2026 trên EMS\" đã quá hạn 2 ngày (Hạn: 21/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-884",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.759Z"
+      "createdAt": "2026-10-22T17:09:12.131Z"
     },
     {
-      "id": "ntf-1792688064750-688",
+      "id": "ntf-1792688952123-517",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "warning",
@@ -18337,10 +18337,10 @@
       "message": "Công việc \"Trực thi IELTS\" chỉ còn 7 giờ nữa là đến hạn chót!",
       "taskId": "TSK-883",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.750Z"
+      "createdAt": "2026-10-22T17:09:12.123Z"
     },
     {
-      "id": "ntf-1792688064743-691",
+      "id": "ntf-1792688952115-859",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18348,10 +18348,10 @@
       "message": "Công việc \"KH chi phí , chính sách chiêu sinh 2027\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-878",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.743Z"
+      "createdAt": "2026-10-22T17:09:12.115Z"
     },
     {
-      "id": "ntf-1792688064736-20",
+      "id": "ntf-1792688952108-527",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18359,10 +18359,10 @@
       "message": "Công việc \"KH chi phí , chính sách chiêu sinh 2027\" đã quá hạn 3 ngày (Hạn: 20/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-878",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.736Z"
+      "createdAt": "2026-10-22T17:09:12.108Z"
     },
     {
-      "id": "ntf-1792688064729-371",
+      "id": "ntf-1792688952100-880",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18370,10 +18370,10 @@
       "message": "Công việc \"KH KPI Khảo thí 2027. Phân bổ KPI khu vực, hệ thống\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-877",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.729Z"
+      "createdAt": "2026-10-22T17:09:12.100Z"
     },
     {
-      "id": "ntf-1792688064722-102",
+      "id": "ntf-1792688952093-266",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18381,10 +18381,10 @@
       "message": "Công việc \"KH KPI Khảo thí 2027. Phân bổ KPI khu vực, hệ thống\" đã quá hạn 3 ngày (Hạn: 20/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-877",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.722Z"
+      "createdAt": "2026-10-22T17:09:12.093Z"
     },
     {
-      "id": "ntf-1792688064715-669",
+      "id": "ntf-1792688952085-710",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18392,10 +18392,10 @@
       "message": "Công việc \"Vận hành TESOL:\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-876",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.715Z"
+      "createdAt": "2026-10-22T17:09:12.085Z"
     },
     {
-      "id": "ntf-1792688064708-156",
+      "id": "ntf-1792688952078-325",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18403,10 +18403,10 @@
       "message": "Công việc \"Vận hành TESOL:\" đã quá hạn 3 ngày (Hạn: 20/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-876",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.708Z"
+      "createdAt": "2026-10-22T17:09:12.078Z"
     },
     {
-      "id": "ntf-1792688064701-621",
+      "id": "ntf-1792688952071-726",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18414,10 +18414,10 @@
       "message": "Công việc \"Họp team Khảo thí\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-875",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.701Z"
+      "createdAt": "2026-10-22T17:09:12.071Z"
     },
     {
-      "id": "ntf-1792688064694-143",
+      "id": "ntf-1792688952064-314",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18425,10 +18425,10 @@
       "message": "Công việc \"Họp team Khảo thí\" đã quá hạn 3 ngày (Hạn: 20/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-875",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.694Z"
+      "createdAt": "2026-10-22T17:09:12.064Z"
     },
     {
-      "id": "ntf-1792688064688-353",
+      "id": "ntf-1792688952055-638",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18436,10 +18436,10 @@
       "message": "Công việc \"Họp TCKD\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-874",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.688Z"
+      "createdAt": "2026-10-22T17:09:12.055Z"
     },
     {
-      "id": "ntf-1792688064681-313",
+      "id": "ntf-1792688952047-700",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18447,10 +18447,10 @@
       "message": "Công việc \"Họp TCKD\" đã quá hạn 4 ngày (Hạn: 19/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-874",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.681Z"
+      "createdAt": "2026-10-22T17:09:12.047Z"
     },
     {
-      "id": "ntf-1792688064674-370",
+      "id": "ntf-1792688952040-980",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18458,10 +18458,10 @@
       "message": "Công việc \"Họp TCKD\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-873",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.674Z"
+      "createdAt": "2026-10-22T17:09:12.040Z"
     },
     {
-      "id": "ntf-1792688064668-804",
+      "id": "ntf-1792688952032-331",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18469,10 +18469,10 @@
       "message": "Công việc \"Họp TCKD\" đã quá hạn 4 ngày (Hạn: 19/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-873",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.668Z"
+      "createdAt": "2026-10-22T17:09:12.032Z"
     },
     {
-      "id": "ntf-1792688064661-525",
+      "id": "ntf-1792688952026-628",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18480,10 +18480,10 @@
       "message": "Công việc \"Tổ chức IELTS Mock Test\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-872",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.661Z"
+      "createdAt": "2026-10-22T17:09:12.026Z"
     },
     {
-      "id": "ntf-1792688064654-683",
+      "id": "ntf-1792688952018-282",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18491,10 +18491,10 @@
       "message": "Công việc \"Tổ chức IELTS Mock Test\" đã quá hạn 5 ngày (Hạn: 18/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-872",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.655Z"
+      "createdAt": "2026-10-22T17:09:12.018Z"
     },
     {
-      "id": "ntf-1792688064647-136",
+      "id": "ntf-1792688952011-482",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18502,10 +18502,10 @@
       "message": "Công việc \"Trực thi IELTS BC\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-871",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.647Z"
+      "createdAt": "2026-10-22T17:09:12.011Z"
     },
     {
-      "id": "ntf-1792688064641-603",
+      "id": "ntf-1792688952003-983",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18513,10 +18513,10 @@
       "message": "Công việc \"Trực thi IELTS BC\" đã quá hạn 6 ngày (Hạn: 17/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-871",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.641Z"
+      "createdAt": "2026-10-22T17:09:12.003Z"
     },
     {
-      "id": "ntf-1792688064634-713",
+      "id": "ntf-1792688951996-83",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18524,10 +18524,10 @@
       "message": "Công việc \"Trực thi IELTS BC\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-870",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.634Z"
+      "createdAt": "2026-10-22T17:09:11.996Z"
     },
     {
-      "id": "ntf-1792688064627-547",
+      "id": "ntf-1792688951989-675",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18535,10 +18535,10 @@
       "message": "Công việc \"Trực thi IELTS BC\" đã quá hạn 6 ngày (Hạn: 17/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-870",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.627Z"
+      "createdAt": "2026-10-22T17:09:11.989Z"
     },
     {
-      "id": "ntf-1792688064621-689",
+      "id": "ntf-1792688951981-232",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18546,10 +18546,10 @@
       "message": "Công việc \"Tổng hợp số liệu Cambridge  - Nhập báo cáo tiến độ KPI 1600\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-869",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.621Z"
+      "createdAt": "2026-10-22T17:09:11.981Z"
     },
     {
-      "id": "ntf-1792688064614-784",
+      "id": "ntf-1792688951974-715",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18557,10 +18557,10 @@
       "message": "Công việc \"Tổng hợp số liệu Cambridge  - Nhập báo cáo tiến độ KPI 1600\" đã quá hạn 7 ngày (Hạn: 16/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-869",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.614Z"
+      "createdAt": "2026-10-22T17:09:11.974Z"
     },
     {
-      "id": "ntf-1792688064607-708",
+      "id": "ntf-1792688951966-430",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18568,10 +18568,10 @@
       "message": "Công việc \"Chuẩn bị số liệu KH kinh doanh 2027\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-868",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.607Z"
+      "createdAt": "2026-10-22T17:09:11.966Z"
     },
     {
-      "id": "ntf-1792688064600-162",
+      "id": "ntf-1792688951960-874",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18579,10 +18579,10 @@
       "message": "Công việc \"Chuẩn bị số liệu KH kinh doanh 2027\" đã quá hạn 8 ngày (Hạn: 15/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-868",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.600Z"
+      "createdAt": "2026-10-22T17:09:11.960Z"
     },
     {
-      "id": "ntf-1792688064593-681",
+      "id": "ntf-1792688951951-357",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18590,10 +18590,10 @@
       "message": "Công việc \"Soạn hồ sơ- đề thi khóa thi 25/10\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-867",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.593Z"
+      "createdAt": "2026-10-22T17:09:11.951Z"
     },
     {
-      "id": "ntf-1792688064586-369",
+      "id": "ntf-1792688951945-62",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18601,10 +18601,10 @@
       "message": "Công việc \"Soạn hồ sơ- đề thi khóa thi 25/10\" đã quá hạn 8 ngày (Hạn: 15/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-867",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.586Z"
+      "createdAt": "2026-10-22T17:09:11.945Z"
     },
     {
-      "id": "ntf-1792688064579-930",
+      "id": "ntf-1792688951938-693",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18612,10 +18612,10 @@
       "message": "Công việc \"Làm việc tại NKN - Soạn hồ sơ- đề thi khóa thi 25/10\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-866",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.579Z"
+      "createdAt": "2026-10-22T17:09:11.938Z"
     },
     {
-      "id": "ntf-1792688064573-634",
+      "id": "ntf-1792688951930-448",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18623,10 +18623,10 @@
       "message": "Công việc \"Làm việc tại NKN - Soạn hồ sơ- đề thi khóa thi 25/10\" đã quá hạn 8 ngày (Hạn: 15/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-866",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.573Z"
+      "createdAt": "2026-10-22T17:09:11.930Z"
     },
     {
-      "id": "ntf-1792688064565-188",
+      "id": "ntf-1792688951923-416",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18634,10 +18634,10 @@
       "message": "Công việc \"Xử lý các công việc vận hành TTKT\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-865",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.565Z"
+      "createdAt": "2026-10-22T17:09:11.923Z"
     },
     {
-      "id": "ntf-1792688064558-234",
+      "id": "ntf-1792688951916-205",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18645,10 +18645,10 @@
       "message": "Công việc \"Xử lý các công việc vận hành TTKT\" đã quá hạn 9 ngày (Hạn: 14/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-865",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.558Z"
+      "createdAt": "2026-10-22T17:09:11.916Z"
     },
     {
-      "id": "ntf-1792688064551-172",
+      "id": "ntf-1792688951909-686",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18656,10 +18656,10 @@
       "message": "Công việc \"Thông báo khai giảng TESOL online + offline Batch 09\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-864",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.551Z"
+      "createdAt": "2026-10-22T17:09:11.909Z"
     },
     {
-      "id": "ntf-1792688064544-622",
+      "id": "ntf-1792688951901-364",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18667,10 +18667,10 @@
       "message": "Công việc \"Thông báo khai giảng TESOL online + offline Batch 09\" đã quá hạn 9 ngày (Hạn: 14/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-864",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.544Z"
+      "createdAt": "2026-10-22T17:09:11.901Z"
     },
     {
-      "id": "ntf-1792688064538-253",
+      "id": "ntf-1792688951893-510",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18678,10 +18678,10 @@
       "message": "Công việc \"Xử lý vận hành TTKT\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-863",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.538Z"
+      "createdAt": "2026-10-22T17:09:11.893Z"
     },
     {
-      "id": "ntf-1792688064531-26",
+      "id": "ntf-1792688951883-144",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18689,10 +18689,10 @@
       "message": "Công việc \"Xử lý vận hành TTKT\" đã quá hạn 9 ngày (Hạn: 14/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-863",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.531Z"
+      "createdAt": "2026-10-22T17:09:11.883Z"
     },
     {
-      "id": "ntf-1792688064524-185",
+      "id": "ntf-1792688951874-613",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18700,10 +18700,10 @@
       "message": "Công việc \"Chốt DS khóa thi Cambridge 29/11 - Kiểm tra hồ sơ thí sinh\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-862",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.524Z"
+      "createdAt": "2026-10-22T17:09:11.874Z"
     },
     {
-      "id": "ntf-1792688064516-184",
+      "id": "ntf-1792688951866-33",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18711,10 +18711,10 @@
       "message": "Công việc \"Chốt DS khóa thi Cambridge 29/11 - Kiểm tra hồ sơ thí sinh\" đã quá hạn 10 ngày (Hạn: 13/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-862",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.516Z"
+      "createdAt": "2026-10-22T17:09:11.866Z"
     },
     {
-      "id": "ntf-1792688064509-267",
+      "id": "ntf-1792688951859-204",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18722,10 +18722,10 @@
       "message": "Công việc \"Họp HCNS - Lương 3P tại PVT\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-861",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.509Z"
+      "createdAt": "2026-10-22T17:09:11.859Z"
     },
     {
-      "id": "ntf-1792688064503-425",
+      "id": "ntf-1792688951851-860",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18733,10 +18733,10 @@
       "message": "Công việc \"Họp HCNS - Lương 3P tại PVT\" đã quá hạn 10 ngày (Hạn: 13/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-861",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.503Z"
+      "createdAt": "2026-10-22T17:09:11.851Z"
     },
     {
-      "id": "ntf-1792688064496-411",
+      "id": "ntf-1792688951842-904",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18744,10 +18744,10 @@
       "message": "Công việc \"Liên hệ đối tác chiêu sinh\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-860",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.496Z"
+      "createdAt": "2026-10-22T17:09:11.842Z"
     },
     {
-      "id": "ntf-1792688064490-114",
+      "id": "ntf-1792688951833-122",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18755,10 +18755,10 @@
       "message": "Công việc \"Liên hệ đối tác chiêu sinh\" đã quá hạn 11 ngày (Hạn: 12/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-860",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.490Z"
+      "createdAt": "2026-10-22T17:09:11.833Z"
     },
     {
-      "id": "ntf-1792688064482-659",
+      "id": "ntf-1792688951826-259",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18766,10 +18766,10 @@
       "message": "Công việc \"Chuẩn bị hồ sơ, form thi Khóa Cambridge 25/10\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-859",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.482Z"
+      "createdAt": "2026-10-22T17:09:11.826Z"
     },
     {
-      "id": "ntf-1792688064476-805",
+      "id": "ntf-1792688951818-593",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18777,10 +18777,10 @@
       "message": "Công việc \"Chuẩn bị hồ sơ, form thi Khóa Cambridge 25/10\" đã quá hạn 11 ngày (Hạn: 12/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-859",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.476Z"
+      "createdAt": "2026-10-22T17:09:11.818Z"
     },
     {
-      "id": "ntf-1792688064470-647",
+      "id": "ntf-1792688951812-246",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18788,10 +18788,10 @@
       "message": "Công việc \"Kiểm tra tiến độ TESOL Batch 06,07 - Tổng hợp form HV kết khóa TESOL Batch 06,07 - Báo cáo kết khóa TESOL Batch 07\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-858",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.470Z"
+      "createdAt": "2026-10-22T17:09:11.812Z"
     },
     {
-      "id": "ntf-1792688064463-720",
+      "id": "ntf-1792688951804-654",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18799,10 +18799,10 @@
       "message": "Công việc \"Kiểm tra tiến độ TESOL Batch 06,07 - Tổng hợp form HV kết khóa TESOL Batch 06,07 - Báo cáo kết khóa TESOL Batch 07\" đã quá hạn 11 ngày (Hạn: 12/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-858",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.463Z"
+      "createdAt": "2026-10-22T17:09:11.804Z"
     },
     {
-      "id": "ntf-1792688064457-883",
+      "id": "ntf-1792688951797-343",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18810,10 +18810,10 @@
       "message": "Công việc \"Tổng hợp số liệu Cambridge  - Nhập báo cáo tiến độ KPI 1600 - Liên hệ các trung tâm điều chỉnh danh sách đki\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-857",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.457Z"
+      "createdAt": "2026-10-22T17:09:11.797Z"
     },
     {
-      "id": "ntf-1792688064450-244",
+      "id": "ntf-1792688951790-995",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18821,10 +18821,10 @@
       "message": "Công việc \"Tổng hợp số liệu Cambridge  - Nhập báo cáo tiến độ KPI 1600 - Liên hệ các trung tâm điều chỉnh danh sách đki\" đã quá hạn 11 ngày (Hạn: 12/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-857",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.450Z"
+      "createdAt": "2026-10-22T17:09:11.790Z"
     },
     {
-      "id": "ntf-1792688064443-315",
+      "id": "ntf-1792688951782-610",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18832,10 +18832,10 @@
       "message": "Công việc \"Trực thi IELTS\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-856",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.443Z"
+      "createdAt": "2026-10-22T17:09:11.782Z"
     },
     {
-      "id": "ntf-1792688064437-693",
+      "id": "ntf-1792688951776-726",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18843,10 +18843,10 @@
       "message": "Công việc \"Trực thi IELTS\" đã quá hạn 13 ngày (Hạn: 10/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-856",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.437Z"
+      "createdAt": "2026-10-22T17:09:11.776Z"
     },
     {
-      "id": "ntf-1792688064430-199",
+      "id": "ntf-1792688951768-642",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18854,10 +18854,10 @@
       "message": "Công việc \"Trực thi IELTS\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-855",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.430Z"
+      "createdAt": "2026-10-22T17:09:11.768Z"
     },
     {
-      "id": "ntf-1792688064423-124",
+      "id": "ntf-1792688951761-123",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18865,10 +18865,10 @@
       "message": "Công việc \"Trực thi IELTS\" đã quá hạn 13 ngày (Hạn: 10/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-855",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.423Z"
+      "createdAt": "2026-10-22T17:09:11.761Z"
     },
     {
-      "id": "ntf-1792688064416-563",
+      "id": "ntf-1792688951754-912",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18876,10 +18876,10 @@
       "message": "Công việc \"Chuẩn bị hồ sơ khóa thi Cambridge 25/10\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-854",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.416Z"
+      "createdAt": "2026-10-22T17:09:11.754Z"
     },
     {
-      "id": "ntf-1792688064410-285",
+      "id": "ntf-1792688951747-777",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18887,10 +18887,10 @@
       "message": "Công việc \"Chuẩn bị hồ sơ khóa thi Cambridge 25/10\" đã quá hạn 14 ngày (Hạn: 9/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-854",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.410Z"
+      "createdAt": "2026-10-22T17:09:11.747Z"
     },
     {
-      "id": "ntf-1792688064403-58",
+      "id": "ntf-1792688951740-884",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18898,10 +18898,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-853",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.403Z"
+      "createdAt": "2026-10-22T17:09:11.740Z"
     },
     {
-      "id": "ntf-1792688064396-509",
+      "id": "ntf-1792688951732-233",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18909,10 +18909,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" đã quá hạn 14 ngày (Hạn: 9/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-853",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.396Z"
+      "createdAt": "2026-10-22T17:09:11.732Z"
     },
     {
-      "id": "ntf-1792688064389-363",
+      "id": "ntf-1792688951726-400",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18920,10 +18920,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-852",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.390Z"
+      "createdAt": "2026-10-22T17:09:11.726Z"
     },
     {
-      "id": "ntf-1792688064382-976",
+      "id": "ntf-1792688951717-403",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18931,10 +18931,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" đã quá hạn 14 ngày (Hạn: 9/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-852",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.382Z"
+      "createdAt": "2026-10-22T17:09:11.717Z"
     },
     {
-      "id": "ntf-1792688064375-92",
+      "id": "ntf-1792688951710-277",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18942,10 +18942,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-851",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.375Z"
+      "createdAt": "2026-10-22T17:09:11.710Z"
     },
     {
-      "id": "ntf-1792688064369-654",
+      "id": "ntf-1792688951702-73",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18953,10 +18953,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" đã quá hạn 15 ngày (Hạn: 8/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-851",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.369Z"
+      "createdAt": "2026-10-22T17:09:11.702Z"
     },
     {
-      "id": "ntf-1792688064361-281",
+      "id": "ntf-1792688951695-60",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18964,10 +18964,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-850",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.361Z"
+      "createdAt": "2026-10-22T17:09:11.695Z"
     },
     {
-      "id": "ntf-1792688064355-3",
+      "id": "ntf-1792688951687-327",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18975,10 +18975,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" đã quá hạn 15 ngày (Hạn: 8/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-850",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.355Z"
+      "createdAt": "2026-10-22T17:09:11.687Z"
     },
     {
-      "id": "ntf-1792688064348-651",
+      "id": "ntf-1792688951679-609",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -18986,10 +18986,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-849",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.348Z"
+      "createdAt": "2026-10-22T17:09:11.679Z"
     },
     {
-      "id": "ntf-1792688064342-727",
+      "id": "ntf-1792688951672-852",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -18997,10 +18997,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" đã quá hạn 16 ngày (Hạn: 7/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-849",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.342Z"
+      "createdAt": "2026-10-22T17:09:11.672Z"
     },
     {
-      "id": "ntf-1792688064335-675",
+      "id": "ntf-1792688951665-425",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19008,10 +19008,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-848",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.335Z"
+      "createdAt": "2026-10-22T17:09:11.665Z"
     },
     {
-      "id": "ntf-1792688064328-318",
+      "id": "ntf-1792688951658-496",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19019,10 +19019,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" đã quá hạn 16 ngày (Hạn: 7/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-848",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.328Z"
+      "createdAt": "2026-10-22T17:09:11.658Z"
     },
     {
-      "id": "ntf-1792688064321-163",
+      "id": "ntf-1792688951650-364",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19030,10 +19030,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-847",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.321Z"
+      "createdAt": "2026-10-22T17:09:11.650Z"
     },
     {
-      "id": "ntf-1792688064314-805",
+      "id": "ntf-1792688951643-199",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19041,10 +19041,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" đã quá hạn 17 ngày (Hạn: 6/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-847",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.314Z"
+      "createdAt": "2026-10-22T17:09:11.643Z"
     },
     {
-      "id": "ntf-1792688064307-423",
+      "id": "ntf-1792688951635-122",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19052,10 +19052,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-846",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.307Z"
+      "createdAt": "2026-10-22T17:09:11.635Z"
     },
     {
-      "id": "ntf-1792688064300-155",
+      "id": "ntf-1792688951628-314",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19063,10 +19063,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" đã quá hạn 17 ngày (Hạn: 6/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-846",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.300Z"
+      "createdAt": "2026-10-22T17:09:11.628Z"
     },
     {
-      "id": "ntf-1792688064294-555",
+      "id": "ntf-1792688951621-517",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19074,10 +19074,10 @@
       "message": "Công việc \"Thiết kế Sale kit khảo thí\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-845",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.294Z"
+      "createdAt": "2026-10-22T17:09:11.621Z"
     },
     {
-      "id": "ntf-1792688064287-379",
+      "id": "ntf-1792688951613-938",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19085,10 +19085,10 @@
       "message": "Công việc \"Thiết kế Sale kit khảo thí\" đã quá hạn 18 ngày (Hạn: 5/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-845",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.287Z"
+      "createdAt": "2026-10-22T17:09:11.613Z"
     },
     {
-      "id": "ntf-1792688064280-150",
+      "id": "ntf-1792688951606-152",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19096,10 +19096,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-844",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.280Z"
+      "createdAt": "2026-10-22T17:09:11.606Z"
     },
     {
-      "id": "ntf-1792688064273-745",
+      "id": "ntf-1792688951599-968",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19107,10 +19107,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" đã quá hạn 18 ngày (Hạn: 5/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-844",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.273Z"
+      "createdAt": "2026-10-22T17:09:11.599Z"
     },
     {
-      "id": "ntf-1792688064266-900",
+      "id": "ntf-1792688951592-840",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19118,10 +19118,10 @@
       "message": "Công việc \"Chuẩn bị báo cáo số liệu Khảo thí\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-843",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.266Z"
+      "createdAt": "2026-10-22T17:09:11.592Z"
     },
     {
-      "id": "ntf-1792688064259-601",
+      "id": "ntf-1792688951584-157",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19129,10 +19129,10 @@
       "message": "Công việc \"Chuẩn bị báo cáo số liệu Khảo thí\" đã quá hạn 18 ngày (Hạn: 5/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-843",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.259Z"
+      "createdAt": "2026-10-22T17:09:11.584Z"
     },
     {
-      "id": "ntf-1792688064252-845",
+      "id": "ntf-1792688951577-721",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19140,10 +19140,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-842",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.252Z"
+      "createdAt": "2026-10-22T17:09:11.577Z"
     },
     {
-      "id": "ntf-1792688064245-890",
+      "id": "ntf-1792688951569-682",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19151,10 +19151,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" đã quá hạn 18 ngày (Hạn: 5/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-842",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.245Z"
+      "createdAt": "2026-10-22T17:09:11.569Z"
     },
     {
-      "id": "ntf-1792688064238-796",
+      "id": "ntf-1792688951563-167",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19162,10 +19162,10 @@
       "message": "Công việc \"OFF\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-841",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.238Z"
+      "createdAt": "2026-10-22T17:09:11.563Z"
     },
     {
-      "id": "ntf-1792688064231-90",
+      "id": "ntf-1792688951555-828",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19173,10 +19173,10 @@
       "message": "Công việc \"OFF\" đã quá hạn 19 ngày (Hạn: 4/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-841",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.231Z"
+      "createdAt": "2026-10-22T17:09:11.555Z"
     },
     {
-      "id": "ntf-1792688064225-107",
+      "id": "ntf-1792688951547-852",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19184,10 +19184,10 @@
       "message": "Công việc \"Trực thi IELTS Mock Test\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-840",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.225Z"
+      "createdAt": "2026-10-22T17:09:11.547Z"
     },
     {
-      "id": "ntf-1792688064218-606",
+      "id": "ntf-1792688951539-661",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19195,10 +19195,10 @@
       "message": "Công việc \"Trực thi IELTS Mock Test\" đã quá hạn 19 ngày (Hạn: 4/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-840",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.218Z"
+      "createdAt": "2026-10-22T17:09:11.539Z"
     },
     {
-      "id": "ntf-1792688064211-852",
+      "id": "ntf-1792688951531-24",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19206,10 +19206,10 @@
       "message": "Công việc \"Trực thi IELTS\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-839",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.211Z"
+      "createdAt": "2026-10-22T17:09:11.531Z"
     },
     {
-      "id": "ntf-1792688064205-781",
+      "id": "ntf-1792688951524-797",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19217,10 +19217,10 @@
       "message": "Công việc \"Trực thi IELTS\" đã quá hạn 20 ngày (Hạn: 3/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-839",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.205Z"
+      "createdAt": "2026-10-22T17:09:11.524Z"
     },
     {
-      "id": "ntf-1792688064198-474",
+      "id": "ntf-1792688951516-926",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19228,10 +19228,10 @@
       "message": "Công việc \"Tìm kiếm, liên hệ các trung tâm, trường học tiềm năng\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-836",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.198Z"
+      "createdAt": "2026-10-22T17:09:11.516Z"
     },
     {
-      "id": "ntf-1792688064191-944",
+      "id": "ntf-1792688951510-566",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19239,10 +19239,10 @@
       "message": "Công việc \"Tìm kiếm, liên hệ các trung tâm, trường học tiềm năng\" đã quá hạn 21 ngày (Hạn: 2/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-836",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.191Z"
+      "createdAt": "2026-10-22T17:09:11.510Z"
     },
     {
-      "id": "ntf-1792688064184-615",
+      "id": "ntf-1792688951501-819",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19250,10 +19250,10 @@
       "message": "Công việc \"Làm báo cáo số liệu tháng 9/2026\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-835",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.184Z"
+      "createdAt": "2026-10-22T17:09:11.501Z"
     },
     {
-      "id": "ntf-1792688064178-947",
+      "id": "ntf-1792688951494-612",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19261,10 +19261,10 @@
       "message": "Công việc \"Làm báo cáo số liệu tháng 9/2026\" đã quá hạn 21 ngày (Hạn: 2/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-835",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.178Z"
+      "createdAt": "2026-10-22T17:09:11.494Z"
     },
     {
-      "id": "ntf-1792688064171-358",
+      "id": "ntf-1792688951486-100",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19272,10 +19272,10 @@
       "message": "Công việc \"Trực thi IELTS- PVT\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-834",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.171Z"
+      "createdAt": "2026-10-22T17:09:11.486Z"
     },
     {
-      "id": "ntf-1792688064165-487",
+      "id": "ntf-1792688951479-685",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19283,10 +19283,10 @@
       "message": "Công việc \"Trực thi IELTS- PVT\" đã quá hạn 21 ngày (Hạn: 2/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-834",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.165Z"
+      "createdAt": "2026-10-22T17:09:11.479Z"
     },
     {
-      "id": "ntf-1792688064158-432",
+      "id": "ntf-1792688951471-798",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19294,10 +19294,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-832",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.158Z"
+      "createdAt": "2026-10-22T17:09:11.471Z"
     },
     {
-      "id": "ntf-1792688064151-762",
+      "id": "ntf-1792688951461-805",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19305,10 +19305,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" đã quá hạn 22 ngày (Hạn: 1/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-832",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.151Z"
+      "createdAt": "2026-10-22T17:09:11.461Z"
     },
     {
-      "id": "ntf-1792688064144-702",
+      "id": "ntf-1792688951450-33",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19316,10 +19316,10 @@
       "message": "Công việc \"Tính &amp; thanh toán chiết khấu đối tác T9/2026 &amp; Prep Nội bộ Quý 3/2026\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-829",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.144Z"
+      "createdAt": "2026-10-22T17:09:11.450Z"
     },
     {
-      "id": "ntf-1792688064137-115",
+      "id": "ntf-1792688951425-626",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19327,10 +19327,10 @@
       "message": "Công việc \"Tính &amp; thanh toán chiết khấu đối tác T9/2026 &amp; Prep Nội bộ Quý 3/2026\" đã quá hạn 23 ngày (Hạn: 30/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-829",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.137Z"
+      "createdAt": "2026-10-22T17:09:11.425Z"
     },
     {
-      "id": "ntf-1792688064130-603",
+      "id": "ntf-1792688951412-64",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19338,10 +19338,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-828",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.130Z"
+      "createdAt": "2026-10-22T17:09:11.412Z"
     },
     {
-      "id": "ntf-1792688064124-206",
+      "id": "ntf-1792688951399-967",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19349,10 +19349,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" đã quá hạn 23 ngày (Hạn: 30/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-828",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.124Z"
+      "createdAt": "2026-10-22T17:09:11.399Z"
     },
     {
-      "id": "ntf-1792688064117-675",
+      "id": "ntf-1792688951392-398",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19360,10 +19360,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-827",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.117Z"
+      "createdAt": "2026-10-22T17:09:11.392Z"
     },
     {
-      "id": "ntf-1792688064110-618",
+      "id": "ntf-1792688951384-978",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19371,10 +19371,10 @@
       "message": "Công việc \"Xử lý công việc vận hành thi TTKT\" đã quá hạn 23 ngày (Hạn: 30/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-827",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.110Z"
+      "createdAt": "2026-10-22T17:09:11.384Z"
     },
     {
-      "id": "ntf-1792688064104-245",
+      "id": "ntf-1792688951377-538",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19382,10 +19382,10 @@
       "message": "Công việc \"Tìm kiếm, liên hệ các trung tâm, trường học tiềm năng\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-826",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.104Z"
+      "createdAt": "2026-10-22T17:09:11.377Z"
     },
     {
-      "id": "ntf-1792688064096-465",
+      "id": "ntf-1792688951369-822",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19393,10 +19393,10 @@
       "message": "Công việc \"Tìm kiếm, liên hệ các trung tâm, trường học tiềm năng\" đã quá hạn 23 ngày (Hạn: 30/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-826",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.096Z"
+      "createdAt": "2026-10-22T17:09:11.369Z"
     },
     {
-      "id": "ntf-1792688064090-571",
+      "id": "ntf-1792688951362-88",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19404,10 +19404,10 @@
       "message": "Công việc \"KH Khảo Thí Quý 4/2026\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-823",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.090Z"
+      "createdAt": "2026-10-22T17:09:11.362Z"
     },
     {
-      "id": "ntf-1792688064082-845",
+      "id": "ntf-1792688951355-529",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19415,10 +19415,10 @@
       "message": "Công việc \"KH Khảo Thí Quý 4/2026\" đã quá hạn 25 ngày (Hạn: 28/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-823",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.082Z"
+      "createdAt": "2026-10-22T17:09:11.355Z"
     },
     {
-      "id": "ntf-1792688064075-218",
+      "id": "ntf-1792688951348-189",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19426,10 +19426,10 @@
       "message": "Công việc \"KH liên kết chiêu sinh-địa điểm thi Cambridge với đối tác tại Tây Ninh\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-822",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.075Z"
+      "createdAt": "2026-10-22T17:09:11.348Z"
     },
     {
-      "id": "ntf-1792688064068-45",
+      "id": "ntf-1792688951341-902",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19437,10 +19437,10 @@
       "message": "Công việc \"KH liên kết chiêu sinh-địa điểm thi Cambridge với đối tác tại Tây Ninh\" đã quá hạn 25 ngày (Hạn: 28/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-822",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.068Z"
+      "createdAt": "2026-10-22T17:09:11.341Z"
     },
     {
-      "id": "ntf-1792688064061-568",
+      "id": "ntf-1792688951333-256",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19448,10 +19448,10 @@
       "message": "Công việc \"Vận hành khóa thi Cambridge tại NKN\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-820",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.061Z"
+      "createdAt": "2026-10-22T17:09:11.333Z"
     },
     {
-      "id": "ntf-1792688064053-794",
+      "id": "ntf-1792688951327-703",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19459,10 +19459,10 @@
       "message": "Công việc \"Vận hành khóa thi Cambridge tại NKN\" đã quá hạn 26 ngày (Hạn: 27/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-820",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.053Z"
+      "createdAt": "2026-10-22T17:09:11.327Z"
     },
     {
-      "id": "ntf-1792688064046-563",
+      "id": "ntf-1792688951319-453",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19470,10 +19470,10 @@
       "message": "Công việc \"KH liên kết chiêu sinh-địa điểm thi Cambridge với đối tác tại Tây Ninh\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-818",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.046Z"
+      "createdAt": "2026-10-22T17:09:11.319Z"
     },
     {
-      "id": "ntf-1792688064040-393",
+      "id": "ntf-1792688951312-731",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19481,10 +19481,10 @@
       "message": "Công việc \"KH liên kết chiêu sinh-địa điểm thi Cambridge với đối tác tại Tây Ninh\" đã quá hạn 27 ngày (Hạn: 26/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-818",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.040Z"
+      "createdAt": "2026-10-22T17:09:11.312Z"
     },
     {
-      "id": "ntf-1792688064032-540",
+      "id": "ntf-1792688951305-866",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19492,10 +19492,10 @@
       "message": "Công việc \"Trao đổi online việc hợp tác tổ chức thi với đối tác\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-813",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.032Z"
+      "createdAt": "2026-10-22T17:09:11.305Z"
     },
     {
-      "id": "ntf-1792688064026-656",
+      "id": "ntf-1792688951297-71",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19503,10 +19503,10 @@
       "message": "Công việc \"Trao đổi online việc hợp tác tổ chức thi với đối tác\" đã quá hạn 29 ngày (Hạn: 24/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-813",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.026Z"
+      "createdAt": "2026-10-22T17:09:11.297Z"
     },
     {
-      "id": "ntf-1792688064019-800",
+      "id": "ntf-1792688951291-109",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19514,10 +19514,10 @@
       "message": "Công việc \"Làm việc tại VTS\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-798",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.019Z"
+      "createdAt": "2026-10-22T17:09:11.291Z"
     },
     {
-      "id": "ntf-1792688064012-659",
+      "id": "ntf-1792688951283-404",
       "userId": "usr-dept-1792670222673-l3g9",
       "type": "alert",
       "level": "danger",
@@ -19525,10 +19525,10 @@
       "message": "Công việc \"Làm việc tại VTS\" đã quá hạn 32 ngày (Hạn: 21/9/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-798",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.012Z"
+      "createdAt": "2026-10-22T17:09:11.283Z"
     },
     {
-      "id": "ntf-1792688064005-380",
+      "id": "ntf-1792688951276-189",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19536,10 +19536,10 @@
       "message": "Công việc \"Kiểm tra CLDV - Đánh điểm\" phụ trách bởi Trần Văn Dũng đã trễ hạn!",
       "taskId": "TSK-795",
       "read": false,
-      "createdAt": "2026-10-22T16:54:24.005Z"
+      "createdAt": "2026-10-22T17:09:11.276Z"
     },
     {
-      "id": "ntf-1792688063998-74",
+      "id": "ntf-1792688951268-905",
       "userId": "usr-dept-1792670222600-fdsg",
       "type": "alert",
       "level": "danger",
@@ -19547,10 +19547,10 @@
       "message": "Công việc \"Kiểm tra CLDV - Đánh điểm\" đã quá hạn 2 ngày (Hạn: 21/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-795",
       "read": false,
-      "createdAt": "2026-10-22T16:54:23.998Z"
+      "createdAt": "2026-10-22T17:09:11.268Z"
     },
     {
-      "id": "ntf-1792688063992-816",
+      "id": "ntf-1792688951261-995",
       "userId": "usr-1",
       "type": "alert",
       "level": "danger",
@@ -19558,10 +19558,10 @@
       "message": "Công việc \"Chuẩn bị nội dung Đào tạo TPVH\" phụ trách bởi Trần Văn Dũng đã trễ hạn!",
       "taskId": "TSK-794",
       "read": false,
-      "createdAt": "2026-10-22T16:54:23.992Z"
+      "createdAt": "2026-10-22T17:09:11.261Z"
     },
     {
-      "id": "ntf-1792688063983-523",
+      "id": "ntf-1792688951254-91",
       "userId": "usr-dept-1792670222600-fdsg",
       "type": "alert",
       "level": "danger",
@@ -19569,7 +19569,7 @@
       "message": "Công việc \"Chuẩn bị nội dung Đào tạo TPVH\" đã quá hạn 2 ngày (Hạn: 21/10/2026)! Vui lòng hoàn tất ngay.",
       "taskId": "TSK-794",
       "read": false,
-      "createdAt": "2026-10-22T16:54:23.983Z"
+      "createdAt": "2026-10-22T17:09:11.254Z"
     }
   ],
   "activities": [

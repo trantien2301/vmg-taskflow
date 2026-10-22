@@ -1168,6 +1168,74 @@ app.post('/api/calendar/sync-now', authenticate, (req, res) => {
   res.json({ success: true, lastSync: now });
 });
 
+// Direct push task event into Google Calendar via Google Calendar REST API
+app.post('/api/calendar/google/push-event', authenticate, async (req, res) => {
+  const { taskId, accessToken } = req.body || {};
+  const task = db.getTaskById(taskId);
+  if (!task) return res.status(404).json({ error: 'Không tìm thấy công việc' });
+
+  const token = accessToken || req.user.googleCalendar?.accessToken;
+  if (!token) {
+    return res.status(400).json({ error: 'Tài khoản chưa kết nối Google Access Token. Vui lòng kết nối Google Calendar API trước.' });
+  }
+
+  const assignedUser = db.getUserById(task.assignedTo);
+  const pad = n => String(n).padStart(2, '0');
+  const formatIsoUtc = (dStr) => {
+    const d = new Date(dStr || Date.now());
+    if (isNaN(d.getTime())) return null;
+    return d.toISOString();
+  };
+
+  const startIso = formatIsoUtc(task.startDate) || new Date().toISOString();
+  const dueIso = formatIsoUtc(task.dueDate) || new Date(Date.now() + 86400000).toISOString();
+
+  try {
+    const gRes = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        summary: `[TaskFlow] ${task.title}`,
+        description: `Mã việc: #${task.id}\nƯu tiên: ${(task.priority || 'medium').toUpperCase()}\nPhòng ban: ${task.department || ''}\nTiến độ: ${task.progress || 0}%\nTrạng thái: ${task.status}\n\nMô tả:\n${task.description || 'Không có mô tả'}\n\n---\nĐược tự động lưu từ TaskFlow Pro Webapp`,
+        start: { dateTime: startIso },
+        end: { dateTime: dueIso },
+        reminders: {
+          useDefault: false,
+          overrides: [
+            { method: 'popup', minutes: 1440 },
+            { method: 'popup', minutes: 120 },
+            { method: 'popup', minutes: 30 }
+          ]
+        }
+      })
+    });
+
+    const gData = await gRes.json();
+    if (!gRes.ok) {
+      return res.status(gRes.status).json({ error: gData.error?.message || 'Lỗi từ Google Calendar API' });
+    }
+
+    db.logActivity({
+      userId: req.user.id,
+      userName: req.user.name,
+      userRole: req.user.role,
+      userAvatar: '📅',
+      action: 'gcal_direct_push',
+      category: 'calendar',
+      taskId: task.id,
+      taskTitle: task.title,
+      details: `Đã tự động lưu công việc #${task.id} trực tiếp vào Google Calendar cá nhân qua API (Event ID: ${gData.id})`
+    });
+
+    res.json({ success: true, event: gData, message: 'Đã tự động lưu công việc vào Google Calendar cá nhân thành công!' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Test immediate reminder notification
 app.post('/api/calendar/test-reminder', authenticate, (req, res) => {
   const notif = db.addNotification({

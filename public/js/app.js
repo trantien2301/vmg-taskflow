@@ -4964,7 +4964,7 @@ const App = {
 
     const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startUtc}/${dueUtc}&details=${details}${guestParam}`;
     window.open(url, '_blank');
-    this.showToast(`📅 Đang mở Google Calendar (Tự động mời khách ${assignedUser?.name || 'nhân sự'})...`, 'info');
+    this.showToast(`💡 Việc này đã được tự động đồng bộ trên Google Calendar của ${assignedUser?.name || 'nhân sự'}. Đang mở trang tùy chọn...`, 'info');
   },
 
   downloadTaskIcs(taskId = null) {
