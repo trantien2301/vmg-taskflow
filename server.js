@@ -563,6 +563,16 @@ app.post('/api/auth/forgot-password', (req, res) => {
     expiresAt: Date.now() + 10 * 60 * 1000 // 10 minutes
   });
 
+  db.logActivity({
+    userId: user.id,
+    userName: user.name,
+    userRole: user.role,
+    userAvatar: user.avatar,
+    action: 'auth_forgot_pwd',
+    category: 'auth',
+    details: `Đã yêu cầu mã OTP xác thực khôi phục mật khẩu cho email: ${cleanEmail}`
+  });
+
   res.json({
     success: true,
     message: 'Mã xác minh khôi phục mật khẩu đã được tạo!',
@@ -883,6 +893,15 @@ app.post('/api/notifications/read-all', authenticate, (req, res) => {
 
 app.post('/api/alerts/scan-now', authenticate, (req, res) => {
   const count = scanDeadlinesAndGenerateAlerts();
+  db.logActivity({
+    userId: req.user.id,
+    userName: req.user.name,
+    userRole: req.user.role || 'user',
+    userAvatar: req.user.avatar || '⏰',
+    action: 'scan_deadlines',
+    category: 'system',
+    details: `Đã kích hoạt quét thời hạn công việc toàn hệ thống (Phát hiện ${count} cảnh báo mới)`
+  });
   res.json({ message: `Đã quét và tạo ${count} cảnh báo mới`, count });
 });
 
