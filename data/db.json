@@ -120,7 +120,7 @@
       "email": "trantien.dni@vmg.edu.vn",
       "password": "$2b$10$0kmUfbY7CfzyvczWs5XB1ubDN46JFzjdxikZGx4pC2df5zP5PPTp.",
       "role": "admin",
-      "department": "Phòng Kỹ Thuật",
+      "department": "Phòng Hành Chính",
       "position": "Trưởng Nhóm",
       "avatar": "👑",
       "phone": "",
@@ -17686,7 +17686,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Làm việc tại PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-933",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:32.524Z"
     },
     {
@@ -17730,7 +17730,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Làm việc tại PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-932",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:32.487Z"
     },
     {
@@ -17774,7 +17774,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Làm việc tại PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-931",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:32.449Z"
     },
     {
@@ -17818,7 +17818,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Làm việc tại PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-930",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:32.411Z"
     },
     {
@@ -17862,7 +17862,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Làm việc tại PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-929",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:32.372Z"
     },
     {
@@ -17906,7 +17906,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Làm việc tại PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-928",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:32.335Z"
     },
     {
@@ -17950,7 +17950,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Làm việc tại PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-927",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:32.296Z"
     },
     {
@@ -17994,7 +17994,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Họp kinh doanh\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-926",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:32.258Z"
     },
     {
@@ -18038,7 +18038,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Làm việc tại PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-925",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:32.221Z"
     },
     {
@@ -18082,7 +18082,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Làm việc tại PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-924",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:32.184Z"
     },
     {
@@ -18126,7 +18126,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Họp trung tâm về quy trình thu tiền\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-923",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:32.148Z"
     },
     {
@@ -18170,7 +18170,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Làm việc tại PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-922",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:32.111Z"
     },
     {
@@ -18214,7 +18214,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Làm việc tại VP PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-921",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:32.075Z"
     },
     {
@@ -18258,7 +18258,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Làm việc tại VP PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-919",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:32.037Z"
     },
     {
@@ -18302,7 +18302,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Làm việc tại VP PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-918",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:32.000Z"
     },
     {
@@ -18346,7 +18346,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Làm việc tại VP PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-917",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.963Z"
     },
     {
@@ -18390,7 +18390,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Họp TCVH + TGĐ về việc giảm chi phí\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-916",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.926Z"
     },
     {
@@ -18434,7 +18434,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Họp GĐ KV2 - Phương án cho Hùng Vương\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-915",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.889Z"
     },
     {
@@ -18478,7 +18478,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Họp GĐ KV1 - Phương án cho TBM và PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-914",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.853Z"
     },
     {
@@ -18522,7 +18522,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Họp GĐKV3 - Kế hoạch BPC\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-913",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.816Z"
     },
     {
@@ -18566,7 +18566,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Họp định kỳ KD\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-912",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.779Z"
     },
     {
@@ -18610,7 +18610,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Làm việc tại VP PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-911",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.742Z"
     },
     {
@@ -18654,7 +18654,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Họp với CRM, Admin về phần mềm EMS\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-910",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.705Z"
     },
     {
@@ -18698,7 +18698,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Làm việc tại VP PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-908",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.668Z"
     },
     {
@@ -18742,7 +18742,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Làm việc tại VP PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-907",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.631Z"
     },
     {
@@ -18786,7 +18786,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Làm việc tại VP PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-906",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.580Z"
     },
     {
@@ -18830,7 +18830,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Làm việc tại VP PVT\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-905",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.543Z"
     },
     {
@@ -18874,7 +18874,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Đi TT LDN\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-904",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.507Z"
     },
     {
@@ -18918,7 +18918,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Đi TT LDN\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-903",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.471Z"
     },
     {
@@ -18962,7 +18962,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Họp công nợ B2C\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-902",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.433Z"
     },
     {
@@ -19006,7 +19006,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Họp công nợ B2C\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-901",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.397Z"
     },
     {
@@ -19050,7 +19050,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Họp công nợ B2C\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-900",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.360Z"
     },
     {
@@ -19094,7 +19094,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Thị Mai",
       "message": "Công việc \"Họp KD\" phụ trách bởi Nguyễn Thị Mai đã trễ hạn!",
       "taskId": "TSK-899",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.324Z"
     },
     {
@@ -19138,7 +19138,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Văn Minh",
       "message": "Công việc \"10:00 Họp HT Group: Hàn Quốc\" phụ trách bởi Nguyễn Văn Minh đã trễ hạn!",
       "taskId": "TSK-896",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.287Z"
     },
     {
@@ -19182,7 +19182,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Văn Minh",
       "message": "Công việc \"3:00 Họp vendor MKT\" phụ trách bởi Nguyễn Văn Minh đã trễ hạn!",
       "taskId": "TSK-895",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.250Z"
     },
     {
@@ -19226,7 +19226,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Văn Minh",
       "message": "Công việc \"8:30 Họp giao ban\" phụ trách bởi Nguyễn Văn Minh đã trễ hạn!",
       "taskId": "TSK-894",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.213Z"
     },
     {
@@ -19270,7 +19270,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Văn Minh",
       "message": "Công việc \"4:00 Họp với GĐK R&amp;D\" phụ trách bởi Nguyễn Văn Minh đã trễ hạn!",
       "taskId": "TSK-893",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.176Z"
     },
     {
@@ -19314,7 +19314,7 @@
       "title": "🚨 Nhân viên trễ hạn: Nguyễn Văn Minh",
       "message": "Công việc \"8:30 Họp KHKD\" phụ trách bởi Nguyễn Văn Minh đã trễ hạn!",
       "taskId": "TSK-892",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.137Z"
     },
     {
@@ -19358,7 +19358,7 @@
       "title": "🚨 Nhân viên trễ hạn: Lê Văn Hùng",
       "message": "Công việc \"Training khảo thí cho trung tâm\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-889",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.101Z"
     },
     {
@@ -19402,7 +19402,7 @@
       "title": "🚨 Nhân viên trễ hạn: Lê Văn Hùng",
       "message": "Công việc \"Đi gặp đối tác Trung tâm\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-888",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.063Z"
     },
     {
@@ -19446,7 +19446,7 @@
       "title": "🚨 Nhân viên trễ hạn: Lê Văn Hùng",
       "message": "Công việc \"Chốt chỉnh sửa Sale Kit sản phẩm Khảo thí\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-887",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:31.025Z"
     },
     {
@@ -19490,7 +19490,7 @@
       "title": "🚨 Nhân viên trễ hạn: Lê Văn Hùng",
       "message": "Công việc \"KH kinh doanh Khảo thí 2027\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-886",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:30.989Z"
     },
     {
@@ -19534,7 +19534,7 @@
       "title": "🚨 Nhân viên trễ hạn: Lê Văn Hùng",
       "message": "Công việc \"Tính KPI Khảo Thí\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-885",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:30.952Z"
     },
     {
@@ -19578,7 +19578,7 @@
       "title": "🚨 Nhân viên trễ hạn: Lê Văn Hùng",
       "message": "Công việc \"Xử lý Payment Lệ phí thi Tháng 9-10/2026 trên EMS\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-884",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:30.914Z"
     },
     {
@@ -19622,7 +19622,7 @@
       "title": "🚨 Nhân viên trễ hạn: Lê Văn Hùng",
       "message": "Công việc \"Trực thi IELTS\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-883",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:30.878Z"
     },
     {
@@ -19699,7 +19699,7 @@
       "title": "🚨 Nhân viên trễ hạn: Lê Văn Hùng",
       "message": "Công việc \"KH chi phí , chính sách chiêu sinh 2027\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-878",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:30.813Z"
     },
     {
@@ -19743,7 +19743,7 @@
       "title": "🚨 Nhân viên trễ hạn: Lê Văn Hùng",
       "message": "Công việc \"KH KPI Khảo thí 2027. Phân bổ KPI khu vực, hệ thống\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-877",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:30.775Z"
     },
     {
@@ -19787,7 +19787,7 @@
       "title": "🚨 Nhân viên trễ hạn: Lê Văn Hùng",
       "message": "Công việc \"Vận hành TESOL:\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-876",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:30.738Z"
     },
     {
@@ -19831,7 +19831,7 @@
       "title": "🚨 Nhân viên trễ hạn: Lê Văn Hùng",
       "message": "Công việc \"Họp team Khảo thí\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-875",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-23T14:12:30.701Z"
     },
     {
@@ -19858,6 +19858,97 @@
     }
   ],
   "activities": [
+    {
+      "id": "act-1792768065269-41bzg",
+      "userId": "usr-1",
+      "userName": "Trần Tiến",
+      "userRole": "admin",
+      "userAvatar": "/uploads/avatars/avatar-usr-1-1792747940607.png?t=1792747940608",
+      "action": "delete_department",
+      "category": "department",
+      "details": "Admin đã xóa phòng ban: \"Phòng Kinh Doanh\"",
+      "taskId": null,
+      "taskTitle": null,
+      "timestamp": "2026-10-23T15:07:45.269Z"
+    },
+    {
+      "id": "act-1792767758621-0fevn",
+      "userId": "usr-1",
+      "userName": "Trần Tiến",
+      "userRole": "admin",
+      "userAvatar": "/uploads/avatars/avatar-usr-1-1792747940607.png?t=1792747940608",
+      "action": "delete_department",
+      "category": "department",
+      "details": "Admin đã xóa phòng ban: \"Phòng Kỹ Thuật\"",
+      "taskId": null,
+      "taskTitle": null,
+      "timestamp": "2026-10-23T15:02:38.621Z"
+    },
+    {
+      "id": "act-1792767733076-2fb2u",
+      "userId": "usr-1",
+      "userName": "Trần Tiến",
+      "userRole": "admin",
+      "userAvatar": "/uploads/avatars/avatar-usr-1-1792747940607.png?t=1792747940608",
+      "action": "auth_login",
+      "category": "auth",
+      "details": "Quản trị viên (Admin) đã đăng nhập vào hệ thống (admin@company.com)",
+      "taskId": null,
+      "taskTitle": null,
+      "timestamp": "2026-10-23T15:02:13.076Z"
+    },
+    {
+      "id": "act-1792767724593-j0xw8",
+      "userId": "usr-1792209027761",
+      "userName": "Trần Tiến",
+      "userRole": "user",
+      "userAvatar": "👤",
+      "action": "auth_logout",
+      "category": "auth",
+      "details": "Nhân sự đã đăng xuất khỏi phiên làm việc",
+      "taskId": null,
+      "taskTitle": null,
+      "timestamp": "2026-10-23T15:02:04.593Z"
+    },
+    {
+      "id": "act-1792767716327-jonsg",
+      "userId": "usr-1792209027761",
+      "userName": "Trần Tiến",
+      "userRole": "admin",
+      "userAvatar": "👑",
+      "action": "update_user",
+      "category": "user",
+      "details": "Đã cập nhật thông tin hồ sơ cá nhân",
+      "taskId": null,
+      "taskTitle": null,
+      "timestamp": "2026-10-23T15:01:56.328Z"
+    },
+    {
+      "id": "act-1792767713144-7uqk7",
+      "userId": "usr-1792209027761",
+      "userName": "Trần Tiến",
+      "userRole": "admin",
+      "userAvatar": "👑",
+      "action": "update_user",
+      "category": "user",
+      "details": "Đã cập nhật thông tin hồ sơ cá nhân",
+      "taskId": null,
+      "taskTitle": null,
+      "timestamp": "2026-10-23T15:01:53.144Z"
+    },
+    {
+      "id": "act-1792767554540-b31fj",
+      "userId": "usr-1792209027761",
+      "userName": "Trần Tiến",
+      "userRole": "admin",
+      "userAvatar": "👑",
+      "action": "delete_department",
+      "category": "department",
+      "details": "Admin đã xóa phòng ban: \"Phòng Vận Hành\"",
+      "taskId": null,
+      "taskTitle": null,
+      "timestamp": "2026-10-23T14:59:14.540Z"
+    },
     {
       "id": "act-1792764918337-yh82c",
       "userId": "usr-1792209027761",
@@ -26266,97 +26357,6 @@
       "taskId": null,
       "taskTitle": null,
       "timestamp": "2026-10-22T11:59:20.295Z"
-    },
-    {
-      "id": "act-1792670360270-si2ph",
-      "userId": "bot-auto",
-      "userName": "⚡ Bot Tự Động",
-      "userRole": "admin",
-      "userAvatar": "👑",
-      "action": "update_task",
-      "category": "task",
-      "details": "Đã cập nhật công việc: \"Làm việc tại Trùng tâm PVT\"",
-      "taskId": "TSK-670",
-      "taskTitle": "Làm việc tại Trùng tâm PVT",
-      "timestamp": "2026-10-22T11:59:20.270Z"
-    },
-    {
-      "id": "act-1792670360244-5xaok",
-      "userId": "bot-auto",
-      "userName": "🤖 Gắn nhãn cảnh báo việc Trễ hạn",
-      "userRole": "admin",
-      "userAvatar": "⏰",
-      "action": "automation_executed",
-      "category": "system",
-      "details": "Tự động gắn thẻ \"Quá hạn\" cho công việc trễ hạn #TSK-669",
-      "taskId": null,
-      "taskTitle": null,
-      "timestamp": "2026-10-22T11:59:20.244Z"
-    },
-    {
-      "id": "act-1792670360222-pmgzf",
-      "userId": "bot-auto",
-      "userName": "⚡ Bot Tự Động",
-      "userRole": "admin",
-      "userAvatar": "👑",
-      "action": "update_task",
-      "category": "task",
-      "details": "Đã cập nhật công việc: \"Làm việc tại Trùng tâm NKN\"",
-      "taskId": "TSK-669",
-      "taskTitle": "Làm việc tại Trùng tâm NKN",
-      "timestamp": "2026-10-22T11:59:20.222Z"
-    },
-    {
-      "id": "act-1792670360198-cbols",
-      "userId": "bot-auto",
-      "userName": "🤖 Gắn nhãn cảnh báo việc Trễ hạn",
-      "userRole": "admin",
-      "userAvatar": "⏰",
-      "action": "automation_executed",
-      "category": "system",
-      "details": "Tự động gắn thẻ \"Quá hạn\" cho công việc trễ hạn #TSK-668",
-      "taskId": null,
-      "taskTitle": null,
-      "timestamp": "2026-10-22T11:59:20.198Z"
-    },
-    {
-      "id": "act-1792670360173-gmo3w",
-      "userId": "bot-auto",
-      "userName": "⚡ Bot Tự Động",
-      "userRole": "admin",
-      "userAvatar": "👑",
-      "action": "update_task",
-      "category": "task",
-      "details": "Đã cập nhật công việc: \"Làm việc tại Trùng tâm PVT\"",
-      "taskId": "TSK-668",
-      "taskTitle": "Làm việc tại Trùng tâm PVT",
-      "timestamp": "2026-10-22T11:59:20.173Z"
-    },
-    {
-      "id": "act-1792670360150-un112",
-      "userId": "bot-auto",
-      "userName": "🤖 Gắn nhãn cảnh báo việc Trễ hạn",
-      "userRole": "admin",
-      "userAvatar": "⏰",
-      "action": "automation_executed",
-      "category": "system",
-      "details": "Tự động gắn thẻ \"Quá hạn\" cho công việc trễ hạn #TSK-667",
-      "taskId": null,
-      "taskTitle": null,
-      "timestamp": "2026-10-22T11:59:20.150Z"
-    },
-    {
-      "id": "act-1792670360128-4eaum",
-      "userId": "bot-auto",
-      "userName": "⚡ Bot Tự Động",
-      "userRole": "admin",
-      "userAvatar": "👑",
-      "action": "update_task",
-      "category": "task",
-      "details": "Đã cập nhật công việc: \"Làm việc tại Trùng tâm NKN\"",
-      "taskId": "TSK-667",
-      "taskTitle": "Làm việc tại Trùng tâm NKN",
-      "timestamp": "2026-10-22T11:59:20.128Z"
     }
   ],
   "settings": {
@@ -26367,21 +26367,8 @@
   },
   "departments": [
     {
-      "id": "dept-1",
-      "name": "Phòng Kỹ Thuật"
-    },
-    {
       "id": "dept-2",
       "name": "Phòng Marketing"
-    },
-    {
-      "id": "dept-3",
-      "name": "Phòng Kinh Doanh"
-    },
-    {
-      "id": "dept-4",
-      "name": "Phòng Vận Hành",
-      "updatedAt": "2026-10-19T05:39:06.689Z"
     },
     {
       "id": "dept-5",

@@ -1,21 +1,28 @@
-/* TaskFlow Pro - Modern Design System */
+/* TaskFlow Pro - Modern Design System (Cyan-Emerald Brand & Dual Themes) */
 :root {
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
-  --primary-light: #eef2ff;
-  --primary-dark: #3730a3;
-  
-  --bg-main: #f8fafc;
-  --bg-card: #ffffff;
-  --bg-sidebar: #0f172a;
-  --sidebar-hover: #1e293b;
-  --sidebar-text: #94a3b8;
-  --sidebar-text-active: #ffffff;
+  /* Brand Gradient: Cyan/Sky Blue (#0ea5e9 / #2563eb) -> Emerald/Neon Green (#10b981 / #4ade80) */
+  --primary: #0ea5e9;
+  --primary-hover: #0284c7;
+  --primary-light: rgba(14, 165, 233, 0.1);
+  --primary-dark: #0369a1;
 
-  --text-primary: #0f172a;
-  --text-secondary: #64748b;
+  --brand-gradient: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+  --brand-gradient-hover: linear-gradient(135deg, #0284c7 0%, #059669 100%);
+  --brand-glow: 0 4px 16px 0 rgba(16, 185, 129, 0.35);
+  --brand-glow-cyan: 0 0 16px rgba(14, 165, 233, 0.35);
+
+  /* Light Theme (Design Tokens matching Image 3) */
+  --bg-main: #f1f5f9;          /* Xám trắng dịu mắt */
+  --bg-card: #ffffff;          /* Nền Card trắng tinh khôi */
+  --bg-sidebar: #ffffff;       /* Sidebar sáng tinh tế */
+  --sidebar-hover: #f8fafc;
+  --sidebar-text: #64748b;
+  --sidebar-text-active: #0f172a;
+
+  --text-primary: #0f172a;     /* Chữ đen đậm rõ nét */
+  --text-secondary: #64748b;   /* Chữ xám trung tính */
   --text-muted: #94a3b8;
-  --border-color: #e2e8f0;
+  --border-color: #e2e8f0;     /* Viền thanh mảnh */
 
   --success: #10b981;
   --success-bg: #ecfdf5;
@@ -23,36 +30,56 @@
   --warning-bg: #fffbeb;
   --danger: #ef4444;
   --danger-bg: #fef2f2;
-  --info: #3b82f6;
-  --info-bg: #eff6ff;
+  --info: #0ea5e9;
+  --info-bg: #f0f9ff;
 
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --radius-sm: 6px;
-  --radius-md: 10px;
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-lg: 0 10px 25px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+  --radius-sm: 8px;
+  --radius-md: 12px;
   --radius-lg: 16px;
   --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 [data-theme="dark"] {
-  --bg-main: #0b1120;
-  --bg-card: #1e293b;
-  --bg-sidebar: #070d17;
-  --sidebar-hover: #162032;
-  --border-color: #334155;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
+  --primary: #0ea5e9;
+  --primary-hover: #38bdf8;
+  --primary-light: rgba(14, 165, 233, 0.18);
+  --primary-dark: #0284c7;
+
+  --brand-gradient: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+  --brand-gradient-hover: linear-gradient(135deg, #38bdf8 0%, #34d399 100%);
+  --brand-glow: 0 4px 20px 0 rgba(16, 185, 129, 0.45);
+  --brand-glow-cyan: 0 0 20px rgba(14, 165, 233, 0.45);
+
+  /* Dark Theme (Design Tokens matching Image 2) */
+  --bg-main: #0f172a;          /* Nền chính xanh đen đậm */
+  --bg-card: #1e293b;          /* Nền Card xám xanh tối */
+  --bg-sidebar: #0b1329;       /* Nền Sidebar sâu lắng */
+  --sidebar-hover: #1e293b;
+  --sidebar-text: #94a3b8;
+  --sidebar-text-active: #f8fafc;
+
+  --border-color: #334155;     /* Viền mảnh sắc nét */
+  --text-primary: #f8fafc;     /* Chữ trắng tinh khôi */
+  --text-secondary: #94a3b8;   /* Chữ xám nhạt */
   --text-muted: #64748b;
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4);
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.35);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 25px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+  --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.05);
+
+  --success-bg: rgba(16, 185, 129, 0.15);
+  --warning-bg: rgba(245, 158, 11, 0.15);
+  --danger-bg: rgba(239, 68, 68, 0.15);
+  --info-bg: rgba(14, 165, 233, 0.15);
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+html {
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 body {
@@ -63,6 +90,12 @@ body {
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+body, .sidebar, .top-header, .kpi-card, .kanban-col, .task-card, .table-card, .modal-content {
+  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, color 0.25s ease;
+}
 }
 
 /* ========================================================
@@ -73,8 +106,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at 15% 50%, rgba(79, 70, 229, 0.12), transparent 45%),
-              radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.12), transparent 45%),
+  background: radial-gradient(circle at 15% 50%, rgba(14, 165, 233, 0.12), transparent 45%),
+              radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.12), transparent 45%),
               var(--bg-main);
   padding: 24px;
   position: fixed;
@@ -89,7 +122,7 @@ body {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  box-shadow: var(--shadow-lg);
   padding: 36px 32px;
   animation: modalFadeIn 0.3s ease;
 }
@@ -105,17 +138,17 @@ body {
 }
 
 .login-logo {
-  width: 54px;
-  height: 54px;
+  width: 56px;
+  height: 56px;
   margin: 0 auto 14px;
-  background: linear-gradient(135deg, #4f46e5, #06b6d4);
+  background: var(--brand-gradient);
   color: #fff;
   border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 28px;
-  box-shadow: 0 8px 16px rgba(79, 70, 229, 0.35);
+  box-shadow: var(--brand-glow);
 }
 
 .login-header h2 {
@@ -570,6 +603,7 @@ body {
   flex-shrink: 0;
   transition: all 0.3s ease;
   z-index: 50;
+  border-right: 1px solid var(--border-color);
 }
 
 .sidebar-header {
@@ -577,34 +611,40 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .logo-badge {
-  width: 38px;
-  height: 38px;
-  background: linear-gradient(135deg, #4f46e5, #06b6d4);
+  width: 40px;
+  height: 40px;
+  background: var(--brand-gradient);
   color: #fff;
-  border-radius: 10px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 20px;
-  font-weight: bold;
-  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.4);
+  font-weight: 800;
+  box-shadow: var(--brand-glow);
+  position: relative;
+  overflow: hidden;
 }
 
 .logo-text {
-  font-size: 17px;
-  font-weight: 700;
-  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
   letter-spacing: -0.5px;
+}
+
+[data-theme="dark"] .logo-text {
+  color: #f8fafc;
 }
 
 .logo-sub {
   font-size: 11px;
-  color: #38bdf8;
-  font-weight: 500;
+  color: var(--primary);
+  font-weight: 600;
   display: block;
 }
 
@@ -621,7 +661,7 @@ body {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #64748b;
+  color: var(--text-muted);
   font-weight: 700;
   margin: 16px 12px 6px;
 }
@@ -635,29 +675,38 @@ body {
   color: var(--sidebar-text);
   text-decoration: none;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  border: 1.5px solid transparent;
 }
 
 .nav-item:hover {
   background-color: var(--sidebar-hover);
-  color: #fff;
+  color: var(--text-primary);
 }
 
+/* Active Nav Item - Glowing Gradient Border Pill matching Images 2 & 3 */
 .nav-item.active {
-  background-color: var(--primary);
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+  background: linear-gradient(var(--bg-sidebar), var(--bg-sidebar)) padding-box,
+              var(--brand-gradient) border-box;
+  border: 1.5px solid transparent;
+  color: var(--text-primary);
+  font-weight: 700;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.25);
 }
 
-.nav-item .icon {
-  font-size: 18px;
-  width: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+[data-theme="dark"] .nav-item.active {
+  background: linear-gradient(rgba(14, 165, 233, 0.12), rgba(16, 185, 129, 0.12)) padding-box,
+              var(--brand-gradient) border-box;
+  border: 1.5px solid transparent;
+  color: #f8fafc;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.35);
+}
+
+.nav-item.active .icon {
+  filter: drop-shadow(0 0 6px rgba(14, 165, 233, 0.6));
 }
 
 .nav-badge {
@@ -676,8 +725,8 @@ body {
 
 .sidebar-footer {
   padding: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  background-color: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-sidebar);
 }
 
 .user-profile-summary {
@@ -690,12 +739,12 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #334155;
+  background: var(--bg-card);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 18px;
-  border: 2px solid #475569;
+  border: 2px solid var(--border-color);
 }
 
 .user-info {
@@ -705,8 +754,8 @@ body {
 
 .user-name {
   font-size: 13px;
-  font-weight: 600;
-  color: #fff;
+  font-weight: 700;
+  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -869,7 +918,18 @@ body {
 
 .btn-icon-badge:hover {
   background-color: var(--primary-light);
-  border-color: #c7d2fe;
+  border-color: var(--primary);
+}
+
+#themeToggleBtn {
+  font-size: 17px;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+#themeToggleBtn:hover {
+  transform: rotate(20deg) scale(1.08);
+  border-color: var(--primary);
+  box-shadow: var(--brand-glow-cyan);
 }
 
 .notif-bubble {
@@ -1019,12 +1079,21 @@ body {
 }
 
 .btn-primary {
-  background-color: var(--primary);
+  background: var(--brand-gradient);
   color: #fff;
+  border: none;
+  box-shadow: var(--brand-glow);
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-hover);
+  background: var(--brand-gradient-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px 0 rgba(16, 185, 129, 0.45);
+  filter: brightness(1.05);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
 }
 
 .btn-outline {
@@ -1064,17 +1133,17 @@ body {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  padding: 18px;
+  padding: 18px 20px;
   display: flex;
   align-items: center;
   gap: 16px;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .kpi-card:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
 }
 
 .kpi-icon {
@@ -1088,11 +1157,17 @@ body {
   flex-shrink: 0;
 }
 
-.kpi-icon.blue { background: #eff6ff; color: #2563eb; }
+.kpi-icon.blue { background: #eff6ff; color: #0284c7; }
 .kpi-icon.green { background: #ecfdf5; color: #059669; }
 .kpi-icon.yellow { background: #fefce8; color: #ca8a04; }
 .kpi-icon.red { background: #fef2f2; color: #dc2626; }
 .kpi-icon.purple { background: #faf5ff; color: #9333ea; }
+
+[data-theme="dark"] .kpi-icon.blue { background: rgba(14, 165, 233, 0.15); color: #38bdf8; }
+[data-theme="dark"] .kpi-icon.green { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+[data-theme="dark"] .kpi-icon.yellow { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+[data-theme="dark"] .kpi-icon.red { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+[data-theme="dark"] .kpi-icon.purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
 
 .kpi-info {
   display: flex;
@@ -1124,6 +1199,7 @@ body {
   flex-wrap: wrap;
   align-items: center;
   gap: 12px;
+  box-shadow: var(--card-shadow);
 }
 
 .filter-input-group {
@@ -1194,16 +1270,16 @@ body {
   font-weight: 700;
 }
 
-/* 1. Giai đoạn: Cần Làm (To Do) - Neutral Slate / Indigo */
+/* 1. Giai đoạn: Cần Làm (To Do) - Neutral Slate */
 .kanban-col.col-todo {
   background: #f8fafc;
-  border-color: #cbd5e1;
-  border-top: 4px solid #64748b;
+  border-color: #e2e8f0;
+  border-top: 3px solid #64748b;
 }
 
 .kanban-col.col-todo .kanban-col-header {
   background: #edf2f7;
-  border-bottom: 2px solid #cbd5e1;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .kanban-col.col-todo .col-title {
@@ -1217,14 +1293,14 @@ body {
 }
 
 [data-theme="dark"] .kanban-col.col-todo {
-  background: #0f172a;
-  border-color: #1e293b;
-  border-top-color: #94a3b8;
+  background: #141f33;
+  border-color: #27354a;
+  border-top: 3px solid #94a3b8;
 }
 
 [data-theme="dark"] .kanban-col.col-todo .kanban-col-header {
-  background: #1e293b;
-  border-bottom-color: #334155;
+  background: #1c2a44;
+  border-bottom: 1px solid #27354a;
 }
 
 [data-theme="dark"] .kanban-col.col-todo .col-title {
@@ -1233,63 +1309,63 @@ body {
 
 [data-theme="dark"] .kanban-col.col-todo .col-count {
   background: #0f172a;
-  color: #cbd5e1;
-  border-color: #334155;
+  color: #94a3b8;
+  border: 1px solid #334155;
 }
 
-/* 2. Giai đoạn: Đang Làm (In Progress) - Energetic Blue / Sky */
+/* 2. Giai đoạn: Đang Làm (In Progress) - Cyan/Sky */
 .kanban-col.col-in_progress {
-  background: #eff6ff;
-  border-color: #bfdbfe;
-  border-top: 4px solid #3b82f6;
+  background: #f0f9ff;
+  border-color: #bae6fd;
+  border-top: 3px solid #0ea5e9;
 }
 
 .kanban-col.col-in_progress .kanban-col-header {
-  background: #dbeafe;
-  border-bottom: 2px solid #93c5fd;
+  background: #e0f2fe;
+  border-bottom: 1px solid #bae6fd;
 }
 
 .kanban-col.col-in_progress .col-title {
-  color: #1d4ed8;
+  color: #0369a1;
 }
 
 .kanban-col.col-in_progress .col-count {
   background: #ffffff;
-  color: #1e40af;
-  border: 1px solid #bfdbfe;
+  color: #0284c7;
+  border: 1px solid #bae6fd;
 }
 
 [data-theme="dark"] .kanban-col.col-in_progress {
-  background: #0c1a30;
-  border-color: #1e3a8a;
-  border-top-color: #3b82f6;
+  background: #141f33;
+  border-color: #27354a;
+  border-top: 3px solid #0ea5e9;
 }
 
 [data-theme="dark"] .kanban-col.col-in_progress .kanban-col-header {
-  background: #172a4c;
-  border-bottom-color: #1e40af;
+  background: rgba(14, 165, 233, 0.12);
+  border-bottom: 1px solid rgba(14, 165, 233, 0.3);
 }
 
 [data-theme="dark"] .kanban-col.col-in_progress .col-title {
-  color: #93c5fd;
+  color: #38bdf8;
 }
 
 [data-theme="dark"] .kanban-col.col-in_progress .col-count {
-  background: #0c1a30;
-  color: #bfdbfe;
-  border-color: #2563eb;
+  background: #0f172a;
+  color: #38bdf8;
+  border: 1px solid rgba(14, 165, 233, 0.3);
 }
 
-/* 3. Giai đoạn: Chờ Duyệt (Review) - Warm Amber / Orange */
+/* 3. Giai đoạn: Chờ Duyệt (Review) - Amber/Orange */
 .kanban-col.col-review {
   background: #fffbeb;
   border-color: #fde68a;
-  border-top: 4px solid #f59e0b;
+  border-top: 3px solid #f59e0b;
 }
 
 .kanban-col.col-review .kanban-col-header {
   background: #fef3c7;
-  border-bottom: 2px solid #fcd34d;
+  border-bottom: 1px solid #fde68a;
 }
 
 .kanban-col.col-review .col-title {
@@ -1303,36 +1379,36 @@ body {
 }
 
 [data-theme="dark"] .kanban-col.col-review {
-  background: #251806;
-  border-color: #78350f;
-  border-top-color: #f59e0b;
+  background: #141f33;
+  border-color: #27354a;
+  border-top: 3px solid #f59e0b;
 }
 
 [data-theme="dark"] .kanban-col.col-review .kanban-col-header {
-  background: #3b240a;
-  border-bottom-color: #92400e;
+  background: rgba(245, 158, 11, 0.12);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 [data-theme="dark"] .kanban-col.col-review .col-title {
-  color: #fde68a;
+  color: #fbbf24;
 }
 
 [data-theme="dark"] .kanban-col.col-review .col-count {
-  background: #251806;
-  color: #fef3c7;
-  border-color: #b45309;
+  background: #0f172a;
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
-/* 4. Giai đoạn: Hoàn Thành (Done / Completed) - Vibrant Emerald / Green */
+/* 4. Giai đoạn: Hoàn Thành (Done / Completed) - Vibrant Emerald */
 .kanban-col.col-completed {
-  background: #f0fdf4;
-  border-color: #bbf7d0;
-  border-top: 4px solid #10b981;
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  border-top: 3px solid #10b981;
 }
 
 .kanban-col.col-completed .kanban-col-header {
-  background: #dcfce7;
-  border-bottom: 2px solid #86efac;
+  background: #d1fae5;
+  border-bottom: 1px solid #a7f3d0;
 }
 
 .kanban-col.col-completed .col-title {
@@ -1341,29 +1417,29 @@ body {
 
 .kanban-col.col-completed .col-count {
   background: #ffffff;
-  color: #166534;
-  border: 1px solid #bbf7d0;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
 }
 
 [data-theme="dark"] .kanban-col.col-completed {
-  background: #082115;
-  border-color: #065f46;
-  border-top-color: #10b981;
+  background: #141f33;
+  border-color: #27354a;
+  border-top: 3px solid #10b981;
 }
 
 [data-theme="dark"] .kanban-col.col-completed .kanban-col-header {
-  background: #0e3422;
-  border-bottom-color: #047857;
+  background: rgba(16, 185, 129, 0.12);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 [data-theme="dark"] .kanban-col.col-completed .col-title {
-  color: #a7f3d0;
+  color: #34d399;
 }
 
 [data-theme="dark"] .kanban-col.col-completed .col-count {
-  background: #082115;
-  color: #d1fae5;
-  border-color: #059669;
+  background: #0f172a;
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .kanban-cards {
@@ -1376,7 +1452,7 @@ body {
 }
 
 .kanban-cards.drag-over {
-  background: rgba(79, 70, 229, 0.08);
+  background: var(--primary-light);
   border: 2px dashed var(--primary);
   border-radius: var(--radius-sm);
 }
@@ -1389,14 +1465,26 @@ body {
   padding: 14px;
   box-shadow: var(--shadow-sm);
   cursor: grab;
-  transition: all 0.2s;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s;
   position: relative;
 }
 
 .task-card:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  border-color: #cbd5e1;
+  box-shadow: var(--card-shadow);
+  border-color: var(--primary);
+}
+
+[data-theme="dark"] .task-card {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="dark"] .task-card:hover {
+  transform: translateY(-2px);
+  border-color: #0ea5e9;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 14px rgba(14, 165, 233, 0.25);
 }
 
 .task-card.dragging {
@@ -1410,11 +1498,16 @@ body {
 }
 
 [data-theme="dark"] .task-card.is-overdue {
-  background: #2a1515;
+  background: #25161c;
 }
 
 .task-card.is-due-soon {
   border-left: 4px solid var(--warning) !important;
+  background: #fffdf5;
+}
+
+[data-theme="dark"] .task-card.is-due-soon {
+  background: #251d14;
 }
 
 .task-card-header {
@@ -1446,22 +1539,46 @@ body {
   animation: pulse-danger 2s infinite;
 }
 
+[data-theme="dark"] .badge-priority.urgent {
+  background: rgba(239, 68, 68, 0.18);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
 .badge-priority.high {
   background: #fff7ed;
   color: #ea580c;
   border: 1px solid #fed7aa;
 }
 
+[data-theme="dark"] .badge-priority.high {
+  background: rgba(249, 115, 22, 0.18);
+  color: #fb923c;
+  border-color: rgba(249, 115, 22, 0.35);
+}
+
 .badge-priority.medium {
-  background: #eff6ff;
-  color: #2563eb;
-  border: 1px solid #bfdbfe;
+  background: #f0f9ff;
+  color: #0284c7;
+  border: 1px solid #bae6fd;
+}
+
+[data-theme="dark"] .badge-priority.medium {
+  background: rgba(14, 165, 233, 0.18);
+  color: #38bdf8;
+  border-color: rgba(14, 165, 233, 0.35);
 }
 
 .badge-priority.low {
   background: #f1f5f9;
   color: #64748b;
   border: 1px solid #e2e8f0;
+}
+
+[data-theme="dark"] .badge-priority.low {
+  background: rgba(100, 116, 139, 0.18);
+  color: #94a3b8;
+  border-color: rgba(100, 116, 139, 0.35);
 }
 
 .task-title {
@@ -1493,8 +1610,10 @@ body {
 
 .task-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary), #06b6d4);
-  transition: width 0.3s;
+  background: var(--brand-gradient);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
 }
 
 .task-card-footer {
@@ -1564,16 +1683,21 @@ body {
 /* Status Badge */
 .badge-status {
   display: inline-block;
-  padding: 3px 8px;
+  padding: 3px 9px;
   border-radius: 12px;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .badge-status.todo { background: #e2e8f0; color: #475569; }
-.badge-status.in_progress { background: #dbeafe; color: #1e40af; }
-.badge-status.review { background: #fef3c7; color: #92400e; }
-.badge-status.completed { background: #d1fae5; color: #065f46; }
+.badge-status.in_progress { background: #e0f2fe; color: #0284c7; }
+.badge-status.review { background: #fef3c7; color: #b45309; }
+.badge-status.completed { background: #d1fae5; color: #047857; }
+
+[data-theme="dark"] .badge-status.todo { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+[data-theme="dark"] .badge-status.in_progress { background: rgba(14, 165, 233, 0.18); color: #38bdf8; }
+[data-theme="dark"] .badge-status.review { background: rgba(245, 158, 11, 0.18); color: #fbbf24; }
+[data-theme="dark"] .badge-status.completed { background: rgba(16, 185, 129, 0.18); color: #34d399; }
 
 /* Alerts View */
 .alert-banner {
@@ -1591,6 +1715,12 @@ body {
   color: #991b1b;
 }
 
+[data-theme="dark"] .alert-banner.danger {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
 .alert-cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -1603,8 +1733,8 @@ body {
   border-radius: var(--radius-md);
   padding: 16px;
   border-left: 5px solid var(--danger);
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.2s;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .alert-card-item.warning {
@@ -1613,7 +1743,7 @@ body {
 
 .alert-card-item:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
 }
 
 /* Reports & Analytics View */
@@ -1744,7 +1874,7 @@ body {
 
 .form-control:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
 }
 
 .form-row {
@@ -2085,10 +2215,10 @@ body {
     transition: all 0.2s;
   }
   .kanban-tab-btn.active {
-    background: var(--primary);
+    background: var(--brand-gradient);
     color: #fff;
-    border-color: var(--primary);
-    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
   }
   .kanban-tab-btn[data-col="todo"].active {
     background: #64748b;
@@ -2097,10 +2227,10 @@ body {
     box-shadow: 0 2px 6px rgba(100, 116, 139, 0.4);
   }
   .kanban-tab-btn[data-col="in_progress"].active {
-    background: #3b82f6;
-    border-color: #3b82f6;
+    background: #0ea5e9;
+    border-color: #0ea5e9;
     color: #fff;
-    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 2px 6px rgba(14, 165, 233, 0.4);
   }
   .kanban-tab-btn[data-col="review"].active {
     background: #f59e0b;
@@ -3178,11 +3308,11 @@ body {
 }
 
 .cal-month-cell.is-today {
-  background-color: rgba(37, 99, 235, 0.05);
+  background-color: rgba(14, 165, 233, 0.08);
 }
 
 [data-theme="dark"] .cal-month-cell.is-today {
-  background-color: rgba(59, 130, 246, 0.12);
+  background-color: rgba(14, 165, 233, 0.15);
 }
 
 .cal-cell-header {
@@ -3205,9 +3335,9 @@ body {
 }
 
 .cal-month-cell.is-today .cal-day-num {
-  background: var(--primary);
+  background: var(--brand-gradient);
   color: #ffffff;
-  box-shadow: 0 0 6px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
 }
 
 .cal-cell-badge {
@@ -3215,7 +3345,7 @@ body {
   font-weight: 800;
   padding: 0 5px;
   border-radius: 10px;
-  background: rgba(37, 99, 235, 0.15);
+  background: var(--primary-light);
   color: var(--primary);
 }
 
@@ -3541,7 +3671,7 @@ body {
 }
 
 .automation-hero-banner {
-  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
+  background: linear-gradient(135deg, #091e3a 0%, #064e3b 100%);
   border-radius: var(--radius-md);
   padding: 24px;
   color: #ffffff;
@@ -3550,9 +3680,10 @@ body {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 20px;
-  box-shadow: 0 8px 24px rgba(49, 46, 129, 0.25);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
   position: relative;
   overflow: hidden;
+  border: 1px solid rgba(14, 165, 233, 0.2);
 }
 
 .automation-hero-banner::after {
@@ -4498,7 +4629,7 @@ body {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #3b82f6, #6366f1, #10b981);
+  background: var(--brand-gradient);
 }
 
 .report-scope-info {
