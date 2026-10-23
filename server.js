@@ -758,6 +758,145 @@ app.get('/api/auth/me', authenticate, (req, res) => {
 });
 
 // -------------------------------------------------------------
+// USER PROFILE & ACCOUNT SETTINGS (MỌI TÀI KHOẢN ĐỀU ĐỔI MK & ẢNH ĐẠI DIỆN ĐƯỢC)
+// -------------------------------------------------------------
+const AVATAR_DIR = path.join(__dirname, 'public', 'uploads', 'avatars');
+if (!fs.existsSync(AVATAR_DIR)) {
+  fs.mkdirSync(AVATAR_DIR, { recursive: true });
+}
+
+// 1. Lấy thông tin hồ sơ tài khoản
+app.get('/api/auth/profile', authenticate, (req, res) => {
+  const user = db.getUserById(req.user.id);
+  if (!user) return res.status(404).json({ error: 'Không tìm thấy thông tin tài khoản' });
+  res.json({ user });
+});
+
+// 2. Cập nhật thông tin hồ sơ (Tên, số điện thoại, chức vụ)
+app.put('/api/auth/profile', authenticate, (req, res) => {
+  const { name, phone, position } = req.body;
+  const updates = {};
+  if (name && name.trim()) updates.name = name.trim();
+  if (typeof phone === 'string') updates.phone = phone.trim();
+  if (typeof position === 'string') updates.position = position.trim();
+
+  const updatedUser = db.updateUser(req.user.id, updates);
+  if (!updatedUser) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
+
+  db.logActivity({
+    userId: req.user.id,
+    userName: updatedUser.name,
+    userRole: updatedUser.role,
+    userAvatar: updatedUser.avatar,
+    action: 'update_profile',
+    category: 'user',
+    details: `${updatedUser.name} đã cập nhật thông tin hồ sơ cá nhân`
+  });
+
+  broadcast('user:updated', { user: updatedUser });
+  res.json({ success: true, message: 'Đã cập nhật thông tin hồ sơ thành công!', user: updatedUser });
+});
+
+// 3. Tải lên và lưu ảnh đại diện (Custom Photo Avatar / Emoji)
+app.post('/api/auth/upload-avatar', authenticate, (req, res) => {
+  try {
+    const avatarDataUrl = req.body.avatarDataUrl || req.body.avatarData;
+    const avatarEmoji = req.body.avatarEmoji;
+
+    let finalAvatar = avatarEmoji;
+    if (avatarDataUrl) {
+      // Validate data URL
+      const matches = avatarDataUrl.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+      if (!matches || matches.length !== 3) {
+        return res.status(400).json({ error: 'Định dạng dữ liệu ảnh không hợp lệ' });
+      }
+
+      const buffer = Buffer.from(matches[2], 'base64');
+      if (buffer.length > 8 * 1024 * 1024) {
+        return res.status(400).json({ error: 'Dung lượng ảnh vượt quá giới hạn cho phép (Tối đa 8MB)' });
+      }
+
+      // Safe filename
+      const filename = `avatar-${req.user.id}-${Date.now()}.png`;
+      const filePath = path.join(AVATAR_DIR, filename);
+
+      // Clean old avatar file if existing on disk
+      const oldUser = db.getUserById(req.user.id);
+      if (oldUser && oldUser.avatar && oldUser.avatar.startsWith('/uploads/avatars/')) {
+        const oldFile = path.join(__dirname, 'public', oldUser.avatar.split('?')[0]);
+        try { if (fs.existsSync(oldFile)) fs.unlinkSync(oldFile); } catch (_) {}
+      }
+
+      fs.writeFileSync(filePath, buffer);
+      finalAvatar = `/uploads/avatars/${filename}?t=${Date.now()}`;
+    }
+
+    if (!finalAvatar) {
+      return res.status(400).json({ error: 'Vui lòng cung cấp ảnh đại diện hoặc biểu tượng avatar' });
+    }
+
+    const updatedUser = db.updateUser(req.user.id, { avatar: finalAvatar });
+
+    db.logActivity({
+      userId: req.user.id,
+      userName: updatedUser.name,
+      userRole: updatedUser.role,
+      userAvatar: updatedUser.avatar,
+      action: 'update_avatar',
+      category: 'user',
+      details: `${updatedUser.name} đã cập nhật ảnh đại diện mới`
+    });
+
+    broadcast('user:updated', { user: updatedUser });
+    res.json({ success: true, message: 'Đã cập nhật ảnh đại diện thành công!', avatar: finalAvatar, user: updatedUser });
+  } catch (err) {
+    console.error('Error uploading avatar:', err);
+    res.status(500).json({ error: 'Lỗi tải lên ảnh đại diện: ' + err.message });
+  }
+});
+
+// 4. Đổi mật khẩu tài khoản cá nhân
+app.post('/api/auth/change-password', authenticate, (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: 'Vui lòng nhập mật khẩu hiện tại và mật khẩu mới' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: 'Mật khẩu mới phải có tối thiểu 6 ký tự' });
+    }
+
+    const fullUser = db.getUserById(req.user.id, true);
+    if (!fullUser) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
+
+    // Kiểm tra mật khẩu hiện tại
+    const isMatch = bcrypt.compareSync(currentPassword, fullUser.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Mật khẩu hiện tại không chính xác' });
+    }
+
+    // Cập nhật mật khẩu mới (updateUser sẽ tự động mã hóa bcrypt)
+    db.updateUser(req.user.id, { password: newPassword });
+
+    db.logActivity({
+      userId: req.user.id,
+      userName: req.user.name,
+      userRole: req.user.role,
+      userAvatar: req.user.avatar,
+      action: 'change_password',
+      category: 'auth',
+      details: `${req.user.name} đã đổi mật khẩu tài khoản thành công`
+    });
+
+    res.json({ success: true, message: 'Đổi mật khẩu thành công! Hãy ghi nhớ mật khẩu mới của bạn.' });
+  } catch (err) {
+    console.error('Error changing password:', err);
+    res.status(500).json({ error: 'Lỗi khi đổi mật khẩu: ' + err.message });
+  }
+});
+
+// -------------------------------------------------------------
 // TASKS ROUTES
 // -------------------------------------------------------------
 app.get('/api/tasks', authenticate, (req, res) => {

@@ -113,6 +113,32 @@ const API = {
     });
   },
 
+  // Profile & Account Settings
+  async getProfile() {
+    return this.request('/api/auth/profile');
+  },
+
+  async updateProfile(profileData) {
+    return this.request('/api/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(profileData)
+    });
+  },
+
+  async uploadAvatar(avatarDataUrl, avatarEmoji = null) {
+    return this.request('/api/auth/upload-avatar', {
+      method: 'POST',
+      body: JSON.stringify({ avatarDataUrl, avatarEmoji })
+    });
+  },
+
+  async changePassword(currentPassword, newPassword) {
+    return this.request('/api/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ currentPassword, newPassword })
+    });
+  },
+
   async switchDemo(userId) {
     const data = await this.request('/api/auth/switch-demo', {
       method: 'POST',

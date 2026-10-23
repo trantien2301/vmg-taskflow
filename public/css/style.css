@@ -5540,5 +5540,161 @@ body {
   to { opacity: 1; transform: translate(-50%, 0); }
 }
 
+/* ============================================================
+   USER PROFILE & AVATAR UPLOAD STYLES
+   ============================================================ */
+
+/* Generic User Avatar Image */
+.user-avatar-img {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid var(--border-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Profile Segmented Tabs */
+.profile-tabs-bar {
+  display: flex;
+  background: var(--bg-main);
+  padding: 4px;
+  border-radius: 8px;
+  margin: 12px 20px 0 20px;
+  gap: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.profile-tab-btn {
+  flex: 1;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.profile-tab-btn:hover {
+  color: var(--text-main);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.profile-tab-btn.active {
+  background: var(--card-bg);
+  color: var(--primary);
+  font-weight: 700;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Profile Avatar Custom Box */
+.profile-avatar-custom-box {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px;
+  background: var(--bg-main);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
+.profile-avatar-preview-wrap {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  flex-shrink: 0;
+}
+
+.profile-avatar-large {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--card-bg);
+  border: 3px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.profile-avatar-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-avatar-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: 16px;
+  line-height: 1;
+  background: var(--card-bg);
+  border-radius: 50%;
+  padding: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.profile-avatar-actions {
+  flex: 1;
+  min-width: 220px;
+}
+
+/* Emoji Palette */
+.profile-emoji-list {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.btn-emoji-pick {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-emoji-pick:hover {
+  transform: scale(1.2);
+  border-color: var(--primary);
+  background: rgba(37, 99, 235, 0.08);
+}
+
+/* Eye Toggle inside input */
+.btn-toggle-eye {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 6px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.btn-toggle-eye:hover {
+  opacity: 1;
+}
+
 
 

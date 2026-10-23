@@ -354,12 +354,13 @@
       </nav>
 
       <div class="sidebar-footer">
-        <div class="user-profile-summary">
+        <div class="user-profile-summary" id="sidebarUserProfileSummary" onclick="App.openProfileModal()" style="cursor:pointer;" title="Nhấp để xem và chỉnh sửa Hồ sơ cá nhân, đổi mật khẩu & ảnh đại diện">
           <div class="user-avatar" id="sidebarUserAvatar">👑</div>
           <div class="user-info">
             <div class="user-name" id="sidebarUserName">Đang tải...</div>
             <span class="user-role-tag admin" id="sidebarUserRole">ADMIN</span>
           </div>
+          <span style="font-size:13px; color:var(--text-muted); margin-left:auto; padding-left:4px;" title="Cài đặt hồ sơ">⚙️</span>
         </div>
         <button class="sidebar-version-pill" id="sidebarVersionBtn" title="Xem thông tin phiên bản & cập nhật">
           <span class="version-dot"></span>
@@ -455,6 +456,12 @@
               </div>
             </div>
           </div>
+
+          <!-- Account Profile & Settings button -->
+          <button class="btn btn-outline btn-sm" id="btnHeaderProfile" onclick="App.openProfileModal()" title="Hồ sơ tài khoản, đổi mật khẩu & ảnh đại diện" style="display:inline-flex; align-items:center; gap:6px; font-weight:600;">
+            <span id="topbarUserAvatar" style="display:inline-flex; align-items:center; justify-content:center;">👤</span>
+            <span class="hide-mobile" id="topbarUserName">Hồ Sơ</span>
+          </button>
 
           <!-- Dark/Light Theme Toggle -->
           <button class="btn-icon-badge" id="themeToggleBtn" title="Đổi giao diện Sáng/Tối">
@@ -2593,6 +2600,168 @@
           📋 Sao Chép Bản Triệu Tập (Zalo / Telegram)
         </button>
         <button type="button" class="btn btn-secondary" data-close-modal="executiveWarRoomModal">
+          Đóng
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: HỒ SƠ TÀI KHOẢN, ĐỔI MẬT KHẨU & ẢNH ĐẠI DIỆN -->
+  <div class="modal-overlay" id="profileModal" style="z-index: 10011;">
+    <div class="modal-content" style="max-width: 620px;">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:24px;">👤</span>
+          <div>
+            <h3 class="modal-title" style="margin:0; font-size:16.5px; font-weight:800;">Hồ Sơ Tài Khoản & Cài Đặt Cá Nhân</h3>
+            <div style="font-size:11.5px; color:var(--text-secondary); margin-top:2px;">Quản lý thông tin, đổi ảnh đại diện và mật khẩu bảo mật</div>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close-modal="profileModal">&times;</button>
+      </div>
+
+      <!-- Segmented Tabs for Profile Modal -->
+      <div class="profile-tabs-bar">
+        <button type="button" class="profile-tab-btn active" id="tabBtnProfileInfo" onclick="App.switchProfileTab('info')">
+          👤 Thông Tin & Ảnh Đại Diện
+        </button>
+        <button type="button" class="profile-tab-btn" id="tabBtnProfileSecurity" onclick="App.switchProfileTab('security')">
+          🔒 Đổi Mật Khẩu
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding:20px;">
+        <!-- TAB 1: THÔNG TIN & ẢNH ĐẠI DIỆN -->
+        <div id="profileTabPaneInfo">
+          <!-- Avatar Customization Box -->
+          <div class="profile-avatar-custom-box">
+            <div class="profile-avatar-preview-wrap">
+              <div id="profileAvatarPreview" class="profile-avatar-large">👤</div>
+              <span class="profile-avatar-badge" title="Đang trực tuyến">🟢</span>
+            </div>
+            <div class="profile-avatar-actions">
+              <div style="font-weight:700; font-size:13.5px; color:var(--text-main);">Ảnh Đại Diện</div>
+              <div style="font-size:11.5px; color:var(--text-secondary); margin-bottom:10px;">
+                Tải ảnh chân dung từ thiết bị (PNG, JPG, WEBP) hoặc chọn biểu tượng phong cách:
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <input type="file" id="profileAvatarFileInput" accept="image/png, image/jpeg, image/webp" style="display:none;" onchange="App.handleAvatarFileSelect(event)">
+                <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('profileAvatarFileInput').click()" style="display:inline-flex; align-items:center; gap:5px;">
+                  📁 Tải Ảnh Mới Lên
+                </button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="App.resetAvatarToDefault()" title="Khôi phục avatar mặc định theo vai trò">
+                  ↺ Đặt Lại Mặc Định
+                </button>
+              </div>
+
+              <!-- Quick Emoji Palette -->
+              <div class="profile-emoji-palette" style="margin-top:12px;">
+                <span style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">Hoặc chọn nhanh biểu tượng:</span>
+                <div class="profile-emoji-list">
+                  <button type="button" class="btn-emoji-pick" onclick="App.pickProfileEmoji('👑')">👑</button>
+                  <button type="button" class="btn-emoji-pick" onclick="App.pickProfileEmoji('👔')">👔</button>
+                  <button type="button" class="btn-emoji-pick" onclick="App.pickProfileEmoji('👤')">👤</button>
+                  <button type="button" class="btn-emoji-pick" onclick="App.pickProfileEmoji('👩‍💻')">👩‍💻</button>
+                  <button type="button" class="btn-emoji-pick" onclick="App.pickProfileEmoji('👨‍💼')">👨‍💼</button>
+                  <button type="button" class="btn-emoji-pick" onclick="App.pickProfileEmoji('👩‍💼')">👩‍💼</button>
+                  <button type="button" class="btn-emoji-pick" onclick="App.pickProfileEmoji('👨‍🎨')">👨‍🎨</button>
+                  <button type="button" class="btn-emoji-pick" onclick="App.pickProfileEmoji('👨‍🎓')">👨‍🎓</button>
+                  <button type="button" class="btn-emoji-pick" onclick="App.pickProfileEmoji('🌟')">🌟</button>
+                  <button type="button" class="btn-emoji-pick" onclick="App.pickProfileEmoji('🚀')">🚀</button>
+                  <button type="button" class="btn-emoji-pick" onclick="App.pickProfileEmoji('⚡')">⚡</button>
+                  <button type="button" class="btn-emoji-pick" onclick="App.pickProfileEmoji('🎯')">🎯</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile Fields Form -->
+          <form id="profileInfoForm" onsubmit="App.handleProfileInfoSubmit(event)" style="margin-top:18px;">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Họ và Tên <span style="color:var(--danger)">*</span></label>
+                <input type="text" class="form-control" id="profileName" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email Đăng Nhập</label>
+                <input type="email" class="form-control" id="profileEmail" disabled style="background:#f1f5f9; cursor:not-allowed;">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Phòng Ban</label>
+                <input type="text" class="form-control" id="profileDept" disabled style="background:#f1f5f9; cursor:not-allowed;">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Vai Trò Hệ Thống</label>
+                <div style="margin-top:6px;">
+                  <span class="user-role-tag" id="profileRoleBadge">USER</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Chức Vụ / Vị Trí</label>
+                <input type="text" class="form-control" id="profilePosition" placeholder="VD: Chuyên viên...">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Số Điện Thoại</label>
+                <input type="tel" class="form-control" id="profilePhone" placeholder="VD: 090...">
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; margin-top:12px;">
+              <button type="submit" class="btn btn-primary" id="btnSaveProfileInfo" style="font-weight:700;">
+                💾 Lưu Thay Đổi Hồ Sơ
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- TAB 2: ĐỔI MẬT KHẨU BẢO MẬT -->
+        <div id="profileTabPaneSecurity" style="display:none;">
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px; margin-bottom:16px; font-size:12.5px; color:var(--text-secondary); line-height:1.5;">
+            🔒 <strong>Bảo mật tài khoản:</strong> Bạn có thể đổi mật khẩu bất kỳ lúc nào. Mật khẩu mới phải có tối thiểu 6 ký tự để bảo đảm an toàn dữ liệu công việc.
+          </div>
+
+          <form id="profilePasswordForm" onsubmit="App.handleProfilePasswordSubmit(event)">
+            <div class="form-group">
+              <label class="form-label">Mật Khẩu Hiện Tại <span style="color:var(--danger)">*</span></label>
+              <div style="position:relative;">
+                <input type="password" class="form-control" id="profileCurrentPass" placeholder="Nhập mật khẩu đang dùng..." required>
+                <button type="button" class="btn-toggle-eye" onclick="App.togglePasswordVisibility('profileCurrentPass')" title="Ẩn/Hiện mật khẩu">👁️</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Mật Khẩu Mới <span style="color:var(--danger)">*</span></label>
+              <div style="position:relative;">
+                <input type="password" class="form-control" id="profileNewPass" placeholder="Nhập mật khẩu mới (Tối thiểu 6 ký tự)..." minlength="6" required>
+                <button type="button" class="btn-toggle-eye" onclick="App.togglePasswordVisibility('profileNewPass')" title="Ẩn/Hiện mật khẩu">👁️</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Xác Nhận Mật Khẩu Mới <span style="color:var(--danger)">*</span></label>
+              <div style="position:relative;">
+                <input type="password" class="form-control" id="profileConfirmPass" placeholder="Nhập lại mật khẩu mới..." minlength="6" required>
+                <button type="button" class="btn-toggle-eye" onclick="App.togglePasswordVisibility('profileConfirmPass')" title="Ẩn/Hiện mật khẩu">👁️</button>
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+              <button type="submit" class="btn btn-primary" id="btnChangePassword" style="background:#dc2626; border-color:#dc2626; font-weight:700;">
+                🔒 Cập Nhật Mật Khẩu Mới
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display:flex; justify-content:flex-end;">
+        <button type="button" class="btn btn-outline" data-close-modal="profileModal">
           Đóng
         </button>
       </div>

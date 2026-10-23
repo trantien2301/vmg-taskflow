@@ -1483,8 +1483,15 @@ const App = {
     const avatarEl = document.getElementById('sidebarUserAvatar');
     const nameEl = document.getElementById('sidebarUserName');
     const roleTagEl = document.getElementById('sidebarUserRole');
+    const topbarAvatarEl = document.getElementById('topbarUserAvatar');
+    const topbarNameEl = document.getElementById('topbarUserName');
 
-    if (avatarEl) avatarEl.innerText = user.avatar || (user.role === 'admin' ? '👑' : (user.role === 'manager' ? '👔' : (user.role === 'viewer' ? '👁️' : '👤')));
+    const defaultEmoji = user.role === 'admin' ? '👑' : (user.role === 'manager' ? '👔' : (user.role === 'viewer' ? '👁️' : '👤'));
+    const userAvatar = user.avatar || defaultEmoji;
+
+    if (avatarEl) avatarEl.innerHTML = this.renderAvatar(userAvatar, 36);
+    if (topbarAvatarEl) topbarAvatarEl.innerHTML = this.renderAvatar(userAvatar, 22);
+    if (topbarNameEl) topbarNameEl.innerText = user.name ? user.name.split(' ').slice(-1)[0] : 'Hồ Sơ';
     if (nameEl) nameEl.innerText = user.name;
     if (roleTagEl) {
       roleTagEl.className = `user-role-tag ${user.role}`;
@@ -2061,7 +2068,7 @@ const App = {
 
         <div class="task-card-footer">
           <div class="task-assignee" title="${assignee ? assignee.name : 'Chưa gán'}">
-            <span>${assignee ? assignee.avatar : '👤'}</span>
+            <span>${assignee ? this.renderAvatar(assignee.avatar, 20) : '👤'}</span>
             <span>${assignee ? assignee.name.split(' ').slice(-1)[0] : 'N/A'}</span>
           </div>
           <div class="task-deadline ${deadlineClass}">
@@ -3258,7 +3265,7 @@ const App = {
         <tr data-user-row="${u.id}">
           <td>
             <div style="display:flex; align-items:center; gap:10px;">
-              <span style="font-size:22px; flex-shrink:0;">${avatar}</span>
+              <span style="flex-shrink:0;">${this.renderAvatar(avatar, 30)}</span>
               <div>
                 <div style="font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:6px;">
                   <span>${this.escapeHtml(u.name)}</span>
@@ -3560,6 +3567,233 @@ const App = {
   },
 
   // -------------------------------------------------------------
+  // USER PROFILE & ACCOUNT SETTINGS (MỌI TÀI KHOẢN ĐỔI MK & ẢNH ĐẠI DIỆN)
+  // -------------------------------------------------------------
+  renderAvatar(avatar, size = 32, className = '') {
+    if (!avatar) {
+      return `<span class="user-avatar-emoji ${className}" style="font-size:${Math.round(size * 0.75)}px; width:${size}px; height:${size}px; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle;">👤</span>`;
+    }
+    
+    if (typeof avatar === 'string' && (avatar.startsWith('http://') || avatar.startsWith('https://') || avatar.startsWith('data:image/') || avatar.startsWith('/uploads/') || avatar.startsWith('uploads/'))) {
+      return `<img src="${this.escapeHtml(avatar)}" class="user-avatar-img ${className}" style="width:${size}px; height:${size}px; border-radius:50%; object-fit:cover; display:inline-block; vertical-align:middle;" alt="Avatar">`;
+    }
+
+    return `<span class="user-avatar-emoji ${className}" style="font-size:${Math.round(size * 0.75)}px; width:${size}px; height:${size}px; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle;">${avatar}</span>`;
+  },
+
+  async openProfileModal() {
+    const user = this.state.user;
+    if (!user) return;
+
+    this.switchProfileTab('info');
+
+    // Populate Info fields
+    const nameInput = document.getElementById('profileName');
+    const emailInput = document.getElementById('profileEmail');
+    const deptInput = document.getElementById('profileDept');
+    const roleBadge = document.getElementById('profileRoleBadge');
+    const posInput = document.getElementById('profilePosition');
+    const phoneInput = document.getElementById('profilePhone');
+    const previewEl = document.getElementById('profileAvatarPreview');
+
+    if (nameInput) nameInput.value = user.name || '';
+    if (emailInput) emailInput.value = user.email || '';
+    if (deptInput) deptInput.value = user.department || 'Phòng Kỹ Thuật';
+    if (posInput) posInput.value = user.position || '';
+    if (phoneInput) phoneInput.value = user.phone || '';
+
+    if (roleBadge) {
+      roleBadge.className = `user-role-tag ${user.role}`;
+      const roleLabels = { admin: 'QUẢN TRỊ VIÊN', manager: 'TRƯỞNG PHÒNG', user: 'NHÂN VIÊN', viewer: 'CHỈ XEM' };
+      roleBadge.innerText = roleLabels[user.role] || user.role.toUpperCase();
+    }
+
+    if (previewEl) {
+      const defaultEmoji = user.role === 'admin' ? '👑' : (user.role === 'manager' ? '👔' : '👤');
+      previewEl.innerHTML = this.renderAvatar(user.avatar || defaultEmoji, 88);
+    }
+
+    // Reset password form fields
+    const curPass = document.getElementById('profileCurrentPass');
+    const newPass = document.getElementById('profileNewPass');
+    const confPass = document.getElementById('profileConfirmPass');
+    if (curPass) curPass.value = '';
+    if (newPass) newPass.value = '';
+    if (confPass) confPass.value = '';
+
+    this.openModal('profileModal');
+  },
+
+  switchProfileTab(tab) {
+    const btnInfo = document.getElementById('tabBtnProfileInfo');
+    const btnSec = document.getElementById('tabBtnProfileSecurity');
+    const paneInfo = document.getElementById('profileTabPaneInfo');
+    const paneSec = document.getElementById('profileTabPaneSecurity');
+
+    if (tab === 'info') {
+      if (btnInfo) btnInfo.classList.add('active');
+      if (btnSec) btnSec.classList.remove('active');
+      if (paneInfo) paneInfo.style.display = 'block';
+      if (paneSec) paneSec.style.display = 'none';
+    } else {
+      if (btnInfo) btnInfo.classList.remove('active');
+      if (btnSec) btnSec.classList.add('active');
+      if (paneInfo) paneInfo.style.display = 'none';
+      if (paneSec) paneSec.style.display = 'block';
+    }
+  },
+
+  togglePasswordVisibility(inputId) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.type = input.type === 'password' ? 'text' : 'password';
+  },
+
+  async handleAvatarFileSelect(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      this.showToast('Vui lòng chọn một tệp hình ảnh hợp lệ (PNG, JPG, WEBP)', 'warning');
+      return;
+    }
+
+    if (file.size > 8 * 1024 * 1024) {
+      this.showToast('Dung lượng ảnh tối đa là 8MB!', 'warning');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const dataUrl = e.target.result;
+      const previewEl = document.getElementById('profileAvatarPreview');
+      if (previewEl) {
+        previewEl.innerHTML = `<img src="${dataUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+      }
+
+      try {
+        const res = await API.uploadAvatar(dataUrl);
+        if (res && res.avatar) {
+          this.state.user.avatar = res.avatar;
+          this.renderHeader();
+          const u = (this.state.users || []).find(x => x.id === this.state.user.id);
+          if (u) u.avatar = res.avatar;
+          this.showToast('✅ Đã tải lên và lưu ảnh đại diện thành công!', 'success');
+          this.playSound('success');
+        }
+      } catch (err) {
+        this.showToast('Lỗi tải ảnh lên: ' + err.message, 'danger');
+      }
+    };
+    reader.readAsDataURL(file);
+  },
+
+  async pickProfileEmoji(emoji) {
+    try {
+      const previewEl = document.getElementById('profileAvatarPreview');
+      if (previewEl) previewEl.innerHTML = this.renderAvatar(emoji, 88);
+
+      const res = await API.uploadAvatar(null, emoji);
+      if (res) {
+        this.state.user.avatar = emoji;
+        this.renderHeader();
+        const u = (this.state.users || []).find(x => x.id === this.state.user.id);
+        if (u) u.avatar = emoji;
+        this.showToast(`✅ Đã chọn biểu tượng đại diện: ${emoji}`, 'success');
+        this.playSound('success');
+      }
+    } catch (err) {
+      this.showToast('Lỗi chọn biểu tượng: ' + err.message, 'danger');
+    }
+  },
+
+  async resetAvatarToDefault() {
+    const user = this.state.user;
+    if (!user) return;
+    const defaultEmoji = user.role === 'admin' ? '👑' : (user.role === 'manager' ? '👔' : '👤');
+    await this.pickProfileEmoji(defaultEmoji);
+  },
+
+  async handleProfileInfoSubmit(e) {
+    e.preventDefault();
+    const name = document.getElementById('profileName')?.value.trim();
+    const position = document.getElementById('profilePosition')?.value.trim();
+    const phone = document.getElementById('profilePhone')?.value.trim();
+
+    if (!name) {
+      this.showToast('Họ và tên không được để trống', 'warning');
+      return;
+    }
+
+    const btn = document.getElementById('btnSaveProfileInfo');
+    if (btn) { btn.disabled = true; btn.innerText = '⏳ Đang lưu...'; }
+
+    try {
+      const res = await API.updateProfile({ name, position, phone });
+      if (res && res.user) {
+        this.state.user.name = res.user.name;
+        this.state.user.position = res.user.position;
+        this.state.user.phone = res.user.phone;
+        this.renderHeader();
+        const u = (this.state.users || []).find(x => x.id === this.state.user.id);
+        if (u) {
+          u.name = res.user.name;
+          u.position = res.user.position;
+          u.phone = res.user.phone;
+        }
+        this.showToast('✅ Đã lưu cập nhật thông tin hồ sơ thành công!', 'success');
+        this.playSound('success');
+      }
+    } catch (err) {
+      this.showToast('Lỗi cập nhật hồ sơ: ' + err.message, 'danger');
+    } finally {
+      if (btn) { btn.disabled = false; btn.innerText = '💾 Lưu Thay Đổi Hồ Sơ'; }
+    }
+  },
+
+  async handleProfilePasswordSubmit(e) {
+    e.preventDefault();
+    const currentPassword = document.getElementById('profileCurrentPass')?.value;
+    const newPassword = document.getElementById('profileNewPass')?.value;
+    const confirmPassword = document.getElementById('profileConfirmPass')?.value;
+
+    if (!currentPassword || !newPassword) {
+      this.showToast('Vui lòng điền đầy đủ mật khẩu hiện tại và mật khẩu mới', 'warning');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      this.showToast('Mật khẩu mới phải có tối thiểu 6 ký tự', 'warning');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      this.showToast('Xác nhận mật khẩu mới không trùng khớp!', 'danger');
+      return;
+    }
+
+    const btn = document.getElementById('btnChangePassword');
+    if (btn) { btn.disabled = true; btn.innerText = '⏳ Đang xử lý...'; }
+
+    try {
+      const res = await API.changePassword(currentPassword, newPassword);
+      this.showToast(`🎉 ${res.message || 'Đổi mật khẩu thành công!'}`, 'success');
+      this.playSound('success');
+
+      document.getElementById('profileCurrentPass').value = '';
+      document.getElementById('profileNewPass').value = '';
+      document.getElementById('profileConfirmPass').value = '';
+
+      setTimeout(() => this.closeModal('profileModal'), 1500);
+    } catch (err) {
+      this.showToast(`Lỗi đổi mật khẩu: ${err.message}`, 'danger');
+      this.playSound('danger');
+    } finally {
+      if (btn) { btn.disabled = false; btn.innerText = '🔒 Cập Nhật Mật Khẩu Mới'; }
+    }
+  },
+
+  // -------------------------------------------------------------
   // REALTIME ACTIVITIES AUDIT STREAM
   // -------------------------------------------------------------
   async renderActivitiesView() {
@@ -3643,7 +3877,7 @@ const App = {
     return `
       <div class="activity-item cat-${this.escapeHtml(category)} ${isNew ? 'highlight-new' : ''}" data-act-id="${item.id}">
         <div class="activity-avatar-col">
-          <div class="activity-avatar">${avatar}</div>
+          <div class="activity-avatar" style="display:flex; align-items:center; justify-content:center;">${this.renderAvatar(avatar, 28)}</div>
           <span class="activity-role-mini ${userRole}">${userRole === 'admin' ? 'ADMIN' : 'USER'}</span>
         </div>
         <div class="activity-content-col">
@@ -4220,7 +4454,7 @@ const App = {
   createCommentHtml(comment) {
     return `
       <div class="comment-item">
-        <div class="comment-avatar">${comment.userAvatar || '👤'}</div>
+        <div class="comment-avatar" style="display:flex; align-items:center; justify-content:center;">${this.renderAvatar(comment.userAvatar || '👤', 32)}</div>
         <div class="comment-bubble">
           <div class="comment-author">${this.escapeHtml(comment.userName)}</div>
           <div>${this.escapeHtml(comment.content)}</div>
