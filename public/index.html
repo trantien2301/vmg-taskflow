@@ -542,6 +542,17 @@
             </select>
           </div>
 
+          <div class="filter-input-group" id="filterStatusWrapper">
+            <span>📌</span>
+            <select id="filterStatus">
+              <option value="all">Tất cả trạng thái</option>
+              <option value="todo">📋 Cần làm</option>
+              <option value="in_progress">⚡ Đang làm</option>
+              <option value="review">👀 Chờ duyệt</option>
+              <option value="completed">✅ Hoàn thành</option>
+            </select>
+          </div>
+
           <div class="filter-input-group" id="filterDeptWrapper">
             <span>🏢</span>
             <select id="filterDepartment">
@@ -555,6 +566,10 @@
               <option value="all">Tất cả người phụ trách</option>
             </select>
           </div>
+
+          <button type="button" class="btn btn-outline btn-sm" id="btnResetFilters" onclick="App.resetFilters()" title="Xóa toàn bộ bộ lọc" style="display:none; color:var(--danger); border-color:#fca5a5; font-size:12px; padding:6px 12px; font-weight:600;">
+            ✕ Xóa Lọc
+          </button>
 
           <div style="margin-left: auto;">
             <button class="btn btn-primary" id="btnOpenAddTaskModal">
@@ -657,6 +672,7 @@
                   <button class="btn btn-outline btn-sm" id="calBtnNext" title="Thời gian sau">▶</button>
                 </div>
                 <h2 class="calendar-title-display" id="calDateDisplay">Tháng 10, 2026</h2>
+                <span id="calFilterBadge" class="cal-filter-badge" style="display:none;"></span>
               </div>
 
               <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
@@ -680,6 +696,12 @@
                   <span class="hide-mobile">Đồng Bộ Google Calendar</span>
                 </button>
               </div>
+            </div>
+
+            <!-- Active Filter Notification Bar in Calendar -->
+            <div class="cal-filter-notice" id="calFilterNotice" style="display:none;">
+              <span id="calFilterNoticeText">🔍 Đang lọc: 0 công việc</span>
+              <button type="button" class="btn-cal-clear-filter" onclick="App.resetFilters()">✕ Bỏ Lọc</button>
             </div>
 
             <!-- Calendar View Content Container -->

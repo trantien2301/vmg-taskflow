@@ -670,6 +670,7 @@ const App = {
     if (searchInput) {
       searchInput.addEventListener('input', (e) => {
         this.state.filters.search = e.target.value;
+        this.updateFilterUiState();
         this.renderView();
       });
     }
@@ -678,6 +679,16 @@ const App = {
     if (priorityFilter) {
       priorityFilter.addEventListener('change', (e) => {
         this.state.filters.priority = e.target.value;
+        this.updateFilterUiState();
+        this.renderView();
+      });
+    }
+
+    const statusFilter = document.getElementById('filterStatus');
+    if (statusFilter) {
+      statusFilter.addEventListener('change', (e) => {
+        this.state.filters.status = e.target.value;
+        this.updateFilterUiState();
         this.renderView();
       });
     }
@@ -686,6 +697,7 @@ const App = {
     if (deptFilter) {
       deptFilter.addEventListener('change', (e) => {
         this.state.filters.department = e.target.value;
+        this.updateFilterUiState();
         this.renderView();
       });
     }
@@ -694,8 +706,14 @@ const App = {
     if (userFilter) {
       userFilter.addEventListener('change', (e) => {
         this.state.filters.assignedTo = e.target.value;
+        this.updateFilterUiState();
         this.renderView();
       });
+    }
+
+    const resetFiltersBtn = document.getElementById('btnResetFilters');
+    if (resetFiltersBtn) {
+      resetFiltersBtn.addEventListener('click', () => this.resetFilters());
     }
 
     // Notification dropdown toggle
@@ -1919,7 +1937,16 @@ const App = {
     const { status, priority, department, assignedTo, search } = this.state.filters;
     let list = this.getRoleScopedTasks();
 
-    if (status !== 'all') list = list.filter(t => t.status === status);
+    if (status !== 'all') {
+      if (status === 'overdue') {
+        const now = new Date();
+        list = list.filter(t => t.status !== 'completed' && t.dueDate && new Date(t.dueDate) < now);
+      } else if (status === 'active') {
+        list = list.filter(t => t.status !== 'completed');
+      } else {
+        list = list.filter(t => t.status === status);
+      }
+    }
     if (priority !== 'all') list = list.filter(t => t.priority === priority);
     if (department !== 'all') list = list.filter(t => t.department === department);
     if (assignedTo !== 'all') list = list.filter(t => t.assignedTo === assignedTo);
@@ -1934,6 +1961,83 @@ const App = {
     }
 
     return list;
+  },
+
+  updateFilterUiState() {
+    const { status, priority, department, assignedTo, search } = this.state.filters;
+    const hasActiveFilter = (search && search.trim() !== '') || priority !== 'all' || status !== 'all' || department !== 'all' || assignedTo !== 'all';
+    
+    // Toggle main clear button
+    const resetBtn = document.getElementById('btnResetFilters');
+    if (resetBtn) {
+      resetBtn.style.display = hasActiveFilter ? 'inline-flex' : 'none';
+    }
+
+    // Update Calendar specific filter notification & badge
+    const noticeEl = document.getElementById('calFilterNotice');
+    const noticeText = document.getElementById('calFilterNoticeText');
+    const filterBadge = document.getElementById('calFilterBadge');
+    
+    if (noticeEl && noticeText) {
+      if (hasActiveFilter) {
+        const activeLabels = [];
+        if (search && search.trim()) activeLabels.push(`"${search.trim()}"`);
+        if (priority !== 'all') {
+          const pLabels = { urgent: 'Khẩn cấp 🚨', high: 'Cao 🔥', medium: 'Trung bình ⚡', low: 'Thấp 🌱' };
+          activeLabels.push(`Ưu tiên: ${pLabels[priority] || priority}`);
+        }
+        if (status !== 'all') {
+          const sLabels = { todo: 'Cần làm 📋', in_progress: 'Đang làm ⏳', review: 'Chờ duyệt 🔍', completed: 'Hoàn thành ✅' };
+          activeLabels.push(`Trạng thái: ${sLabels[status] || status}`);
+        }
+        if (department !== 'all') activeLabels.push(`Phòng: ${department}`);
+        if (assignedTo !== 'all') {
+          const u = (this.state.users || []).find(x => x.id === assignedTo);
+          activeLabels.push(`Người nhận: ${u ? u.name : assignedTo}`);
+        }
+        
+        const count = this.getFilteredTasks().length;
+        const total = this.getRoleScopedTasks().length;
+        noticeText.innerHTML = `🔍 <strong>Đang lọc Lịch & Thời Hạn:</strong> ${activeLabels.join(' • ')} (Hiển thị <strong>${count}</strong> / ${total} công việc)`;
+        noticeEl.style.display = 'flex';
+        
+        if (filterBadge) {
+          filterBadge.innerText = `🔍 Lọc: ${count}/${total}`;
+          filterBadge.style.display = 'inline-block';
+        }
+      } else {
+        noticeEl.style.display = 'none';
+        if (filterBadge) filterBadge.style.display = 'none';
+      }
+    }
+  },
+
+  resetFilters() {
+    this.state.filters = {
+      search: '',
+      priority: 'all',
+      status: 'all',
+      department: 'all',
+      assignedTo: 'all'
+    };
+
+    const s = document.getElementById('filterSearch');
+    if (s) s.value = '';
+    const p = document.getElementById('filterPriority');
+    if (p) p.value = 'all';
+    const st = document.getElementById('filterStatus');
+    if (st) st.value = 'all';
+    const d = document.getElementById('filterDepartment');
+    if (d) d.value = 'all';
+    const a = document.getElementById('filterAssignee');
+    if (a) a.value = 'all';
+
+    const resetBtn = document.getElementById('btnResetFilters');
+    if (resetBtn) resetBtn.style.display = 'none';
+
+    this.updateFilterUiState();
+    this.renderView();
+    this.showToast('✨ Đã đặt lại tất cả bộ lọc về mặc định', 'info');
   },
 
   // -------------------------------------------------------------
@@ -2201,10 +2305,12 @@ const App = {
   // CALENDAR / TIMELINE VIEW (DAY, WEEK, MONTH MODES)
   // -------------------------------------------------------------
   renderCalendarView() {
+    this.updateFilterUiState();
     this.renderActiveCalendarMode();
   },
 
   renderActiveCalendarMode() {
+    this.updateFilterUiState();
     const container = document.getElementById('calendarViewBody');
     const titleEl = document.getElementById('calDateDisplay');
     if (!container) return;
@@ -2293,6 +2399,10 @@ const App = {
 
   toLocalDateKey(dateObjOrString) {
     if (!dateObjOrString) return '';
+    if (typeof dateObjOrString === 'string') {
+      const match = dateObjOrString.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (match) return `${match[1]}-${match[2]}-${match[3]}`;
+    }
     const d = new Date(dateObjOrString);
     if (isNaN(d.getTime())) return '';
     const year = d.getFullYear();
@@ -2329,9 +2439,12 @@ const App = {
 
     const todayKey = this.toLocalDateKey(new Date());
 
+    // Use filtered tasks respecting search, priority, department, assignee, status, and role scoping!
+    const filteredTasks = this.getFilteredTasks();
+
     // Map tasks by local date key
     const tasksByDate = {};
-    (this.state.tasks || []).forEach(t => {
+    filteredTasks.forEach(t => {
       if (!t.dueDate) return;
       const key = this.toLocalDateKey(t.dueDate);
       if (!tasksByDate[key]) tasksByDate[key] = [];
@@ -2442,8 +2555,9 @@ const App = {
 
     const weekdayNames = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'];
 
+    const filteredTasks = this.getFilteredTasks();
     const tasksByDate = {};
-    (this.state.tasks || []).forEach(t => {
+    filteredTasks.forEach(t => {
       if (!t.dueDate) return;
       const key = this.toLocalDateKey(t.dueDate);
       if (!tasksByDate[key]) tasksByDate[key] = [];
@@ -2528,7 +2642,7 @@ const App = {
     const dayName = dayNames[currentDate.getDay()];
     const fullDateStr = `${currentDate.getDate()} Tháng ${currentDate.getMonth() + 1}, ${currentDate.getFullYear()}`;
 
-    const tasks = this.state.tasks || [];
+    const tasks = this.getFilteredTasks();
     const now = new Date();
 
     // Tasks due on this day
