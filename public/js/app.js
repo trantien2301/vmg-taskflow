@@ -463,7 +463,16 @@ const App = {
       case 'user:created':
       case 'user:updated':
       case 'user:deleted':
-        this.refreshUsersList();
+        this.refreshUsersList().then(() => {
+          if (this.state.activeView === 'users') {
+            this.renderUsersView();
+          } else if (this.state.activeView === 'kanban') {
+            this.renderKanbanView();
+          }
+        });
+        if (data && data.user) {
+          this.showToast(`👥 Đã cập nhật nhân sự: "${data.user.name}" (${(data.user.role || 'user').toUpperCase()})`, 'info');
+        }
         break;
 
       case 'department:created':
@@ -3425,7 +3434,21 @@ const App = {
         this.playSound('success');
       }
       this.closeModal('userModal');
+
+      // Tự động xóa bộ lọc tìm kiếm để nhân sự mới luôn hiển thị ngay lập tức
+      const searchInp = document.getElementById('userSearchInput');
+      if (searchInp) searchInp.value = '';
+      const deptFlt = document.getElementById('userFilterDept');
+      if (deptFlt) deptFlt.value = 'all';
+      const roleFlt = document.getElementById('userFilterRole');
+      if (roleFlt) roleFlt.value = 'all';
+      const statFlt = document.getElementById('userFilterStatus');
+      if (statFlt) statFlt.value = 'all';
+
       await this.refreshUsersList();
+      if (this.state.activeView === 'users') {
+        this.renderUsersView();
+      }
     } catch (err) {
       this.showToast(`Lỗi: ${err.message}`, 'danger');
       this.playSound('danger');
@@ -3765,11 +3788,96 @@ const App = {
   // -------------------------------------------------------------
   // TASK CRUD & MODALS
   // -------------------------------------------------------------
+  populateTaskFormDropdowns(selectedAssignee = null, selectedDept = null) {
+    const currentUser = this.state.user || {};
+    const allUsers = this.state.users || [];
+    const deptsList = (this.state.departments || []).map(d => typeof d === 'string' ? d : d.name);
+
+    const deptSelect = document.getElementById('taskFormDept');
+    const assigneeSelect = document.getElementById('taskFormAssignee');
+    const deptHint = document.getElementById('taskFormDeptHint');
+    const assigneeHint = document.getElementById('taskFormAssigneeHint');
+    const quickAddDeptBtn = document.getElementById('btnTaskFormQuickAddDept');
+
+    if (!deptSelect || !assigneeSelect) return;
+
+    if (currentUser.role === 'user') {
+      // 1. NHÂN VIÊN CẤP DƯỚI:
+      // Chỉ nhận việc và tự tạo việc cho chính mình, KHÔNG được giao việc cho Manager hoặc bất kỳ ai khác
+      const myDept = currentUser.department || 'Phòng Kỹ Thuật';
+      deptSelect.innerHTML = `<option value="${this.escapeHtml(myDept)}">${this.escapeHtml(myDept)}</option>`;
+      deptSelect.value = myDept;
+      deptSelect.disabled = true;
+      if (deptHint) deptHint.innerHTML = '<span style="color:#059669; font-weight:600;">🔒 Phòng ban của bạn</span>';
+      if (quickAddDeptBtn) quickAddDeptBtn.style.display = 'none';
+
+      assigneeSelect.innerHTML = `<option value="${currentUser.id}">👤 ${this.escapeHtml(currentUser.name)} (Chính tôi - Tự tạo việc cá nhân)</option>`;
+      assigneeSelect.value = currentUser.id;
+      assigneeSelect.disabled = true;
+      if (assigneeHint) {
+        assigneeHint.innerHTML = '<span style="color:#b91c1c; font-weight:700;">🔒 Phân quyền nhân viên: Bạn chỉ được tạo việc cho chính mình, không được giao việc cho Manager hoặc người khác.</span>';
+      }
+    } else if (currentUser.role === 'manager') {
+      // 2. TRƯỞNG PHÒNG (MANAGER):
+      // Được giao việc cho nhân viên cấp dưới trong cùng phòng ban, hoặc tự giao việc cho mình
+      const myDept = currentUser.department || '';
+      deptSelect.innerHTML = `<option value="${this.escapeHtml(myDept)}">${this.escapeHtml(myDept)}</option>`;
+      deptSelect.value = myDept;
+      deptSelect.disabled = true;
+      if (deptHint) deptHint.innerHTML = `<span style="color:#059669; font-weight:600;">🏢 Phòng ban quản lý: ${this.escapeHtml(myDept)}</span>`;
+      if (quickAddDeptBtn) quickAddDeptBtn.style.display = 'none';
+
+      // Lọc cấp dưới trong cùng phòng ban
+      const subordinates = allUsers.filter(u => u.department === myDept && u.role === 'user' && u.id !== currentUser.id);
+
+      let optionsHtml = `<option value="${currentUser.id}">👔 ${this.escapeHtml(currentUser.name)} (Chính tôi - Trưởng phòng)</option>`;
+      if (subordinates.length > 0) {
+        optionsHtml += subordinates.map(u => 
+          `<option value="${u.id}">👤 ${this.escapeHtml(u.name)} - ${this.escapeHtml(u.position || 'Nhân viên')}</option>`
+        ).join('');
+      } else {
+        optionsHtml += `<option value="" disabled>(Chưa có nhân viên cấp dưới trong ${this.escapeHtml(myDept)})</option>`;
+      }
+
+      assigneeSelect.innerHTML = optionsHtml;
+      assigneeSelect.disabled = false;
+      if (selectedAssignee && (selectedAssignee === currentUser.id || subordinates.some(s => s.id === selectedAssignee))) {
+        assigneeSelect.value = selectedAssignee;
+      } else {
+        assigneeSelect.value = currentUser.id;
+      }
+
+      if (assigneeHint) {
+        assigneeHint.innerHTML = `<span style="color:#047857; font-weight:600;">👔 Phân quyền Trưởng phòng: Được giao việc cho nhân viên cấp dưới trong ${this.escapeHtml(myDept)} hoặc chính mình.</span>`;
+      }
+    } else {
+      // 3. QUẢN TRỊ VIÊN (ADMIN): Toàn quyền
+      deptSelect.innerHTML = deptsList.map(d => `<option value="${this.escapeHtml(d)}">${this.escapeHtml(d)}</option>`).join('');
+      deptSelect.value = selectedDept || (deptsList[0] || 'Phòng Kỹ Thuật');
+      deptSelect.disabled = false;
+      if (deptHint) deptHint.innerHTML = '';
+      if (quickAddDeptBtn) quickAddDeptBtn.style.display = 'inline-block';
+
+      assigneeSelect.innerHTML = allUsers.map(u => 
+        `<option value="${u.id}">${this.escapeHtml(u.name)} - ${this.escapeHtml(u.department || 'N/A')} [${(u.role || 'user').toUpperCase()}]</option>`
+      ).join('');
+      assigneeSelect.value = selectedAssignee || currentUser.id || (allUsers[0]?.id || '');
+      assigneeSelect.disabled = false;
+      if (assigneeHint) assigneeHint.innerHTML = '';
+    }
+  },
+
   openTaskModal(taskToEdit = null) {
     this.populateDepartmentDropdowns();
     const titleEl = document.getElementById('taskModalTitle');
     const form = document.getElementById('taskForm');
     form.reset();
+
+    // Populate dropdowns strictly based on role permissions
+    this.populateTaskFormDropdowns(
+      taskToEdit ? taskToEdit.assignedTo : null,
+      taskToEdit ? taskToEdit.department : null
+    );
 
     if (taskToEdit) {
       titleEl.innerText = `Chỉnh sửa công việc #${taskToEdit.id}`;
@@ -3777,8 +3885,6 @@ const App = {
       document.getElementById('taskFormTitle').value = taskToEdit.title;
       document.getElementById('taskFormDesc').value = taskToEdit.description || '';
       document.getElementById('taskFormPriority').value = taskToEdit.priority;
-      document.getElementById('taskFormDept').value = taskToEdit.department;
-      document.getElementById('taskFormAssignee').value = taskToEdit.assignedTo;
       if (taskToEdit.dueDate) {
         document.getElementById('taskFormDueDate').value = taskToEdit.dueDate.split('T')[0];
       }
@@ -3804,17 +3910,29 @@ const App = {
     const assignedTo = document.getElementById('taskFormAssignee').value;
     const dueDate = document.getElementById('taskFormDueDate').value;
 
+    const currentUser = this.state.user || {};
+    let finalAssignedTo = assignedTo;
+    let finalDept = department;
+
+    // Enforce role-based assignment
+    if (currentUser.role === 'user') {
+      finalAssignedTo = currentUser.id;
+      finalDept = currentUser.department || 'Phòng Kỹ Thuật';
+    } else if (currentUser.role === 'manager') {
+      finalDept = currentUser.department || 'Phòng Marketing';
+    }
+
     const payload = {
       title,
       description,
       priority,
-      department,
-      assignedTo,
+      department: finalDept,
+      assignedTo: finalAssignedTo,
       dueDate: dueDate ? new Date(dueDate).toISOString() : null
     };
 
     try {
-      const assignedUser = this.state.users.find(u => u.id === assignedTo);
+      const assignedUser = this.state.users.find(u => u.id === finalAssignedTo);
       const assignedName = assignedUser ? assignedUser.name : 'nhân sự';
 
       if (id) {

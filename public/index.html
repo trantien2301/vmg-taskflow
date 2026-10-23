@@ -1616,16 +1616,18 @@
             <div class="form-group">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                 <label class="form-label" style="margin-bottom:0;">Phòng Ban Phụ Trách</label>
-                <button type="button" class="btn-link-action" onclick="App.quickAddDepartment('taskFormDept')" style="background:none; border:none; color:var(--primary); font-size:12px; font-weight:600; cursor:pointer;" title="Thêm phòng ban mới">
+                <button type="button" class="btn-link-action" id="btnTaskFormQuickAddDept" onclick="App.quickAddDepartment('taskFormDept')" style="background:none; border:none; color:var(--primary); font-size:12px; font-weight:600; cursor:pointer;" title="Thêm phòng ban mới">
                   + Thêm phòng ban
                 </button>
               </div>
               <select class="form-control" id="taskFormDept"></select>
+              <div id="taskFormDeptHint" style="font-size:11px; margin-top:4px; line-height:1.4;"></div>
             </div>
 
             <div class="form-group">
               <label class="form-label">Phân Công Cho Nhân Viên</label>
               <select class="form-control" id="taskFormAssignee"></select>
+              <div id="taskFormAssigneeHint" style="font-size:11px; margin-top:4px; line-height:1.4;"></div>
             </div>
           </div>
 

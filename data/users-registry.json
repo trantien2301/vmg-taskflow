@@ -1,0 +1,762 @@
+[
+  {
+    "id": "usr-1",
+    "name": "Trần Quản Trị",
+    "email": "admin@company.com",
+    "password": "$2b$10$uhT3k8V5nuiXs.f4uV8WaeokBuJ0PomZssM/pZAyqk1fAvCslEs8e",
+    "role": "admin",
+    "department": "Ban Giám Đốc",
+    "position": "Giám Đốc Dự Án",
+    "avatar": "👑",
+    "phone": "0901 234 567",
+    "active": true,
+    "createdAt": "2026-10-17T02:40:51.381Z",
+    "permissions": {
+      "canCreateTask": true,
+      "canEditTask": true,
+      "canDeleteTask": true,
+      "canReviewTask": true,
+      "canManageDept": true,
+      "canManageUsers": true,
+      "canManageAutomation": true,
+      "canViewReports": true,
+      "canAccessExecutiveDesk": true
+    },
+    "googleCalendar": {
+      "enabled": true,
+      "email": "admin@company.com",
+      "autoSync": true,
+      "syncToken": "gcal_usr-1_jjrclp3w",
+      "reminderTimes": [
+        1440,
+        120,
+        30
+      ],
+      "notifyBrowser": true,
+      "notifySound": true,
+      "lastSync": "2026-10-22T16:25:16.386Z"
+    }
+  },
+  {
+    "id": "usr-4",
+    "name": "Lê Tuyết Mai",
+    "email": "mai.le@company.com",
+    "password": "$2b$10$uhT3k8V5nuiXs.f4uV8WaeokBuJ0PomZssM/pZAyqk1fAvCslEs8e",
+    "role": "user",
+    "department": "Phòng Kinh Doanh",
+    "position": "Chuyên viên Tư Vấn",
+    "avatar": "👩‍💼",
+    "phone": "0934 567 890",
+    "active": true,
+    "createdAt": "2026-10-17T02:40:51.381Z",
+    "permissions": {
+      "canCreateTask": true,
+      "canEditTask": true,
+      "canDeleteTask": false,
+      "canReviewTask": false,
+      "canManageDept": false,
+      "canManageUsers": false,
+      "canManageAutomation": false,
+      "canViewReports": false,
+      "canAccessExecutiveDesk": false
+    },
+    "googleCalendar": {
+      "enabled": true,
+      "email": "mai.le@company.com",
+      "autoSync": true,
+      "syncToken": "gcal_usr-4_9vlryoag",
+      "reminderTimes": [
+        1440,
+        120,
+        30
+      ],
+      "notifyBrowser": true,
+      "notifySound": true,
+      "lastSync": "2026-10-22T16:53:38.426Z"
+    }
+  },
+  {
+    "id": "usr-5",
+    "name": "Phạm Minh Hoàng",
+    "email": "hoang.pham@company.com",
+    "password": "$2b$10$uhT3k8V5nuiXs.f4uV8WaeokBuJ0PomZssM/pZAyqk1fAvCslEs8e",
+    "role": "user",
+    "department": "Phòng Vận Hành",
+    "position": "Điều phối viên",
+    "avatar": "👨‍🔧",
+    "phone": "0945 678 901",
+    "active": true,
+    "createdAt": "2026-10-17T02:40:51.381Z",
+    "permissions": {
+      "canCreateTask": true,
+      "canEditTask": true,
+      "canDeleteTask": false,
+      "canReviewTask": false,
+      "canManageDept": false,
+      "canManageUsers": false,
+      "canManageAutomation": false,
+      "canViewReports": false,
+      "canAccessExecutiveDesk": false
+    },
+    "googleCalendar": {
+      "enabled": true,
+      "email": "hoang.pham@company.com",
+      "autoSync": true,
+      "syncToken": "gcal_usr-5_mu4del81",
+      "reminderTimes": [
+        1440,
+        120,
+        30
+      ],
+      "notifyBrowser": true,
+      "notifySound": true,
+      "lastSync": null
+    }
+  },
+  {
+    "id": "usr-1792209027761",
+    "name": "Trần Tiến",
+    "email": "trantien.dni@vmg.edu.vn",
+    "password": "$2b$10$0kmUfbY7CfzyvczWs5XB1ubDN46JFzjdxikZGx4pC2df5zP5PPTp.",
+    "role": "admin",
+    "department": "Phòng Kỹ Thuật",
+    "position": "Trưởng Nhóm",
+    "avatar": "👑",
+    "phone": "",
+    "active": true,
+    "createdAt": "2026-10-17T03:50:27.853Z",
+    "permissions": {
+      "canCreateTask": true,
+      "canEditTask": true,
+      "canDeleteTask": true,
+      "canReviewTask": true,
+      "canManageDept": true,
+      "canManageUsers": true,
+      "canManageAutomation": true,
+      "canViewReports": true,
+      "canAccessExecutiveDesk": true
+    },
+    "googleCalendar": {
+      "enabled": true,
+      "email": "trantien.dni@vmg.edu.vn",
+      "autoSync": true,
+      "syncToken": "gcal_usr-1792209027761_77cngwn3",
+      "reminderTimes": [
+        1440,
+        120,
+        30
+      ],
+      "notifyBrowser": true,
+      "notifySound": true,
+      "lastSync": null
+    }
+  },
+  {
+    "id": "usr-dept-1792670222017-j6ic",
+    "name": "Nguyễn Lan Hương",
+    "email": "lanhuong.mkt@vmg.edu.vn",
+    "password": "$2b$10$nixHfSXb4P2hgy4R3J8HkuUosCWH7V.wkbRyzYZkti6PfJXGxb1Eq",
+    "role": "manager",
+    "department": "Phòng Marketing",
+    "position": "Trưởng Phòng Marketing",
+    "avatar": "👔",
+    "phone": "0905289574",
+    "active": true,
+    "createdAt": "2026-10-22T11:57:02.099Z",
+    "permissions": {
+      "canCreateTask": true,
+      "canEditTask": true,
+      "canDeleteTask": false,
+      "canReviewTask": true,
+      "canManageDept": true,
+      "canManageUsers": false,
+      "canManageAutomation": true,
+      "canViewReports": false,
+      "canAccessExecutiveDesk": false
+    },
+    "googleCalendar": {
+      "enabled": true,
+      "email": "lanhuong.mkt@vmg.edu.vn",
+      "autoSync": true,
+      "syncToken": "gcal_usr-dept-1792670222017-j6ic_d7gzyylr",
+      "reminderTimes": [
+        1440,
+        120,
+        30
+      ],
+      "notifyBrowser": true,
+      "notifySound": true,
+      "lastSync": null
+    }
+  },
+  {
+    "id": "usr-dept-1792670222099-pgz0",
+    "name": "Phạm Thanh Trúc",
+    "email": "thanhtruc.hc@vmg.edu.vn",
+    "password": "$2b$10$42dD0dpOVsCDd/ld2CFoN.99Z2Haq1Dl1GVAguyROVMEtS56afTjO",
+    "role": "user",
+    "department": "Phòng Hành Chính",
+    "position": "Trưởng Phòng Hành Chính",
+    "avatar": "👩‍💼",
+    "phone": "0908119711",
+    "active": true,
+    "createdAt": "2026-10-22T11:57:02.172Z",
+    "permissions": {
+      "canCreateTask": true,
+      "canEditTask": true,
+      "canDeleteTask": false,
+      "canReviewTask": false,
+      "canManageDept": false,
+      "canManageUsers": false,
+      "canManageAutomation": false,
+      "canViewReports": false,
+      "canAccessExecutiveDesk": false
+    },
+    "googleCalendar": {
+      "enabled": true,
+      "email": "thanhtruc.hc@vmg.edu.vn",
+      "autoSync": true,
+      "syncToken": "gcal_usr-dept-1792670222099-pgz0_kgq0acqd",
+      "reminderTimes": [
+        1440,
+        120,
+        30
+      ],
+      "notifyBrowser": true,
+      "notifySound": true,
+      "lastSync": null
+    }
+  },
+  {
+    "id": "usr-dept-1792670222172-3v88",
+    "name": "Đỗ Quốc Anh",
+    "email": "quocanh.rnd@vmg.edu.vn",
+    "password": "$2b$10$/ib4n/coeXGY5JIcmuThFe6VCDRqJvhvpI6KcSt/Hb50sYbH1UBk2",
+    "role": "user",
+    "department": "Khối R&D",
+    "position": "Giám Đốc Khối R&D",
+    "avatar": "👨‍🔬",
+    "phone": "0903394660",
+    "active": true,
+    "createdAt": "2026-10-22T11:57:02.242Z",
+    "permissions": {
+      "canCreateTask": true,
+      "canEditTask": true,
+      "canDeleteTask": false,
+      "canReviewTask": false,
+      "canManageDept": false,
+      "canManageUsers": false,
+      "canManageAutomation": false,
+      "canViewReports": false,
+      "canAccessExecutiveDesk": false
+    },
+    "googleCalendar": {
+      "enabled": true,
+      "email": "quocanh.rnd@vmg.edu.vn",
+      "autoSync": true,
+      "syncToken": "gcal_usr-dept-1792670222172-3v88_7ugg9sj9",
+      "reminderTimes": [
+        1440,
+        120,
+        30
+      ],
+      "notifyBrowser": true,
+      "notifySound": true,
+      "lastSync": null
+    }
+  },
+  {
+    "id": "usr-dept-1792670222242-mmzk",
+    "name": "Vũ Minh Tuấn",
+    "email": "minhtuan.tckd@vmg.edu.vn",
+    "password": "$2b$10$JXRRip9q24wV8dn09xGjmeOC7AunsasvhVRS8LnbOhwgZ.Fc6QXoG",
+    "role": "user",
+    "department": "Khối Tài Chính Kinh Doanh",
+    "position": "Trưởng Khối TCKD",
+    "avatar": "👨‍💼",
+    "phone": "0908916144",
+    "active": true,
+    "createdAt": "2026-10-22T11:57:02.312Z",
+    "permissions": {
+      "canCreateTask": true,
+      "canEditTask": true,
+      "canDeleteTask": false,
+      "canReviewTask": false,
+      "canManageDept": false,
+      "canManageUsers": false,
+      "canManageAutomation": false,
+      "canViewReports": false,
+      "canAccessExecutiveDesk": false
+    },
+    "googleCalendar": {
+      "enabled": true,
+      "email": "minhtuan.tckd@vmg.edu.vn",
+      "autoSync": true,
+      "syncToken": "gcal_usr-dept-1792670222242-mmzk_wrp7nvuc",
+      "reminderTimes": [
+        1440,
+        120,
+        30
+      ],
+      "notifyBrowser": true,
+      "notifySound": true,
+      "lastSync": null
+    }
+  },
+  {
+    "id": "usr-dept-1792670222312-1ojc",
+    "name": "Hoàng Kim Ngân",
+    "email": "kimngan.ptns@vmg.edu.vn",
+    "password": "$2b$10$Y8CK5rds/YgcbZkvFbjTUupBNwAO/VZPoe5rIqneF3uyDO.doAEgC",
+    "role": "user",
+    "department": "Phòng Phát Triển Nhân Sự",
+    "position": "Trưởng Phòng PTNS",
+    "avatar": "👩‍💼",
+    "phone": "0901299689",
+    "active": true,
+    "createdAt": "2026-10-22T11:57:02.387Z",
+    "permissions": {
+      "canCreateTask": true,
+      "canEditTask": true,
+      "canDeleteTask": false,
+      "canReviewTask": false,
+      "canManageDept": false,
+      "canManageUsers": false,
+      "canManageAutomation": false,
+      "canViewReports": false,
+      "canAccessExecutiveDesk": false
+    },
+    "googleCalendar": {
+      "enabled": true,
+      "email": "kimngan.ptns@vmg.edu.vn",
+      "autoSync": true,
+      "syncToken": "gcal_usr-dept-1792670222312-1ojc_zimimoig",
+      "reminderTimes": [
+        1440,
+        120,
+        30
+      ],
+      "notifyBrowser": true,
+      "notifySound": true,
+      "lastSync": null
+    }
+  },
+  {
+    "id": "usr-dept-1792670222388-is3j",
+    "name": "Ngô Quang Hải",
+    "email": "quanghai.gdkv1@vmg.edu.vn",
+    "password": "$2b$10$k6WyxP5jRp8WJs1Lbu7XpO6rr1WO.zQOtgpfG26/P7axz9apIS6ju",
+    "role": "user",
+    "department": "Ban Giám Đốc Khu Vực 1",
+    "position": "Giám Đốc Khu Vực 1",
+    "avatar": "👨‍💼",
+    "phone": "0908063201",
+    "active": true,
+    "createdAt": "2026-10-22T11:57:02.458Z",
+    "permissions": {
+      "canCreateTask": true,
+      "canEditTask": true,
+      "canDeleteTask": false,
+      "canReviewTask": false,
+      "canManageDept": false,
+      "canManageUsers": false,
+      "canManageAutomation": false,
+      "canViewReports": false,
+      "canAccessExecutiveDesk": false
+    },
+    "googleCalendar": {
+      "enabled": true,
+      "email": "quanghai.gdkv1@vmg.edu.vn",
+      "autoSync": true,
+      "syncToken": "gcal_usr-dept-1792670222388-is3j_pyo0rjfm",
+      "reminderTimes": [
+        1440,
+        120,
+        30
+      ],
+      "notifyBrowser": true,
+      "notifySound": true,
+      "lastSync": null
+    }
+  },
+  {
+    "id": "usr-dept-1792670222458-4i47",
+    "name": "Trần Đình Hùng",
+    "email": "dinhhung.gdkv2@vmg.edu.vn",
+    "password": "$2b$10$BSlhhf3m4k7vH/ACIHTW5.K3rK4iSLh6EHrfufavhdVbWWBoofMwm",
+    "role": "user",
+    "department": "Ban Giám Đốc Khu Vực 2",
+    "position": "Giám Đốc Khu Vực 2",
+    "avatar": "👨‍💼",
+    "phone": "0903114772",
+    "active": true,
+    "createdAt": "2026-10-22T11:57:02.527Z",
+    "permissions": {
+      "canCreateTask": true,
+      "canEditTask": true,
+      "canDeleteTask": false,
+      "canReviewTask": false,
+      "canManageDept": false,
+      "canManageUsers": false,
+      "canManageAutomation": false,
+      "canViewReports": false,
+      "canAccessExecutiveDesk": false
+    },
+    "googleCalendar": {
+      "enabled": true,
+      "email": "dinhhung.gdkv2@vmg.edu.vn",
+      "autoSync": true,
+      "syncToken": "gcal_usr-dept-1792670222458-4i47_t3mt2b2a",
+      "reminderTimes": [
+        1440,
+        120,
+        30
+      ],
+      "notifyBrowser": true,
+      "notifySound": true,
+      "lastSync": null
+    }
+  },
+  {
+    "id": "usr-dept-1792670222527-zg4z",
+    "name": "Hoàng Văn Bình",
+    "email": "vanbinh.gdkv3@vmg.edu.vn",
+    "password": "$2b$10$YJFf9.rpaIcyN1AODJlA0ehU0SclVAY/TR11b8Mn3xUkHMWuLDjqC",
+    "role": "user",
+    "department": "Ban Giám Đốc Khu Vực 3",
+    "position": "Giám Đốc Khu Vực 3",
+    "avatar": "👨‍💼",
+    "phone": "0906387331",
+    "active": true,
+    "createdAt": "2026-10-22T11:57:02.600Z",
+    "permissions": {
+      "canCreateTask": true,
+      "canEditTask": true,
+      "canDeleteTask": false,
+      "canReviewTask": false,
+      "canManageDept": false,
+      "canManageUsers": false,
+      "canManageAutomation": false,
+      "canViewReports": false,
+      "canAccessExecutiveDesk": false
+    },
+    "googleCalendar": {
+      "enabled": true,
+      "email": "vanbinh.gdkv3@vmg.edu.vn",
+      "autoSync": true,
+      "syncToken": "gcal_usr-dept-1792670222527-zg4z_wpehd6u8",
+      "reminderTimes": [
+        1440,
+        120,
+        30
+      ],
+      "notifyBrowser": true,
+      "notifySound": true,
+      "lastSync": null
+    }
+  },
+  {
+    "id": "usr-dept-1792670222600-fdsg",
+    "name": "Trần Văn Dũng",
+    "email": "vandung.cskh@vmg.edu.vn",
+    "password": "$2b$10$TXKxPLBESKtoTTfbL8eVIuv5iq/CsI6qOQW3mWleUNFmYHx3vvtC2",
+    "role": "user",
+    "department": "Phòng Chăm Sóc Khách Hàng",
+    "position": "Trưởng Phòng CSKH",
+    "avatar": "👨‍💼",
+    "phone": "0902126800",
+    "active": true,
+    "createdAt": "2026-10-22T11:57:02.673Z",
+    "permissions": {
+      "canCreateTask": true,
+      "canEditTask": true,
+      "canDeleteTask": false,
+      "canReviewTask": false,
+      "canManageDept": false,
+      "canManageUsers": false,
+      "canManageAutomation": false,
+      "canViewReports": false,
+      "canAccessExecutiveDesk": false
+    },
+    "googleCalendar": {
+      "enabled": true,
+      "email": "vandung.cskh@vmg.edu.vn",
+      "autoSync": true,
+      "syncToken": "gcal_usr-dept-1792670222600-fdsg_swc92tzp",
+      "reminderTimes": [
+        1440,
+        120,
+        30
+      ],
+      "notifyBrowser": true,
+      "notifySound": true,
+      "lastSync": null
+    }
+  },
+  {
+    "id": "usr-dept-1792670222673-l3g9",
+    "name": "Lê Văn Hùng",
+    "email": "vanhung.ttkt@vmg.edu.vn",
+    "password": "$2b$10$7hYnlODFsGruY2pjvDlO8.Z4kmhQYKNYBxQJbRUG3qU37XaCM5QCu",
+    "role": "user",
+    "department": "Trung Tâm Khảo Thí",
+    "position": "Giám Đốc TT Khảo Thí",
+    "avatar": "👨‍🏫",
+    "phone": "0904420244",
+    "active": true,
+    "createdAt": "2026-10-22T11:57:02.744Z",
+    "permissions": {
+      "canCreateTask": true,
+      "canEditTask": true,
+      "canDeleteTask": false,
+      "canReviewTask": false,
+      "canManageDept": false,
+      "canManageUsers": false,
+      "canManageAutomation": false,
+      "canViewReports": false,
+      "canAccessExecutiveDesk": false
+    },
+    "googleCalendar": {
+      "enabled": true,
+      "email": "vanhung.ttkt@vmg.edu.vn",
+      "autoSync": true,
+      "syncToken": "gcal_usr-dept-1792670222673-l3g9_jxm132cq",
+      "reminderTimes": [
+        1440,
+        120,
+        30
+      ],
+      "notifyBrowser": true,
+      "notifySound": true,
+      "lastSync": null
+    }
+  },
+  {
+    "id": "usr-dept-1792670222744-r3ww",
+    "name": "Nguyễn Văn Minh",
+    "email": "vanminh.vmp@vmg.edu.vn",
+    "password": "$2b$10$bArD4fcFXovV95rgqAZIQOppIHrfIzeZS8CZdsOggV4AKXPK7TXqi",
+    "role": "user",
+    "department": "Khối R&D - VMP",
+    "position": "Trưởng Nhóm R&D VMP",
+    "avatar": "👨‍💻",
+    "phone": "0908043222",
+    "active": true,
+    "createdAt": "2026-10-22T11:57:02.814Z",
+    "permissions": {
+      "canCreateTask": true,
+      "canEditTask": true,
+      "canDeleteTask": false,
+      "canReviewTask": false,
+      "canManageDept": false,
+      "canManageUsers": false,
+      "canManageAutomation": false,
+      "canViewReports": false,
+      "canAccessExecutiveDesk": false
+    },
+    "googleCalendar": {
+      "enabled": true,
+      "email": "vanminh.vmp@vmg.edu.vn",
+      "autoSync": true,
+      "syncToken": "gcal_usr-dept-1792670222744-r3ww_p2hql7gm",
+      "reminderTimes": [
+        1440,
+        120,
+        30
+      ],
+      "notifyBrowser": true,
+      "notifySound": true,
+      "lastSync": null
+    }
+  },
+  {
+    "id": "usr-dept-1792670222814-f0hg",
+    "name": "Nguyễn Thị Mai",
+    "email": "thimai.tckt@vmg.edu.vn",
+    "password": "$2b$10$trk5eFH1HclR8RfGC57jOu3jbGnL0eDF66kym1cBNqCypJHPNVn/O",
+    "role": "user",
+    "department": "Phòng Tài Chính Kế Toán",
+    "position": "Kế Toán Trưởng",
+    "avatar": "👩‍💼",
+    "phone": "0901525408",
+    "active": true,
+    "createdAt": "2026-10-22T11:57:02.886Z",
+    "permissions": {
+      "canCreateTask": true,
+      "canEditTask": true,
+      "canDeleteTask": false,
+      "canReviewTask": false,
+      "canManageDept": false,
+      "canManageUsers": false,
+      "canManageAutomation": false,
+      "canViewReports": false,
+      "canAccessExecutiveDesk": false
+    },
+    "googleCalendar": {
+      "enabled": true,
+      "email": "thimai.tckt@vmg.edu.vn",
+      "autoSync": true,
+      "syncToken": "gcal_usr-dept-1792670222814-f0hg_aflqblx3",
+      "reminderTimes": [
+        1440,
+        120,
+        30
+      ],
+      "notifyBrowser": true,
+      "notifySound": true,
+      "lastSync": null
+    }
+  },
+  {
+    "id": "usr-viewer-1",
+    "name": "Hoàng Giám Sát",
+    "email": "viewer@vmg.edu.vn",
+    "password": "$2b$10$DKAIXSDTzI1GjirDY3Ayx.haeDrc4apxbucRPTfhhasmoDFjyo3my",
+    "role": "viewer",
+    "department": "Ban Kiểm Soát",
+    "position": "Chuyên viên Giám Sát",
+    "avatar": "👁️",
+    "phone": "0988 999 111",
+    "active": true,
+    "permissions": {
+      "canCreateTask": false,
+      "canEditTask": false,
+      "canDeleteTask": false,
+      "canReviewTask": false,
+      "canManageDept": false,
+      "canManageUsers": false,
+      "canManageAutomation": false,
+      "canViewReports": true,
+      "canAccessExecutiveDesk": false
+    },
+    "createdAt": "2026-10-22T14:17:58.265Z",
+    "googleCalendar": {
+      "enabled": true,
+      "email": "viewer@vmg.edu.vn",
+      "autoSync": true,
+      "syncToken": "gcal_usr-viewer-1_743739ne",
+      "reminderTimes": [
+        1440,
+        120,
+        30
+      ],
+      "notifyBrowser": true,
+      "notifySound": true,
+      "lastSync": null
+    }
+  },
+  {
+    "id": "usr-1792742337596",
+    "name": "Trần Thanh Liêm",
+    "email": "thanhliem.dni@vmg.edu.vn",
+    "password": "$2b$10$YhV.nmk40cM5cC9XlSGH3.xnROZXSi114K/o3axXclMwiIWyZm0di",
+    "role": "admin",
+    "permissions": {
+      "canCreateTask": true,
+      "canEditTask": true,
+      "canDeleteTask": true,
+      "canReviewTask": true,
+      "canManageDept": true,
+      "canManageUsers": true,
+      "canManageAutomation": true,
+      "canViewReports": true,
+      "canAccessExecutiveDesk": true
+    },
+    "department": "Ban Giám Đốc",
+    "position": "Tổng Giám Đốc",
+    "avatar": "👑",
+    "phone": "0000000000000000",
+    "active": true,
+    "googleCalendar": {
+      "enabled": true,
+      "email": "thanhliem.dni@vmg.edu.vn",
+      "autoSync": true,
+      "syncToken": "gcal_usr-1792742337596_0vsolwtj",
+      "reminderTimes": [
+        1440,
+        120,
+        30
+      ],
+      "notifyBrowser": true,
+      "notifySound": true,
+      "lastSync": null
+    },
+    "createdAt": "2026-10-23T07:58:57.676Z"
+  },
+  {
+    "id": "usr-1792744749566",
+    "name": "Nguyễn Văn Test",
+    "email": "test.user@vmg.edu.vn",
+    "password": "$2b$10$IRrXh54utvxq3WdbA9z.suYVwoOme3BIct444lp7rBQeZ8ELs19Ya",
+    "role": "user",
+    "permissions": {
+      "canCreateTask": true,
+      "canEditTask": true,
+      "canDeleteTask": false,
+      "canReviewTask": false,
+      "canManageDept": false,
+      "canManageUsers": false,
+      "canManageAutomation": false,
+      "canViewReports": false,
+      "canAccessExecutiveDesk": false
+    },
+    "department": "Phòng Marketing",
+    "position": "Chuyên viên Content",
+    "avatar": "👤",
+    "phone": "0911222333",
+    "active": true,
+    "googleCalendar": {
+      "enabled": true,
+      "email": "test.user@vmg.edu.vn",
+      "autoSync": true,
+      "syncToken": "gcal_usr-1792744749566_xxw33s6o",
+      "reminderTimes": [
+        1440,
+        120,
+        30
+      ],
+      "notifyBrowser": true,
+      "notifySound": true,
+      "lastSync": null
+    },
+    "createdAt": "2026-10-23T08:39:09.645Z"
+  },
+  {
+    "id": "usr-1792745065771",
+    "name": "Vũ Thị Hoa",
+    "email": "hoa.vu@vmg.edu.vn",
+    "password": "$2b$10$HIq2M8vS8DjW3DPJxi/3xe2mWa595Isv5w0/rP6nSRhFETLEiyEgy",
+    "role": "user",
+    "permissions": {
+      "canCreateTask": true,
+      "canEditTask": true,
+      "canDeleteTask": false,
+      "canReviewTask": false,
+      "canManageDept": false,
+      "canManageUsers": false,
+      "canManageAutomation": false,
+      "canViewReports": false,
+      "canAccessExecutiveDesk": false
+    },
+    "department": "Phòng Marketing",
+    "position": "Chuyên viên SEO",
+    "avatar": "👤",
+    "phone": "0987654321",
+    "active": true,
+    "googleCalendar": {
+      "enabled": true,
+      "email": "hoa.vu@vmg.edu.vn",
+      "autoSync": true,
+      "syncToken": "gcal_usr-1792745065771_ntkrotsa",
+      "reminderTimes": [
+        1440,
+        120,
+        30
+      ],
+      "notifyBrowser": true,
+      "notifySound": true,
+      "lastSync": "2026-10-23T08:49:12.276Z"
+    },
+    "createdAt": "2026-10-23T08:44:25.842Z"
+  }
+]

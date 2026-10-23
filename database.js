@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 
 const DATA_DIR = path.join(__dirname, 'data');
 const DB_PATH = path.join(DATA_DIR, 'db.json');
+const USERS_REGISTRY_PATH = path.join(DATA_DIR, 'users-registry.json');
 
 // Ensure data directory exists
 if (!fs.existsSync(DATA_DIR)) {
@@ -473,117 +474,197 @@ class Database {
     this.load();
   }
 
-  load() {
+  syncUsersRegistry() {
     try {
-      if (fs.existsSync(DB_PATH)) {
-        const raw = fs.readFileSync(DB_PATH, 'utf8');
-        this.data = JSON.parse(raw);
-        if (!this.data.departments || !Array.isArray(this.data.departments)) {
-          this.data.departments = [
-            { id: 'dept-1', name: 'Phòng Kỹ Thuật' },
-            { id: 'dept-2', name: 'Phòng Marketing' },
-            { id: 'dept-3', name: 'Phòng Kinh Doanh' },
-            { id: 'dept-4', name: 'Phòng Vận Hành' },
-            { id: 'dept-5', name: 'Ban Giám Đốc' }
-          ];
-          this.save();
+      if (!this.data || !Array.isArray(this.data.users)) return;
+      const seen = new Set();
+      const registryUsers = [];
+      for (const u of this.data.users) {
+        const emailKey = (u.email || '').toLowerCase();
+        if (emailKey && !seen.has(emailKey)) {
+          seen.add(emailKey);
+          registryUsers.push(u);
         }
-        if (!this.data.automations || !Array.isArray(this.data.automations)) {
-          this.data.automations = getDefaultData().automations || [];
-          this.save();
-        }
-        if (!this.data.announcementPoster) {
-          this.data.announcementPoster = {
-            active: true,
-            type: 'special_mission',
-            badgeText: 'NHIỆM VỤ ĐẶC BIỆT',
-            title: 'CHIẾN DỊCH CAO ĐIỂM QUÝ IV / 2026',
-            subtitle: 'TĂNG TỐC HOÀN THÀNH 100% MỤC TIÊU TUYỂN SINH & ĐÀO TẠO',
-            message: 'Toàn thể Cán bộ - Nhân viên VMG English tập trung cao độ, chủ động tháo gỡ điểm nghẽn, đẩy nhanh tiến độ các dự án trọng điểm theo chỉ đạo trực tiếp từ Ban Giám Đốc.',
-            details: [
-              'Tập trung xử lý dứt điểm 100% công việc quá hạn trong 48 giờ tới',
-              'Phối hợp liên phòng ban chặt chẽ giữa Khối Tuyển Sinh, Marketing và Đào Tạo',
-              'Cập nhật tiến độ hàng ngày và tuân thủ báo cáo nghiêm ngặt trên TaskFlow'
-            ],
-            deadline: '2026-11-15',
-            targetAudience: 'Toàn thể Cán bộ - Nhân viên VMG English',
-            issuedBy: 'BAN GIÁM ĐỐC VMG',
-            theme: 'vmg_classic',
-            imageDataUrl: '',
-            updatedAt: new Date().toISOString(),
-            updatedBy: 'Trần Quản Trị'
-          };
-          this.save();
-        }
+      }
+      fs.writeFileSync(USERS_REGISTRY_PATH, JSON.stringify(registryUsers, null, 2), 'utf8');
+    } catch (e) {
+      console.error('Error syncing persistent users registry:', e);
+    }
+  }
 
-        // Ensure user permissions and active status
-        if (this.data.users && Array.isArray(this.data.users)) {
-          let modified = false;
-          this.data.users.forEach(u => {
-            if (typeof u.active === 'undefined') {
-              u.active = true;
-              modified = true;
+  loadUsersRegistry() {
+    try {
+      if (fs.existsSync(USERS_REGISTRY_PATH)) {
+        const raw = fs.readFileSync(USERS_REGISTRY_PATH, 'utf8');
+        const regUsers = JSON.parse(raw);
+        if (Array.isArray(regUsers) && this.data && Array.isArray(this.data.users)) {
+          let mergedCount = 0;
+          for (const ru of regUsers) {
+            const exists = this.data.users.find(u => 
+              (ru.email && u.email && u.email.toLowerCase() === ru.email.toLowerCase()) || 
+              (ru.id && u.id === ru.id)
+            );
+            if (!exists) {
+              this.data.users.push(ru);
+              mergedCount++;
             }
-            if (!u.permissions) {
-              const role = u.role || 'user';
-              u.permissions = { ...(DEFAULT_PERMISSIONS[role] || DEFAULT_PERMISSIONS.user) };
-              modified = true;
-            } else {
-              if ((u.role === 'user' || u.role === 'manager') && u.permissions.canViewReports !== false) {
-                // Member và manager không được xem báo cáo hệ thống
-                u.permissions.canViewReports = false;
-                modified = true;
-              }
-              // Đảm bảo quyền Bàn Làm Việc (canAccessExecutiveDesk)
-              if (typeof u.permissions.canAccessExecutiveDesk === 'undefined') {
-                u.permissions.canAccessExecutiveDesk = (u.role === 'admin');
-                modified = true;
-              }
-            }
-
-            // Đảm bảo cấu hình Google Calendar & Nhắc lịch cho từng account
-            if (!u.googleCalendar) {
-              u.googleCalendar = {
-                enabled: true,
-                email: u.email || '',
-                autoSync: true,
-                syncToken: `gcal_${u.id}_${Math.random().toString(36).substring(2, 10)}`,
-                reminderTimes: [1440, 120, 30], // Nhắc trước 1 ngày (1440p), 2 giờ (120p), 30 phút (30p)
-                notifyBrowser: true,
-                notifySound: true,
-                lastSync: null
-              };
-              modified = true;
-            }
-          });
-
-          // Ensure a sample viewer account exists for testing Viewer role
-          const hasViewer = this.data.users.some(u => u.role === 'viewer');
-          if (!hasViewer) {
-            this.data.users.push({
-              id: 'usr-viewer-1',
-              name: 'Hoàng Giám Sát',
-              email: 'viewer@vmg.edu.vn',
-              password: DEFAULT_PASSWORD_HASH,
-              role: 'viewer',
-              department: 'Ban Kiểm Soát',
-              position: 'Chuyên viên Giám Sát',
-              avatar: '👁️',
-              phone: '0988 999 111',
-              active: true,
-              permissions: { ...DEFAULT_PERMISSIONS.viewer },
-              createdAt: new Date().toISOString()
-            });
-            modified = true;
           }
-
-          if (modified) {
-            this.save();
+          if (mergedCount > 0) {
+            console.log(`[Auto-Repair] Đã khôi phục thành công ${mergedCount} tài khoản nhân sự từ persistent registry.`);
           }
         }
       } else {
+        this.syncUsersRegistry();
+      }
+    } catch (e) {
+      console.error('Error loading persistent users registry:', e);
+    }
+  }
+
+  load() {
+    try {
+      let loaded = false;
+      if (fs.existsSync(DB_PATH)) {
+        try {
+          const raw = fs.readFileSync(DB_PATH, 'utf8');
+          this.data = JSON.parse(raw);
+          loaded = true;
+        } catch (parseErr) {
+          console.error('Warning: db.json was corrupted. Attempting recovery from db.json.bak...', parseErr);
+        }
+      }
+
+      // Fallback to db.json.bak if primary file failed
+      if (!loaded && fs.existsSync(`${DB_PATH}.bak`)) {
+        try {
+          const rawBak = fs.readFileSync(`${DB_PATH}.bak`, 'utf8');
+          this.data = JSON.parse(rawBak);
+          loaded = true;
+          console.log('[Recovery] Đã phục hồi dữ liệu thành công từ db.json.bak!');
+        } catch (bakErr) {
+          console.error('Backup recovery failed:', bakErr);
+        }
+      }
+
+      if (!loaded) {
         this.data = getDefaultData();
         this.save();
+      }
+
+      // Always auto-merge from persistent users registry so custom personnel are NEVER lost
+      this.loadUsersRegistry();
+
+      if (!this.data.departments || !Array.isArray(this.data.departments)) {
+        this.data.departments = [
+          { id: 'dept-1', name: 'Phòng Kỹ Thuật' },
+          { id: 'dept-2', name: 'Phòng Marketing' },
+          { id: 'dept-3', name: 'Phòng Kinh Doanh' },
+          { id: 'dept-4', name: 'Phòng Vận Hành' },
+          { id: 'dept-5', name: 'Ban Giám Đốc' }
+        ];
+        this.save();
+      }
+      if (!this.data.automations || !Array.isArray(this.data.automations)) {
+        this.data.automations = getDefaultData().automations || [];
+        this.save();
+      }
+      if (!this.data.announcementPoster) {
+        this.data.announcementPoster = {
+          active: true,
+          type: 'special_mission',
+          badgeText: 'NHIỆM VỤ ĐẶC BIỆT',
+          title: 'CHIẾN DỊCH CAO ĐIỂM QUÝ IV / 2026',
+          subtitle: 'TĂNG TỐC HOÀN THÀNH 100% MỤC TIÊU TUYỂN SINH & ĐÀO TẠO',
+          message: 'Toàn thể Cán bộ - Nhân viên VMG English tập trung cao độ, chủ động tháo gỡ điểm nghẽn, đẩy nhanh tiến độ các dự án trọng điểm theo chỉ đạo trực tiếp từ Ban Giám Đốc.',
+          details: [
+            'Tập trung xử lý dứt điểm 100% công việc quá hạn trong 48 giờ tới',
+            'Phối hợp liên phòng ban chặt chẽ giữa Khối Tuyển Sinh, Marketing và Đào Tạo',
+            'Cập nhật tiến độ hàng ngày và tuân thủ báo cáo nghiêm ngặt trên TaskFlow'
+          ],
+          deadline: '2026-11-15',
+          targetAudience: 'Toàn thể Cán bộ - Nhân viên VMG English',
+          issuedBy: 'BAN GIÁM ĐỐC VMG',
+          theme: 'vmg_classic',
+          imageDataUrl: '',
+          updatedAt: new Date().toISOString(),
+          updatedBy: 'Trần Quản Trị'
+        };
+        this.save();
+      }
+
+      // Ensure user permissions and active status
+      if (this.data.users && Array.isArray(this.data.users)) {
+        let modified = false;
+        this.data.users.forEach(u => {
+          if (typeof u.active === 'undefined') {
+            u.active = true;
+            modified = true;
+          }
+
+          // Cấp quyền Admin cao cấp cho tài khoản chính trantien.dni@vmg.edu.vn
+          if (u.email && u.email.toLowerCase() === 'trantien.dni@vmg.edu.vn') {
+            if (u.role !== 'admin') {
+              u.role = 'admin';
+              u.avatar = '👑';
+              u.permissions = { ...DEFAULT_PERMISSIONS.admin };
+              modified = true;
+            }
+          }
+
+          if (!u.permissions) {
+            const role = u.role || 'user';
+            u.permissions = { ...(DEFAULT_PERMISSIONS[role] || DEFAULT_PERMISSIONS.user) };
+            modified = true;
+          } else {
+            if ((u.role === 'user' || u.role === 'manager') && u.permissions.canViewReports !== false) {
+              u.permissions.canViewReports = false;
+              modified = true;
+            }
+            if (typeof u.permissions.canAccessExecutiveDesk === 'undefined') {
+              u.permissions.canAccessExecutiveDesk = (u.role === 'admin');
+              modified = true;
+            }
+          }
+
+          // Đảm bảo cấu hình Google Calendar & Nhắc lịch cho từng account
+          if (!u.googleCalendar) {
+            u.googleCalendar = {
+              enabled: true,
+              email: u.email || '',
+              autoSync: true,
+              syncToken: `gcal_${u.id}_${Math.random().toString(36).substring(2, 10)}`,
+              reminderTimes: [1440, 120, 30],
+              notifyBrowser: true,
+              notifySound: true,
+              lastSync: null
+            };
+            modified = true;
+          }
+        });
+
+        // Ensure a sample viewer account exists for testing Viewer role
+        const hasViewer = this.data.users.some(u => u.role === 'viewer');
+        if (!hasViewer) {
+          this.data.users.push({
+            id: 'usr-viewer-1',
+            name: 'Hoàng Giám Sát',
+            email: 'viewer@vmg.edu.vn',
+            password: DEFAULT_PASSWORD_HASH,
+            role: 'viewer',
+            department: 'Ban Kiểm Soát',
+            position: 'Chuyên viên Giám Sát',
+            avatar: '👁️',
+            phone: '0988 999 111',
+            active: true,
+            permissions: { ...DEFAULT_PERMISSIONS.viewer },
+            createdAt: new Date().toISOString()
+          });
+          modified = true;
+        }
+
+        if (modified) {
+          this.save();
+        }
       }
     } catch (err) {
       console.error('Error loading database, resetting to default:', err);
@@ -594,9 +675,17 @@ class Database {
 
   save() {
     try {
-      const tempPath = `${DB_PATH}.tmp`;
-      fs.writeFileSync(tempPath, JSON.stringify(this.data, null, 2), 'utf8');
-      fs.renameSync(tempPath, DB_PATH);
+      const content = JSON.stringify(this.data, null, 2);
+      // Safe write directly on Windows to prevent renameSync EPERM errors
+      fs.writeFileSync(DB_PATH, content, 'utf8');
+
+      // Keep persistent backup copy
+      try {
+        fs.writeFileSync(`${DB_PATH}.bak`, content, 'utf8');
+      } catch (_) {}
+
+      // Keep persistent user registry up-to-date
+      this.syncUsersRegistry();
     } catch (err) {
       console.error('Error saving database:', err);
     }

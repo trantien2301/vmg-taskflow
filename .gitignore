@@ -1,6 +1,7 @@
 node_modules/
 cloudflared.exe
 *.log
+*.bak
 .system_generated/
 .DS_Store
 Thumbs.db

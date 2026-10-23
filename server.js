@@ -406,8 +406,8 @@ function authenticate(req, res, next) {
 }
 
 function requireAdmin(req, res, next) {
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Chỉ Quản trị viên (Admin) mới có quyền thực hiện thao tác này!' });
+  if (req.user.role !== 'admin' && !req.user.permissions?.canManageUsers) {
+    return res.status(403).json({ error: 'Chỉ Quản trị viên (Admin) hoặc người có quyền quản lý nhân sự mới có quyền thực hiện thao tác này!' });
   }
   next();
 }
@@ -815,12 +815,48 @@ app.post('/api/tasks', authenticate, (req, res) => {
     return res.status(400).json({ error: 'Tiêu đề công việc là bắt buộc' });
   }
 
+  // -----------------------------------------------------------
+  // KIỂM SOÁT PHÂN QUYỀN GIAO VIỆC (MANAGER & NHÂN VIÊN)
+  // -----------------------------------------------------------
+  let targetAssignee = assignedTo || req.user.id;
+  let targetDept = department || req.user.department;
+
+  if (req.user.role === 'user') {
+    // Nhân viên cấp dưới chỉ được nhận việc và tự tạo việc cho chính mình, KHÔNG được giao việc cho Manager hoặc người khác
+    if (targetAssignee !== req.user.id) {
+      return res.status(403).json({
+        error: 'Phân quyền Nhân viên: Bạn chỉ được tạo việc cho chính mình, không có quyền giao việc cho Manager hoặc nhân sự khác.'
+      });
+    }
+    targetDept = req.user.department;
+  } else if (req.user.role === 'manager') {
+    // Manager chỉ được giao việc cho nhân viên cấp dưới trong cùng phòng ban, hoặc tự giao việc cho mình
+    const assigneeObj = db.getUserById(targetAssignee);
+    if (!assigneeObj) {
+      return res.status(400).json({ error: 'Không tìm thấy nhân sự được phân công' });
+    }
+
+    if (assigneeObj.id !== req.user.id) {
+      if (assigneeObj.department !== req.user.department) {
+        return res.status(403).json({
+          error: `Phân quyền Manager: Bạn chỉ được giao việc cho nhân sự trực thuộc phòng ban của mình (${req.user.department}).`
+        });
+      }
+      if (assigneeObj.role !== 'user') {
+        return res.status(403).json({
+          error: 'Phân quyền Manager: Bạn chỉ được giao việc cho nhân viên cấp dưới trong phòng, không được giao việc cho Manager khác hoặc Ban Giám Đốc.'
+        });
+      }
+    }
+    targetDept = req.user.department;
+  }
+
   const newTask = db.createTask({
     title,
     description,
     priority: priority || 'medium',
-    department: department || req.user.department,
-    assignedTo: assignedTo || req.user.id,
+    department: targetDept,
+    assignedTo: targetAssignee,
     startDate: startDate || new Date().toISOString(),
     dueDate: dueDate || new Date(Date.now() + 3 * 86400000).toISOString(),
     progress: 0,
@@ -885,9 +921,37 @@ app.put('/api/tasks/:id', authenticate, (req, res) => {
   const task = db.getTaskById(req.params.id);
   if (!task) return res.status(404).json({ error: 'Không tìm thấy công việc' });
 
-  // Users can only edit tasks assigned to them, unless they are Admin
-  if (req.user.role !== 'admin' && task.assignedTo !== req.user.id && task.createdBy !== req.user.id) {
+  // Users can only edit tasks assigned to them, unless they are Admin or Manager in their department
+  const isManagerInDept = req.user.role === 'manager' && task.department === req.user.department;
+  if (req.user.role !== 'admin' && !isManagerInDept && task.assignedTo !== req.user.id && task.createdBy !== req.user.id) {
     return res.status(403).json({ error: 'Bạn không có quyền chỉnh sửa công việc này' });
+  }
+
+  // Phân quyền chuyển giao việc khi sửa task
+  if (req.body.assignedTo && req.body.assignedTo !== task.assignedTo) {
+    const newAssigneeId = req.body.assignedTo;
+    if (req.user.role === 'user') {
+      if (newAssigneeId !== req.user.id) {
+        return res.status(403).json({
+          error: 'Phân quyền Nhân viên: Bạn không có quyền chuyển giao việc cho Manager hoặc người khác.'
+        });
+      }
+    } else if (req.user.role === 'manager') {
+      const targetUser = db.getUserById(newAssigneeId);
+      if (!targetUser) return res.status(400).json({ error: 'Không tìm thấy nhân sự được phân công.' });
+      if (targetUser.id !== req.user.id) {
+        if (targetUser.department !== req.user.department) {
+          return res.status(403).json({
+            error: `Phân quyền Manager: Bạn chỉ được giao việc cho nhân sự trực thuộc phòng ban của mình (${req.user.department}).`
+          });
+        }
+        if (targetUser.role !== 'user') {
+          return res.status(403).json({
+            error: 'Phân quyền Manager: Bạn chỉ được giao việc cho nhân viên cấp dưới trong phòng ban, không được giao việc cho Manager khác hoặc Ban Giám Đốc.'
+          });
+        }
+      }
+    }
   }
 
   const updatedTask = db.updateTask(req.params.id, req.body, req.user);
@@ -1835,7 +1899,7 @@ app.get('/api/users', authenticate, (req, res) => {
 });
 
 app.post('/api/users', authenticate, requireAdmin, (req, res) => {
-  const { name, email, password, role, department, position, phone } = req.body;
+  const { name, email, password, role, department, position, phone, active, permissions } = req.body;
   if (!name || !email) {
     return res.status(400).json({ error: 'Tên và email là bắt buộc' });
   }
@@ -1852,7 +1916,9 @@ app.post('/api/users', authenticate, requireAdmin, (req, res) => {
     role: role || 'user',
     department,
     position,
-    phone
+    phone,
+    active: typeof active === 'boolean' ? active : true,
+    permissions
   });
 
   db.logActivity({
