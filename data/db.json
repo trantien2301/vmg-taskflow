@@ -26258,20 +26258,21 @@
   "announcementPoster": {
     "active": true,
     "type": "special_mission",
-    "badgeText": "⚡ NHIỆM VỤ ĐẶC BIỆT",
+    "badgeText": "⚡ NHIỆM VỤ ĐẶC BIỆT ⚡",
     "title": "CHIẾN DỊCH CAO ĐIỂM QUÝ IV / 2026",
-    "subtitle": "CHUYỂN ĐỔI SỐ VÀ TẬP TRUNG TOÀN LỰC",
-    "message": "Ban Lãnh Đạo phát động chiến dịch thi đua nước rút hoàn thành các chỉ tiêu cuối năm.",
+    "subtitle": "TĂNG TỐC HOÀN THÀNH 100% MỤC TIÊU TUYỂN SINH & ĐÀO TẠO",
+    "message": "Toàn thể Cán bộ - Nhân viên VMG English tập trung cao độ, chủ động tháo gỡ điểm nghẽn, tăng tốc hoàn thành các chỉ tiêu trọng điểm theo chỉ đạo trực tiếp từ Ban Giám Đốc.",
     "details": [
-      "Hoàn thành 100% các công việc còn tồn đọng",
-      "Đồng bộ toàn bộ lịch công việc cá nhân lên Google Calendar"
+      "Tập trung xử lý dứt điểm 100% công việc quá hạn trong 48 giờ tới.",
+      "Phối hợp liên phòng ban chặt chẽ giữa Khối Tuyển Sinh, Marketing và Đào Tạo.",
+      "Cập nhật tiến độ hàng ngày và thực hiện báo cáo nghiêm túc trên TaskFlow."
     ],
     "deadline": "2026-11-15",
     "targetAudience": "Toàn thể Cán bộ - Nhân viên VMG English",
-    "issuedBy": "BAN TỔNG GIÁM ĐỐC",
+    "issuedBy": "BAN GIÁM ĐỐC VMG",
     "theme": "vmg_classic",
-    "updatedAt": "2026-10-23T04:35:36.406Z",
+    "updatedAt": "2026-10-23T04:53:57.672Z",
     "updatedBy": "Trần Quản Trị",
-    "imageUrl": "/images/active-announcement-poster.png?v=1792730136406"
+    "imageUrl": "/images/active-announcement-poster.png?v=1792731237673"
   }
 }

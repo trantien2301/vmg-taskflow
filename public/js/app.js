@@ -5763,7 +5763,14 @@ const App = {
 
           const posterSrc = res.poster.imageUrl || res.poster.imageDataUrl;
           if (posterSrc) {
-            if (img) img.src = posterSrc;
+            if (img) {
+              img.onerror = () => {
+                this.drawPosterToCanvas(res.poster, (url) => {
+                  if (img) img.src = url;
+                });
+              };
+              img.src = posterSrc;
+            }
             if (overlay) overlay.style.display = 'flex';
           } else {
             // Draw immediately on the fly
@@ -5917,281 +5924,288 @@ const App = {
   },
 
   drawPosterToCanvas(posterObj = null, callback = null) {
-    const canvas = document.getElementById('posterCanvas');
-    const previewImg = document.getElementById('posterLivePreviewImg');
-    if (!canvas) return;
+    return new Promise((resolve) => {
+      const canvas = document.getElementById('posterCanvas');
+      const previewImg = document.getElementById('posterLivePreviewImg');
+      if (!canvas) {
+        if (typeof callback === 'function') callback('');
+        return resolve('');
+      }
 
-    const ctx = canvas.getContext('2d');
-    const W = canvas.width;
-    const H = canvas.height;
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width;
+      const H = canvas.height;
 
-    const p = posterObj || {};
-    const theme = document.getElementById('posterThemeSelect')?.value || p.theme || 'vmg_classic';
-    const typeLabel = document.getElementById('posterTypeSelect')?.selectedOptions[0]?.text || p.badgeText || '⚡ NHIỆM VỤ ĐẶC BIỆT';
-    const title = (document.getElementById('posterTitleInput')?.value || p.title || 'CHIẾN DỊCH CAO ĐIỂM QUÝ IV / 2026').toUpperCase();
-    const subtitle = (document.getElementById('posterSubtitleInput')?.value || p.subtitle || '').toUpperCase();
-    const message = document.getElementById('posterMessageInput')?.value || p.message || '';
-    const d1 = document.getElementById('posterDetail1')?.value || p.details?.[0] || '';
-    const d2 = document.getElementById('posterDetail2')?.value || p.details?.[1] || '';
-    const d3 = document.getElementById('posterDetail3')?.value || p.details?.[2] || '';
-    const deadline = document.getElementById('posterDeadlineInput')?.value || p.deadline || '';
-    const issuedBy = (document.getElementById('posterIssuedByInput')?.value || p.issuedBy || 'BAN GIÁM ĐỐC VMG').toUpperCase();
+      const p = posterObj || {};
+      const theme = document.getElementById('posterThemeSelect')?.value || p.theme || 'vmg_classic';
+      const typeLabel = document.getElementById('posterTypeSelect')?.selectedOptions[0]?.text || p.badgeText || '⚡ NHIỆM VỤ ĐẶC BIỆT';
+      const title = (document.getElementById('posterTitleInput')?.value || p.title || 'CHIẾN DỊCH CAO ĐIỂM QUÝ IV / 2026').toUpperCase();
+      const subtitle = (document.getElementById('posterSubtitleInput')?.value || p.subtitle || '').toUpperCase();
+      const message = document.getElementById('posterMessageInput')?.value || p.message || '';
+      const d1 = document.getElementById('posterDetail1')?.value || p.details?.[0] || '';
+      const d2 = document.getElementById('posterDetail2')?.value || p.details?.[1] || '';
+      const d3 = document.getElementById('posterDetail3')?.value || p.details?.[2] || '';
+      const deadline = document.getElementById('posterDeadlineInput')?.value || p.deadline || '';
+      const issuedBy = (document.getElementById('posterIssuedByInput')?.value || p.issuedBy || 'BAN GIÁM ĐỐC VMG').toUpperCase();
 
-    // 1. Background & Border
-    if (theme === 'vmg_royal_dark') {
-      const grad = ctx.createLinearGradient(0, 0, 0, H);
-      grad.addColorStop(0, '#0f172a');
-      grad.addColorStop(1, '#1e1b4b');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, W, H);
+      // 1. Background & Border
+      if (theme === 'vmg_royal_dark') {
+        const grad = ctx.createLinearGradient(0, 0, 0, H);
+        grad.addColorStop(0, '#0f172a');
+        grad.addColorStop(1, '#1e1b4b');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
 
-      ctx.strokeStyle = '#d4af37';
-      ctx.lineWidth = 2.5;
-      ctx.strokeRect(16, 16, W - 32, H - 32);
+        ctx.strokeStyle = '#d4af37';
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(16, 16, W - 32, H - 32);
 
-      ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(22, 22, W - 44, H - 44);
-    } else if (theme === 'vmg_minimal_white') {
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, W, H);
+        ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(22, 22, W - 44, H - 44);
+      } else if (theme === 'vmg_minimal_white') {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, W, H);
 
-      ctx.strokeStyle = '#a61d24';
-      ctx.lineWidth = 3;
-      ctx.strokeRect(16, 16, W - 32, H - 32);
-    } else {
-      const grad = ctx.createLinearGradient(0, 0, 0, H);
-      grad.addColorStop(0, '#ffffff');
-      grad.addColorStop(1, '#fbf8f2');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, W, H);
+        ctx.strokeStyle = '#a61d24';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(16, 16, W - 32, H - 32);
+      } else {
+        const grad = ctx.createLinearGradient(0, 0, 0, H);
+        grad.addColorStop(0, '#ffffff');
+        grad.addColorStop(1, '#fbf8f2');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
 
-      ctx.strokeStyle = '#a61d24';
-      ctx.lineWidth = 3.5;
-      ctx.strokeRect(16, 16, W - 32, H - 32);
+        ctx.strokeStyle = '#a61d24';
+        ctx.lineWidth = 3.5;
+        ctx.strokeRect(16, 16, W - 32, H - 32);
 
-      ctx.strokeStyle = '#d4af37';
-      ctx.lineWidth = 1.5;
-      ctx.strokeRect(23, 23, W - 46, H - 46);
+        ctx.strokeStyle = '#d4af37';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(23, 23, W - 46, H - 46);
 
-      const drawDiamond = (cx, cy) => {
-        ctx.fillStyle = '#d4af37';
-        ctx.beginPath();
-        ctx.moveTo(cx, cy - 5);
-        ctx.lineTo(cx + 5, cy);
-        ctx.lineTo(cx, cy + 5);
-        ctx.lineTo(cx - 5, cy);
-        ctx.closePath();
-        ctx.fill();
-      };
-      drawDiamond(23, 23);
-      drawDiamond(W - 23, 23);
-      drawDiamond(23, H - 23);
-      drawDiamond(W - 23, H - 23);
-    }
+        const drawDiamond = (cx, cy) => {
+          ctx.fillStyle = '#d4af37';
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - 5);
+          ctx.lineTo(cx + 5, cy);
+          ctx.lineTo(cx, cy + 5);
+          ctx.lineTo(cx - 5, cy);
+          ctx.closePath();
+          ctx.fill();
+        };
+        drawDiamond(23, 23);
+        drawDiamond(W - 23, 23);
+        drawDiamond(23, H - 23);
+        drawDiamond(W - 23, H - 23);
+      }
 
-    const wrapText = (text, x, y, maxWidth, lineHeight, font, color, align = 'center') => {
-      ctx.font = font;
-      ctx.fillStyle = color;
-      ctx.textAlign = align;
-      const words = (text || '').split(' ');
-      let line = '';
-      let curY = y;
-      for (let n = 0; n < words.length; n++) {
-        const testLine = line + words[n] + ' ';
-        const metrics = ctx.measureText(testLine);
-        if (metrics.width > maxWidth && n > 0) {
-          ctx.fillText(line.trim(), x, curY);
-          line = words[n] + ' ';
-          curY += lineHeight;
-        } else {
-          line = testLine;
+      const wrapText = (text, x, y, maxWidth, lineHeight, font, color, align = 'center') => {
+        ctx.font = font;
+        ctx.fillStyle = color;
+        ctx.textAlign = align;
+        const words = (text || '').split(' ');
+        let line = '';
+        let curY = y;
+        for (let n = 0; n < words.length; n++) {
+          const testLine = line + words[n] + ' ';
+          const metrics = ctx.measureText(testLine);
+          if (metrics.width > maxWidth && n > 0) {
+            ctx.fillText(line.trim(), x, curY);
+            line = words[n] + ' ';
+            curY += lineHeight;
+          } else {
+            line = testLine;
+          }
         }
-      }
-      ctx.fillText(line.trim(), x, curY);
-      return curY;
-    };
+        ctx.fillText(line.trim(), x, curY);
+        return curY;
+      };
 
-    const logoImg = new Image();
-    logoImg.src = (theme === 'vmg_royal_dark') ? 'images/vmg-logo-white.png' : 'images/vmg-logo-red.png';
+      const logoImg = new Image();
+      logoImg.crossOrigin = 'anonymous';
+      logoImg.src = (theme === 'vmg_royal_dark') ? 'images/vmg-logo-white.png' : 'images/vmg-logo-red.png';
 
-    const drawPosterContent = () => {
-      // Draw Logo
-      const logoW = 180;
-      const logoH = 101;
-      const logoX = (W - logoW) / 2;
-      const logoY = 38;
-      try {
-        ctx.drawImage(logoImg, logoX, logoY, logoW, logoH);
-      } catch (e) {}
+      const drawPosterContent = () => {
+        // Draw Logo
+        const logoW = 180;
+        const logoH = 101;
+        const logoX = (W - logoW) / 2;
+        const logoY = 38;
+        try {
+          if (logoImg.naturalWidth) {
+            ctx.drawImage(logoImg, logoX, logoY, logoW, logoH);
+          }
+        } catch (e) {}
 
-      // Divider line under logo
-      ctx.strokeStyle = (theme === 'vmg_royal_dark') ? '#d4af37' : '#c5a059';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(140, 155);
-      ctx.lineTo(W - 140, 155);
-      ctx.stroke();
-
-      // Center ornament
-      ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#fbbf24' : '#a61d24';
-      ctx.font = 'bold 12px serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('◆  VMG ENGLISH  ◆', W / 2, 172);
-
-      // Badge Pill
-      const badgeY = 195;
-      const badgeW = 280;
-      const badgeH = 32;
-      const badgeX = (W - badgeW) / 2;
-
-      ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#d4af37' : '#a61d24';
-      ctx.beginPath();
-      ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 16);
-      ctx.fill();
-
-      ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#0f172a' : '#ffffff';
-      ctx.font = 'bold 13px "Inter", "Segoe UI", Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(typeLabel, W / 2, badgeY + 21);
-
-      // Title
-      const titleColor = (theme === 'vmg_royal_dark') ? '#ffffff' : '#a61d24';
-      let titleEndY = wrapText(title, W / 2, 268, 680, 36, 'bold 27px "Inter", "Segoe UI", Arial, sans-serif', titleColor, 'center');
-
-      // Subtitle
-      let subEndY = titleEndY;
-      if (subtitle) {
-        const subColor = (theme === 'vmg_royal_dark') ? '#fbbf24' : '#475569';
-        subEndY = wrapText(subtitle, W / 2, titleEndY + 32, 680, 24, 'bold 15px "Inter", "Segoe UI", Arial, sans-serif', subColor, 'center');
-      }
-
-      // Separator line
-      const sepY = subEndY + 22;
-      ctx.strokeStyle = (theme === 'vmg_royal_dark') ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(180, sepY);
-      ctx.lineTo(W - 180, sepY);
-      ctx.stroke();
-
-      // Message Paragraph
-      const msgColor = (theme === 'vmg_royal_dark') ? '#e2e8f0' : '#334155';
-      let msgEndY = wrapText(`"${message}"`, W / 2, sepY + 28, 660, 25, 'italic 15.5px "Inter", "Segoe UI", Arial, sans-serif', msgColor, 'center');
-
-      // Directive Points Box
-      const boxY = Math.max(msgEndY + 24, 490);
-      const boxW = 680;
-      const boxH = 200;
-      const boxX = (W - boxW) / 2;
-
-      ctx.fillStyle = (theme === 'vmg_royal_dark') ? 'rgba(255,255,255,0.05)' : '#faf7f0';
-      ctx.strokeStyle = (theme === 'vmg_royal_dark') ? 'rgba(212,175,55,0.4)' : '#e5d7be';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.roundRect(boxX, boxY, boxW, boxH, 10);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#fbbf24' : '#a61d24';
-      ctx.font = 'bold 13px "Inter", "Segoe UI", Arial, sans-serif';
-      ctx.textAlign = 'left';
-      ctx.fillText('🎯 CÁC MỤC TIÊU & NHIỆM VỤ TRỌNG TÂM:', boxX + 24, boxY + 34);
-
-      ctx.strokeStyle = (theme === 'vmg_royal_dark') ? 'rgba(255,255,255,0.1)' : '#e8decb';
-      ctx.beginPath();
-      ctx.moveTo(boxX + 24, boxY + 44);
-      ctx.lineTo(boxX + boxW - 24, boxY + 44);
-      ctx.stroke();
-
-      const items = [d1, d2, d3].filter(Boolean);
-      const itemTextColor = (theme === 'vmg_royal_dark') ? '#f1f5f9' : '#1e293b';
-      const bulletColor = (theme === 'vmg_royal_dark') ? '#fbbf24' : '#a61d24';
-
-      items.forEach((item, idx) => {
-        const itemY = boxY + 76 + (idx * 40);
-        ctx.fillStyle = bulletColor;
+        // Divider line under logo
+        ctx.strokeStyle = (theme === 'vmg_royal_dark') ? '#d4af37' : '#c5a059';
+        ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.arc(boxX + 32, itemY - 4, 4, 0, Math.PI * 2);
+        ctx.moveTo(140, 155);
+        ctx.lineTo(W - 140, 155);
+        ctx.stroke();
+
+        // Center ornament
+        ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#fbbf24' : '#a61d24';
+        ctx.font = 'bold 12px serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('◆  VMG ENGLISH  ◆', W / 2, 172);
+
+        // Badge Pill
+        const badgeY = 195;
+        const badgeW = 280;
+        const badgeH = 32;
+        const badgeX = (W - badgeW) / 2;
+
+        ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#d4af37' : '#a61d24';
+        ctx.beginPath();
+        ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 16);
         ctx.fill();
 
-        ctx.font = '600 14px "Inter", "Segoe UI", Arial, sans-serif';
-        ctx.fillStyle = itemTextColor;
-        ctx.fillText(item, boxX + 48, itemY);
-      });
+        ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#0f172a' : '#ffffff';
+        ctx.font = 'bold 13px "Inter", "Segoe UI", Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(typeLabel, W / 2, badgeY + 21);
 
-      // Footer Section
-      const footY = 825;
-      ctx.strokeStyle = (theme === 'vmg_royal_dark') ? 'rgba(212,175,55,0.4)' : '#d4af37';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(60, footY);
-      ctx.lineTo(W - 60, footY);
-      ctx.stroke();
+        // Title
+        const titleColor = (theme === 'vmg_royal_dark') ? '#ffffff' : '#a61d24';
+        let titleEndY = wrapText(title, W / 2, 268, 680, 36, 'bold 27px "Inter", "Segoe UI", Arial, sans-serif', titleColor, 'center');
 
-      ctx.textAlign = 'left';
-      ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#94a3b8' : '#64748b';
-      ctx.font = 'bold 11.5px "Inter", "Segoe UI", Arial, sans-serif';
-      ctx.fillText('ĐỐI TƯỢNG THỰC HIỆN:', 60, footY + 30);
+        // Subtitle
+        let subEndY = titleEndY;
+        if (subtitle) {
+          const subColor = (theme === 'vmg_royal_dark') ? '#fbbf24' : '#475569';
+          subEndY = wrapText(subtitle, W / 2, titleEndY + 32, 680, 24, 'bold 15px "Inter", "Segoe UI", Arial, sans-serif', subColor, 'center');
+        }
 
-      ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#f8fafc' : '#1e293b';
-      ctx.font = 'bold 13px "Inter", "Segoe UI", Arial, sans-serif';
-      ctx.fillText('Toàn thể Cán bộ - Nhân viên VMG English', 60, footY + 48);
+        // Separator line
+        const sepY = subEndY + 22;
+        ctx.strokeStyle = (theme === 'vmg_royal_dark') ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(180, sepY);
+        ctx.lineTo(W - 180, sepY);
+        ctx.stroke();
 
-      if (deadline) {
+        // Message Paragraph
+        const msgColor = (theme === 'vmg_royal_dark') ? '#e2e8f0' : '#334155';
+        let msgEndY = wrapText(`"${message}"`, W / 2, sepY + 28, 660, 25, 'italic 15.5px "Inter", "Segoe UI", Arial, sans-serif', msgColor, 'center');
+
+        // Directive Points Box
+        const boxY = Math.max(msgEndY + 24, 490);
+        const boxW = 680;
+        const boxH = 200;
+        const boxX = (W - boxW) / 2;
+
+        ctx.fillStyle = (theme === 'vmg_royal_dark') ? 'rgba(255,255,255,0.05)' : '#faf7f0';
+        ctx.strokeStyle = (theme === 'vmg_royal_dark') ? 'rgba(212,175,55,0.4)' : '#e5d7be';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(boxX, boxY, boxW, boxH, 10);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#fbbf24' : '#a61d24';
+        ctx.font = 'bold 13px "Inter", "Segoe UI", Arial, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('🎯 CÁC MỤC TIÊU & NHIỆM VỤ TRỌNG TÂM:', boxX + 24, boxY + 34);
+
+        ctx.strokeStyle = (theme === 'vmg_royal_dark') ? 'rgba(255,255,255,0.1)' : '#e8decb';
+        ctx.beginPath();
+        ctx.moveTo(boxX + 24, boxY + 44);
+        ctx.lineTo(boxX + boxW - 24, boxY + 44);
+        ctx.stroke();
+
+        const items = [d1, d2, d3].filter(Boolean);
+        const itemTextColor = (theme === 'vmg_royal_dark') ? '#f1f5f9' : '#1e293b';
+        const bulletColor = (theme === 'vmg_royal_dark') ? '#fbbf24' : '#a61d24';
+
+        items.forEach((item, idx) => {
+          const itemY = boxY + 76 + (idx * 40);
+          ctx.fillStyle = bulletColor;
+          ctx.beginPath();
+          ctx.arc(boxX + 32, itemY - 4, 4, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.font = '600 14px "Inter", "Segoe UI", Arial, sans-serif';
+          ctx.fillStyle = itemTextColor;
+          ctx.fillText(item, boxX + 48, itemY);
+        });
+
+        // Footer Section
+        const footY = 825;
+        ctx.strokeStyle = (theme === 'vmg_royal_dark') ? 'rgba(212,175,55,0.4)' : '#d4af37';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(60, footY);
+        ctx.lineTo(W - 60, footY);
+        ctx.stroke();
+
+        ctx.textAlign = 'left';
         ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#94a3b8' : '#64748b';
         ctx.font = 'bold 11.5px "Inter", "Segoe UI", Arial, sans-serif';
-        ctx.fillText('HẠN CHÓT HOÀN THÀNH:', 60, footY + 76);
+        ctx.fillText('ĐỐI TƯỢNG THỰC HIỆN:', 60, footY + 30);
+
+        ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#f8fafc' : '#1e293b';
+        ctx.font = 'bold 13px "Inter", "Segoe UI", Arial, sans-serif';
+        ctx.fillText('Toàn thể Cán bộ - Nhân viên VMG English', 60, footY + 48);
+
+        if (deadline) {
+          ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#94a3b8' : '#64748b';
+          ctx.font = 'bold 11.5px "Inter", "Segoe UI", Arial, sans-serif';
+          ctx.fillText('HẠN CHÓT HOÀN THÀNH:', 60, footY + 76);
+
+          ctx.fillStyle = '#dc2626';
+          ctx.font = 'bold 14px "Inter", "Segoe UI", Arial, sans-serif';
+          ctx.fillText(`📅 ${new Date(deadline).toLocaleDateString('vi-VN')}`, 60, footY + 96);
+        }
+
+        ctx.textAlign = 'right';
+        ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#94a3b8' : '#64748b';
+        ctx.font = 'bold 11.5px "Inter", "Segoe UI", Arial, sans-serif';
+        ctx.fillText('CHỈ ĐẠO BAN HÀNH:', W - 60, footY + 30);
+
+        ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#fbbf24' : '#a61d24';
+        ctx.font = 'bold 15px "Inter", "Segoe UI", Arial, sans-serif';
+        ctx.fillText(issuedBy, W - 60, footY + 50);
+
+        // Stamp
+        ctx.save();
+        ctx.translate(W - 170, footY + 85);
+        ctx.rotate(-4 * Math.PI / 180);
+        ctx.strokeStyle = '#dc2626';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(-80, -18, 160, 36);
 
         ctx.fillStyle = '#dc2626';
-        ctx.font = 'bold 14px "Inter", "Segoe UI", Arial, sans-serif';
-        ctx.fillText(`📅 ${new Date(deadline).toLocaleDateString('vi-VN')}`, 60, footY + 96);
-      }
+        ctx.font = 'bold 11px "Inter", "Segoe UI", Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('★ ĐÃ BAN HÀNH ★', 0, -2);
+        ctx.font = '9px "Inter", "Segoe UI", Arial, sans-serif';
+        ctx.fillText(new Date().toLocaleDateString('vi-VN'), 0, 10);
+        ctx.restore();
 
-      ctx.textAlign = 'right';
-      ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#94a3b8' : '#64748b';
-      ctx.font = 'bold 11.5px "Inter", "Segoe UI", Arial, sans-serif';
-      ctx.fillText('CHỈ ĐẠO BAN HÀNH:', W - 60, footY + 30);
-
-      ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#fbbf24' : '#a61d24';
-      ctx.font = 'bold 15px "Inter", "Segoe UI", Arial, sans-serif';
-      ctx.fillText(issuedBy, W - 60, footY + 50);
-
-      // Stamp
-      ctx.save();
-      ctx.translate(W - 170, footY + 85);
-      ctx.rotate(-4 * Math.PI / 180);
-      ctx.strokeStyle = '#dc2626';
-      ctx.lineWidth = 1.5;
-      ctx.strokeRect(-80, -18, 160, 36);
-
-      ctx.fillStyle = '#dc2626';
-      ctx.font = 'bold 11px "Inter", "Segoe UI", Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('★ ĐÃ BAN HÀNH ★', 0, -2);
-      ctx.font = '9px "Inter", "Segoe UI", Arial, sans-serif';
-      ctx.fillText(new Date().toLocaleDateString('vi-VN'), 0, 10);
-      ctx.restore();
-
-      try {
-        const dataUrl = canvas.toDataURL('image/png');
-        this.state.generatedPosterDataUrl = dataUrl;
-        if (previewImg) {
-          previewImg.src = dataUrl;
+        let dataUrl = '';
+        try {
+          dataUrl = canvas.toDataURL('image/png');
+          this.state.generatedPosterDataUrl = dataUrl;
+          if (previewImg) previewImg.src = dataUrl;
+        } catch (err) {
+          console.warn('Canvas export warning:', err);
         }
-        if (typeof callback === 'function') {
-          callback(dataUrl);
-        }
-      } catch (err) {
-        console.warn('Canvas export warning:', err);
-      }
-    };
+        if (typeof callback === 'function') callback(dataUrl);
+        resolve(dataUrl);
+      };
 
-    if (logoImg.complete) {
-      drawPosterContent();
-    } else {
-      logoImg.onload = drawPosterContent;
-    }
+      if (logoImg.complete) {
+        drawPosterContent();
+      } else {
+        logoImg.onload = drawPosterContent;
+        logoImg.onerror = drawPosterContent;
+      }
+    });
   },
 
   async savePosterAnnouncement(e) {
@@ -6200,7 +6214,7 @@ const App = {
     if (btn) btn.disabled = true;
 
     try {
-      this.renderPosterCanvas();
+      const generatedUrl = await this.renderPosterCanvas();
 
       const posterData = {
         active: Boolean(document.getElementById('posterActiveToggle')?.checked),
@@ -6217,7 +6231,7 @@ const App = {
         ].filter(Boolean),
         deadline: document.getElementById('posterDeadlineInput')?.value || '',
         issuedBy: document.getElementById('posterIssuedByInput')?.value || 'BAN GIÁM ĐỐC VMG',
-        imageDataUrl: this.state.generatedPosterDataUrl || ''
+        imageDataUrl: generatedUrl || this.state.generatedPosterDataUrl || ''
       };
 
       const res = await API.updateAnnouncementPoster(posterData);
