@@ -1597,6 +1597,67 @@ app.get('/api/reports/export-csv', authenticate, (req, res) => {
 });
 
 // -------------------------------------------------------------
+// EXECUTIVE DESK (BÀN LÀM VIỆC AI - Phân Tích & Dự Báo Điều Hành Cao Cấp)
+// -------------------------------------------------------------
+function requireExecutiveDeskAccess(req, res, next) {
+  const user = req.user;
+  if (!user) return res.status(401).json({ error: 'Chưa xác thực' });
+  const hasAccess = user.role === 'admin' || (user.permissions && user.permissions.canAccessExecutiveDesk === true);
+  if (!hasAccess) {
+    return res.status(403).json({
+      error: 'Quyền truy cập Bàn Làm Việc (Executive AI Cockpit) bị từ chối. Chức năng này yêu cầu phân quyền cấp cao (canAccessExecutiveDesk: true).'
+    });
+  }
+  next();
+}
+
+// 1. Lấy toàn bộ phân tích AI nhân sự trễ hẹn & dự báo sức khỏe phòng ban
+app.get('/api/executive-desk/analytics', authenticate, requireExecutiveDeskAccess, (req, res) => {
+  try {
+    const data = db.getExecutiveDeskAnalytics(req.query);
+    res.json({ success: true, ...data });
+  } catch (err) {
+    console.error('Error generating executive desk analytics:', err);
+    res.status(500).json({ error: 'Lỗi khi tạo phân tích điều hành AI: ' + err.message });
+  }
+});
+
+// 2. Trợ Lý AI Điều Hành Trực Tuyến (Interactive Executive AI Assistant)
+app.post('/api/executive-desk/ask-ai', authenticate, requireExecutiveDeskAccess, (req, res) => {
+  try {
+    const { question, department } = req.body || {};
+    if (!question || !question.trim()) {
+      return res.status(400).json({ error: 'Vui lòng cung cấp câu hỏi cho Trợ lý AI.' });
+    }
+    const result = db.askExecutiveDeskAi(question, { department });
+    res.json({ success: true, ...result });
+  } catch (err) {
+    console.error('Error in askExecutiveDeskAi:', err);
+    res.status(500).json({ error: 'Lỗi xử lý câu hỏi AI: ' + err.message });
+  }
+});
+
+// 3. Thực hiện tái phân bổ cân bằng tải công việc (AI Workload Rebalance)
+app.post('/api/executive-desk/rebalance', authenticate, requireExecutiveDeskAccess, (req, res) => {
+  try {
+    const { taskId, targetUserId } = req.body || {};
+    if (!taskId || !targetUserId) {
+      return res.status(400).json({ error: 'Thiếu mã công việc hoặc nhân sự nhận việc.' });
+    }
+    const result = db.executeExecutiveRebalance(taskId, targetUserId, req.user);
+
+    // Realtime WS broadcast
+    broadcast('task:updated', { task: result.task, updatedBy: `[Bàn Làm Việc AI] ${req.user.name}` });
+    broadcast('executive:rebalance_applied', { taskId, targetUserId, triggeredBy: req.user.name });
+
+    res.json({ success: true, message: 'Đã tái phân bổ và cân bằng tải công việc thành công!', task: result.task });
+  } catch (err) {
+    console.error('Error executing executive rebalance:', err);
+    res.status(500).json({ error: 'Lỗi khi cân bằng tải công việc: ' + err.message });
+  }
+});
+
+// -------------------------------------------------------------
 // USER MANAGEMENT ROUTES (Admin)
 // -------------------------------------------------------------
 app.get('/api/users', authenticate, (req, res) => {

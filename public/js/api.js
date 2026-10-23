@@ -192,6 +192,26 @@ const API = {
     return this.request(`/api/reports/summary${query}`);
   },
 
+  // Executive Desk (Bàn Làm Việc AI)
+  async getExecutiveDeskAnalytics(dept = '') {
+    const query = dept ? `?department=${encodeURIComponent(dept)}` : '';
+    return this.request(`/api/executive-desk/analytics${query}`);
+  },
+
+  async askExecutiveDeskAi(question, dept = '') {
+    return this.request('/api/executive-desk/ask-ai', {
+      method: 'POST',
+      body: JSON.stringify({ question, department: dept })
+    });
+  },
+
+  async rebalanceExecutiveDeskTask(taskId, targetUserId) {
+    return this.request('/api/executive-desk/rebalance', {
+      method: 'POST',
+      body: JSON.stringify({ taskId, targetUserId })
+    });
+  },
+
   // Users
   async getUsers() {
     return this.request('/api/users');

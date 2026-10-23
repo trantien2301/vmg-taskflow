@@ -277,6 +277,14 @@
           <span>Lịch & Thời Hạn</span>
         </a>
 
+        <!-- EXECUTIVE AI COCKPIT: BÀN LÀM VIỆC -->
+        <div class="nav-section-title" id="navSectionExecutiveTitle">Điều Hành & Phân Tích AI</div>
+        <a class="nav-item" data-view="executive-desk" id="navItemExecutiveDesk">
+          <span class="icon">💼</span>
+          <span>Bàn Làm Việc</span>
+          <span class="nav-badge" style="font-size:9.5px; font-weight:800; background:linear-gradient(135deg, #8b5cf6, #3b82f6); color:#fff; box-shadow:0 2px 6px rgba(139,92,246,0.35);">AI PRO</span>
+        </a>
+
         <div class="nav-section-title">Cảnh Báo & Giám Sát</div>
         <a class="nav-item" data-view="alerts">
           <span class="icon">🚨</span>
@@ -830,6 +838,274 @@
                   <thead id="reportTableHead"></thead>
                   <tbody id="reportTableBody"></tbody>
                 </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW: BÀN LÀM VIỆC (EXECUTIVE AI COCKPIT) -->
+        <section class="view-panel" id="view-executive-desk">
+          <!-- Access Denied Card (Shown when canAccessExecutiveDesk is false) -->
+          <div class="report-access-denied" id="executiveDeskAccessDenied" style="display:none;">
+            <div class="access-denied-icon">🔒</div>
+            <h2 class="access-denied-title">Khu Vực Phân Quyền Cao Cấp</h2>
+            <p class="access-denied-desc">
+              Tài khoản của bạn hiện <strong>chưa được cấp quyền truy cập "Bàn Làm Việc"</strong> (<code>canAccessExecutiveDesk: false</code>).<br>
+              Chức năng này được bảo mật dành riêng cho Ban Lãnh Đạo & Quản Trị Viên để xem dự báo chiến lược, phân tích rủi ro nhân sự và trợ lý AI.<br>
+              Vui lòng liên hệ Quản Trị Viên (Admin) trong mục Quản Lý Nhân Sự để được phân quyền.
+            </p>
+            <button class="btn btn-primary btn-sm" onclick="App.switchView('kanban')">
+              📋 Quay Lại Bảng Công Việc
+            </button>
+          </div>
+
+          <!-- Main Executive Desk Content -->
+          <div id="executiveDeskMainContent">
+            <!-- Scope & Action Header Card -->
+            <div class="executive-scope-card">
+              <div class="executive-scope-info">
+                <div class="executive-badge-row">
+                  <span class="executive-badge">✨ EXECUTIVE AI COCKPIT</span>
+                  <span class="report-scope-dept" id="executiveScopeDeptText">Toàn Doanh Nghiệp (16 Phòng Ban)</span>
+                  <span class="badge" style="background:rgba(16,185,129,0.12); color:#059669; font-weight:700; font-size:11.5px; border-radius:12px; padding:3px 8px;" id="executiveLiveTimeBadge">
+                    🟢 Realtime Sync
+                  </span>
+                </div>
+                <h1 class="executive-title">
+                  <span>💼 Bàn Làm Việc Điều Hành & Trợ Lý AI</span>
+                </h1>
+                <p class="executive-desc">
+                  Trung tâm chỉ huy điều hành cao cấp: AI tự động phân tích nhân sự trễ hẹn, chẩn đoán nguyên nhân gốc rễ, dự báo xu hướng sức khỏe 16 phòng ban và trợ lý đề xuất hành động thông minh.
+                </p>
+              </div>
+
+              <!-- Scope Actions & Controls -->
+              <div class="executive-actions-bar">
+                <div class="report-dept-filter-wrap">
+                  <label for="executiveDeptFilter" class="report-filter-label">Phòng ban:</label>
+                  <select id="executiveDeptFilter" class="form-control form-control-sm report-dept-select" onchange="App.onExecutiveDeptFilterChange(this.value)">
+                    <option value="all">🏢 Tất cả 16 phòng ban</option>
+                  </select>
+                </div>
+
+                <button class="btn btn-outline btn-sm" onclick="App.openExecutiveBriefingModal()" title="Tạo tóm tắt điều hành bằng AI cho cuộc họp giao ban">
+                  ⚡ Bản Tin Giao Ban AI
+                </button>
+                <button class="btn btn-primary btn-sm" onclick="App.printExecutiveDeskReport()" title="In bản báo cáo điều hành và dự báo">
+                  🖨️ In Báo Cáo
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="App.renderExecutiveDeskView()" title="Làm mới dữ liệu AI tức thì">
+                  🔄
+                </button>
+              </div>
+            </div>
+
+            <!-- KPI Metric Cards Grid -->
+            <div class="executive-kpi-grid">
+              <div class="executive-kpi-card">
+                <div class="executive-kpi-header">
+                  <span class="executive-kpi-title">Điểm Sức Khỏe Doanh Nghiệp</span>
+                  <div class="executive-kpi-icon purple">🎯</div>
+                </div>
+                <div class="executive-kpi-val" id="exeKpiHealthScore">--/100</div>
+                <div class="executive-kpi-sub" id="exeKpiHealthSub">Tỷ lệ đúng hạn toàn hệ thống: --%</div>
+              </div>
+
+              <div class="executive-kpi-card">
+                <div class="executive-kpi-header">
+                  <span class="executive-kpi-title">Nhân Sự Rủi Ro Trễ Hạn</span>
+                  <div class="executive-kpi-icon red">🚨</div>
+                </div>
+                <div class="executive-kpi-val" id="exeKpiDelayedStaff">0</div>
+                <div class="executive-kpi-sub" id="exeKpiDelayedStaffSub">Nhóm nguy cơ cao cần can thiệp</div>
+              </div>
+
+              <div class="executive-kpi-card">
+                <div class="executive-kpi-header">
+                  <span class="executive-kpi-title">Dự Báo Việc Nguy Cơ (7-14 Ngày)</span>
+                  <div class="executive-kpi-icon amber">🔮</div>
+                </div>
+                <div class="executive-kpi-val" id="exeKpiForecastOverdue">0</div>
+                <div class="executive-kpi-sub" id="exeKpiForecastOverdueSub">Dự báo nguy cơ trễ nếu không hỗ trợ</div>
+              </div>
+
+              <div class="executive-kpi-card">
+                <div class="executive-kpi-header">
+                  <span class="executive-kpi-title">Phòng Ban Cần Trợ Lực</span>
+                  <div class="executive-kpi-icon blue">🏢</div>
+                </div>
+                <div class="executive-kpi-val" id="exeKpiCriticalDepts">0</div>
+                <div class="executive-kpi-sub" id="exeKpiCriticalDeptsSub">Phòng ban quá tải hoặc trễ hạn > 30%</div>
+              </div>
+            </div>
+
+            <!-- Top Urgent Matters Banner -->
+            <div class="executive-urgent-banner" id="executiveUrgentBanner" style="display:none;">
+              <div class="executive-urgent-header">
+                <div class="executive-urgent-title">
+                  <span>🔥</span>
+                  <span>ĐIỂM NÓNG KHẨN CẤP CẦN CHỈ ĐẠO TRONG NGÀY:</span>
+                </div>
+                <span class="badge danger" id="exeUrgentCountBadge">0 việc khẩn cấp</span>
+              </div>
+              <div class="executive-urgent-list" id="exeUrgentListContainer"></div>
+            </div>
+
+            <!-- Segmented View Tabs inside Executive Desk -->
+            <div class="executive-section-tabs">
+              <button type="button" class="executive-tab-btn active" id="exeTabBtnPersonnel" onclick="App.switchExecutiveSubTab('personnel')">
+                <span>🚨 AI Phân Tích Nhân Sự Trễ Hẹn</span>
+                <span class="badge danger" id="exePersonnelTabBadge" style="font-size:10px; padding:2px 6px;">0</span>
+              </button>
+              <button type="button" class="executive-tab-btn" id="exeTabBtnForecast" onclick="App.switchExecutiveSubTab('forecast')">
+                <span>🏢 Dự Báo Hoạt Động Các Phòng Ban</span>
+              </button>
+              <button type="button" class="executive-tab-btn" id="exeTabBtnRebalance" onclick="App.switchExecutiveSubTab('rebalance')">
+                <span>⚖️ Cân Bằng Tải Nhân Lực Thông Minh</span>
+                <span class="badge" style="background:#7c3aed; color:#fff; font-size:10px; padding:2px 6px;" id="exeRebalanceBadge">0</span>
+              </button>
+              <button type="button" class="executive-tab-btn" id="exeTabBtnAssistant" onclick="App.switchExecutiveSubTab('assistant')">
+                <span>🤖 Trợ Lý AI Hỏi Đáp Điều Hành</span>
+              </button>
+            </div>
+
+            <!-- SUB-TAB 1: PERSONNEL RISK INTELLIGENCE -->
+            <div id="exeSubContentPersonnel">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+                <div>
+                  <h3 style="margin:0; font-size:15px; font-weight:700; color:var(--text-main);">
+                    Danh Sách Nhân Sự & Chẩn Đoán AI Nguyên Nhân Trễ Hẹn
+                  </h3>
+                  <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
+                    AI tự động quét tiến độ thực tế, phát hiện quá tải, tắc nghẽn khâu duyệt và gợi ý giải pháp can thiệp.
+                  </div>
+                </div>
+
+                <!-- Risk filter buttons -->
+                <div style="display:flex; gap:6px;">
+                  <button type="button" class="btn btn-xs btn-outline active" id="exeRiskFilterAll" onclick="App.filterExecutivePersonnel('all')">Tất cả</button>
+                  <button type="button" class="btn btn-xs btn-outline" id="exeRiskFilterCritical" onclick="App.filterExecutivePersonnel('critical')" style="color:#dc2626; border-color:#fca5a5;">🔴 Rủi ro cao</button>
+                  <button type="button" class="btn btn-xs btn-outline" id="exeRiskFilterWarning" onclick="App.filterExecutivePersonnel('warning')" style="color:#d97706; border-color:#fcd34d;">🟡 Cảnh báo</button>
+                  <button type="button" class="btn btn-xs btn-outline" id="exeRiskFilterHealthy" onclick="App.filterExecutivePersonnel('healthy')" style="color:#059669; border-color:#6ee7b7;">🟢 An toàn</button>
+                </div>
+              </div>
+
+              <!-- Personnel Cards Grid -->
+              <div class="executive-personnel-grid" id="executivePersonnelGrid">
+                <div style="text-align:center; padding:40px; color:var(--text-muted); grid-column:1/-1;">Đang tải phân tích AI...</div>
+              </div>
+            </div>
+
+            <!-- SUB-TAB 2: DEPARTMENT PREDICTIVE FORECAST -->
+            <div id="exeSubContentForecast" style="display:none;">
+              <!-- Forecast Chart Card -->
+              <div style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:20px; margin-bottom:24px; box-shadow:var(--shadow-sm);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+                  <div>
+                    <h3 style="margin:0; font-size:15px; font-weight:700; color:var(--text-main);">
+                      📊 Biểu Đồ So Sánh Sức Khỏe & Tải Trọng 16 Phòng Ban
+                    </h3>
+                    <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
+                      Đối chiếu Điểm Sức Khỏe (Health Score) vs Tỷ Lệ Trễ Hạn vs Khối Lượng Đang Xử Lý.
+                    </div>
+                  </div>
+                </div>
+                <div style="height:320px; position:relative;">
+                  <canvas id="executiveDeptChart"></canvas>
+                </div>
+              </div>
+
+              <!-- Department Health & Forecast Grid -->
+              <div style="margin-bottom:14px;">
+                <h3 style="margin:0; font-size:15px; font-weight:700; color:var(--text-main);">
+                  🏢 Thẻ Sức Khỏe & Dự Báo 7 - 30 Ngày Từng Phòng Ban
+                </h3>
+                <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
+                  Mô hình dự báo nguy cơ vỡ tiến độ, điểm nghẽn quy trình và khuyến nghị chiến lược của AI.
+                </div>
+              </div>
+              <div class="executive-dept-grid" id="executiveDeptGrid"></div>
+            </div>
+
+            <!-- SUB-TAB 3: SMART WORKLOAD REBALANCER -->
+            <div id="exeSubContentRebalance" style="display:none;">
+              <div style="background:linear-gradient(135deg, rgba(139,92,246,0.08), rgba(16,185,129,0.08)); border:1.5px solid rgba(139,92,246,0.3); border-radius:var(--radius-md); padding:18px 20px; margin-bottom:20px;">
+                <div style="font-weight:800; font-size:14px; color:#7c3aed; margin-bottom:6px; display:flex; align-items:center; gap:8px;">
+                  <span>⚖️ BỘ CÂN BẰNG TẢI NHÂN LỰC THÔNG MINH (AI WORKLOAD REBALANCER)</span>
+                </div>
+                <div style="font-size:12.5px; color:var(--text-main); line-height:1.5;">
+                  Hệ thống AI tự động phát hiện các nhân sự đang quá tải (> 4 việc, có việc trễ) và kết nối với các nhân sự đang còn dư công suất trong cùng phòng ban/chuyên môn để đề xuất phương án chuyển giao việc. Lãnh đạo có thể bấm <strong>"⚡ Chuyển Việc Ngay"</strong> để hệ thống tự động tái phân công trong 1 giây.
+                </div>
+              </div>
+
+              <div class="rebalance-table-wrap">
+                <table class="rebalance-table">
+                  <thead>
+                    <tr>
+                      <th style="width:140px;">Phòng Ban</th>
+                      <th>Công Việc Đề Xuất Chuyển</th>
+                      <th style="width:200px;">Nhân Sự Quá Tải ➔ Nhận Việc</th>
+                      <th>Lý Do Điều Phối Của AI</th>
+                      <th style="width:140px; text-align:center;">Hành Động</th>
+                    </tr>
+                  </thead>
+                  <tbody id="executiveRebalanceTableBody">
+                    <tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-muted);">Đang phân tích phương án cân bằng tải...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- SUB-TAB 4: INTERACTIVE AI ASSISTANT -->
+            <div id="exeSubContentAssistant" style="display:none;">
+              <div class="executive-ai-assistant-card">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                  <div style="width:38px; height:38px; border-radius:10px; background:linear-gradient(135deg, #8b5cf6, #3b82f6); display:flex; align-items:center; justify-content:center; color:#fff; font-size:20px; box-shadow:0 3px 8px rgba(139,92,246,0.3);">
+                    🤖
+                  </div>
+                  <div>
+                    <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--text-main);">
+                      Trợ Lý AI Điều Hành Trực Tuyến
+                    </h3>
+                    <div style="font-size:12px; color:var(--text-secondary);">
+                      Hỏi đáp chuyên sâu về tiến độ dự án, dự báo rủi ro, phân bổ nhân sự dựa trên dữ liệu thời gian thực.
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Suggested Prompts -->
+                <div class="ai-prompts-bar">
+                  <span style="font-size:12px; font-weight:700; color:var(--text-secondary); align-self:center;">Gợi ý câu hỏi:</span>
+                  <button type="button" class="ai-prompt-btn" onclick="App.askExecutiveAiPrompt('Ai đang trễ hẹn nặng nhất và cần can thiệp gì?')">
+                    📌 Ai đang trễ hẹn nặng nhất?
+                  </button>
+                  <button type="button" class="ai-prompt-btn" onclick="App.askExecutiveAiPrompt('Phòng ban nào đang có nguy cơ vỡ tiến độ tuần tới?')">
+                    🏢 Dự báo sức khỏe các phòng ban?
+                  </button>
+                  <button type="button" class="ai-prompt-btn" onclick="App.askExecutiveAiPrompt('Đề xuất phương án san sẻ việc hợp lý nhất?')">
+                    ⚖️ Phương án san việc hợp lý?
+                  </button>
+                  <button type="button" class="ai-prompt-btn" onclick="App.askExecutiveAiPrompt('Tóm tắt tình hình điều hành và 3 chỉ đạo quan trọng nhất hôm nay')">
+                    📊 Tóm tắt 3 chỉ đạo hôm nay
+                  </button>
+                </div>
+
+                <!-- Chat Input Form -->
+                <form id="executiveAiChatForm" onsubmit="App.handleExecutiveAiSubmit(event)">
+                  <div class="ai-chat-input-wrap">
+                    <input type="text" class="form-control" id="executiveAiInput" placeholder="Nhập câu hỏi điều hành (Ví dụ: Ai đang rảnh việc nhất trong tuần này?)..." required style="font-size:13.5px; padding:10px 14px;">
+                    <button type="submit" class="btn btn-primary" id="btnExecutiveAiSend" style="white-space:nowrap; padding:10px 20px; font-weight:700; background:linear-gradient(135deg, #8b5cf6, #3b82f6); border:none;">
+                      <span>⚡ Hỏi AI Ngay</span>
+                    </button>
+                  </div>
+                </form>
+
+                <!-- AI Response Container -->
+                <div class="ai-response-box" id="executiveAiResponseBox">
+                  <div style="color:var(--text-muted); font-style:italic;">
+                    💡 Chọn câu hỏi gợi ý phía trên hoặc gõ câu hỏi của bạn để nhận phân tích thời gian thực từ Trợ Lý AI...
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1443,6 +1719,14 @@
                   <div class="perm-desc">Truy cập Báo cáo & Thống kê hệ thống (Mặc định: Admin & Ban Giám Sát; Member và Manager không được xem)</div>
                 </div>
               </label>
+
+              <label class="perm-checkbox-item" style="border-color: #8b5cf6; background: rgba(139, 92, 246, 0.04);">
+                <input type="checkbox" id="perm_canAccessExecutiveDesk">
+                <div class="perm-info">
+                  <div class="perm-title" style="color: #7c3aed; font-weight: 700;">💼 Bàn Làm Việc (Phân Tích AI & Dự Báo Điều Hành Cao Cấp)</div>
+                  <div class="perm-desc">Quyền hạn cấp cao: Truy cập Bàn Làm Việc AI, xem phân tích nhân sự trễ hẹn, dự báo rủi ro phòng ban và trợ lý điều hành</div>
+                </div>
+              </label>
             </div>
           </div>
 
@@ -1970,6 +2254,34 @@
         <button type="button" class="btn btn-primary" onclick="App.saveGoogleCalendarSettings()">
           💾 Lưu Cấu Hình Đồng Bộ & Nhắc Lịch
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: BẢN TIN ĐIỀU HÀNH AI GIAO BAN -->
+  <div class="modal-overlay" id="executiveBriefingModal" style="z-index: 10008;">
+    <div class="modal-content" style="max-width: 720px;">
+      <div class="modal-header" style="background:linear-gradient(135deg, rgba(139,92,246,0.1), rgba(59,130,246,0.1));">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, #8b5cf6, #3b82f6); display:flex; align-items:center; justify-content:center; color:#fff; font-size:18px;">
+            ⚡
+          </div>
+          <div>
+            <h3 class="modal-title" style="margin:0; font-size:16.5px; font-weight:800;">Bản Tin Giao Ban Điều Hành AI</h3>
+            <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;" id="briefingModalTime">Tổng hợp tình hình vận hành toàn doanh nghiệp</div>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close-modal="executiveBriefingModal">&times;</button>
+      </div>
+      <div class="modal-body" style="padding:22px; max-height: calc(85vh - 120px); overflow-y:auto;" id="briefingModalBody">
+        <div style="text-align:center; padding:30px; color:var(--text-muted);">Đang biên soạn bản tin AI...</div>
+      </div>
+      <div class="modal-footer" style="display:flex; justify-content:space-between; align-items:center;">
+        <button type="button" class="btn btn-outline" onclick="App.copyBriefingContent()">📋 Sao Chép Nội Dung</button>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn btn-outline" onclick="App.printExecutiveDeskReport()">🖨️ In Báo Cáo</button>
+          <button type="button" class="btn btn-primary" data-close-modal="executiveBriefingModal">Đóng</button>
+        </div>
       </div>
     </div>
   </div>

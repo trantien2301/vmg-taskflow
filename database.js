@@ -429,7 +429,8 @@ const DEFAULT_PERMISSIONS = {
     canManageDept: true,
     canManageUsers: true,
     canManageAutomation: true,
-    canViewReports: true
+    canViewReports: true,
+    canAccessExecutiveDesk: true // Bàn Làm Việc: Phân tích AI & Dự báo điều hành cao cấp
   },
   manager: {
     canCreateTask: true,
@@ -439,7 +440,8 @@ const DEFAULT_PERMISSIONS = {
     canManageDept: false,
     canManageUsers: false,
     canManageAutomation: true,
-    canViewReports: false // Manager không xem báo cáo hệ thống
+    canViewReports: false, // Manager không xem báo cáo hệ thống
+    canAccessExecutiveDesk: false // Phân quyền cao cấp - Có thể được Admin cấp riêng
   },
   user: {
     canCreateTask: true,
@@ -449,7 +451,8 @@ const DEFAULT_PERMISSIONS = {
     canManageDept: false,
     canManageUsers: false,
     canManageAutomation: false,
-    canViewReports: false // Member không xem báo cáo hệ thống
+    canViewReports: false, // Member không xem báo cáo hệ thống
+    canAccessExecutiveDesk: false
   },
   viewer: {
     canCreateTask: false,
@@ -459,7 +462,8 @@ const DEFAULT_PERMISSIONS = {
     canManageDept: false,
     canManageUsers: false,
     canManageAutomation: false,
-    canViewReports: true
+    canViewReports: true,
+    canAccessExecutiveDesk: false
   }
 };
 
@@ -501,10 +505,17 @@ class Database {
               const role = u.role || 'user';
               u.permissions = { ...(DEFAULT_PERMISSIONS[role] || DEFAULT_PERMISSIONS.user) };
               modified = true;
-            } else if ((u.role === 'user' || u.role === 'manager') && u.permissions.canViewReports !== false) {
-              // Member và manager không được xem báo cáo hệ thống
-              u.permissions.canViewReports = false;
-              modified = true;
+            } else {
+              if ((u.role === 'user' || u.role === 'manager') && u.permissions.canViewReports !== false) {
+                // Member và manager không được xem báo cáo hệ thống
+                u.permissions.canViewReports = false;
+                modified = true;
+              }
+              // Đảm bảo quyền Bàn Làm Việc (canAccessExecutiveDesk)
+              if (typeof u.permissions.canAccessExecutiveDesk === 'undefined') {
+                u.permissions.canAccessExecutiveDesk = (u.role === 'admin');
+                modified = true;
+              }
             }
 
             // Đảm bảo cấu hình Google Calendar & Nhắc lịch cho từng account
@@ -1293,6 +1304,25 @@ class Database {
     this.data = getDefaultData();
     this.save();
     return true;
+  }
+
+  // --- Executive Desk (Bàn Làm Việc AI) Integration ---
+  getExecutiveDeskAnalytics(options = {}) {
+    const ExecutiveDeskEngine = require('./executiveDesk');
+    const engine = new ExecutiveDeskEngine(this);
+    return engine.generateAnalytics(options);
+  }
+
+  askExecutiveDeskAi(question, options = {}) {
+    const ExecutiveDeskEngine = require('./executiveDesk');
+    const engine = new ExecutiveDeskEngine(this);
+    return engine.askExecutiveAi(question, options);
+  }
+
+  executeExecutiveRebalance(taskId, targetUserId, currentUser) {
+    const ExecutiveDeskEngine = require('./executiveDesk');
+    const engine = new ExecutiveDeskEngine(this);
+    return engine.executeRebalance(taskId, targetUserId, currentUser);
   }
 }
 

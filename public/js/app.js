@@ -28,7 +28,12 @@ const App = {
       department: 'all',
       assignedTo: 'all',
       search: ''
-    }
+    },
+    executiveDeskData: null,
+    executiveRiskFilter: 'all',
+    executiveSubTab: 'personnel',
+    executiveTargetDept: 'all',
+    executiveDeptChartInstance: null
   },
 
   // Audio effects using Web Audio API
@@ -504,6 +509,12 @@ const App = {
 
       case 'automation:executed':
         this.handleAutomationExecutedEvent(data);
+        break;
+
+      case 'executive:rebalance_applied':
+        if (this.state.activeView === 'executive-desk') {
+          this.renderExecutiveDeskView();
+        }
         break;
 
       case 'automation:updated':
@@ -1345,6 +1356,13 @@ const App = {
         this.showToast('Tài khoản Vai trò Member và Manager không được xem Báo cáo của hệ thống!', 'danger');
         return;
       }
+
+      // 3. Bàn Làm Việc (Executive Desk) guard
+      const canAccessExecutive = user.role === 'admin' || (user.permissions && user.permissions.canAccessExecutiveDesk === true);
+      if (viewName === 'executive-desk' && !canAccessExecutive) {
+        this.showToast('Bạn không có quyền truy cập Bàn Làm Việc (Chỉ dành cho Lãnh đạo cấp cao được phân quyền)!', 'danger');
+        return;
+      }
     }
 
     this.state.activeView = viewName;
@@ -1363,7 +1381,8 @@ const App = {
       alerts: '🚨 Trung Tâm Cảnh Báo',
       users: '👥 Quản Trị Nhân Sự',
       activities: '📜 Nhật Ký Hoạt Động',
-      automation: '⚡ Tự Động Hóa (Automation)'
+      automation: '⚡ Tự Động Hóa (Automation)',
+      'executive-desk': '💼 Bàn Làm Việc Điều Hành & Trợ Lý AI'
     };
     const titleEl = document.getElementById('currentViewTitle');
     if (titleEl) {
@@ -1407,6 +1426,9 @@ const App = {
         break;
       case 'automation':
         this.renderAutomationView();
+        break;
+      case 'executive-desk':
+        this.renderExecutiveDeskView();
         break;
     }
     this.renderKPIs();
@@ -1454,6 +1476,15 @@ const App = {
       const canAuto = user.role === 'admin' || (user.permissions && user.permissions.canManageAutomation);
       autoNav.style.display = canAuto ? 'flex' : 'none';
       if (autoTitle) autoTitle.style.display = canAuto ? 'block' : 'none';
+    }
+
+    // Executive Desk Navigation visibility (Phân quyền cao cấp: canAccessExecutiveDesk)
+    const execNav = document.getElementById('navItemExecutiveDesk');
+    const execTitle = document.getElementById('navSectionExecutiveTitle');
+    if (execNav) {
+      const canAccessExecutive = user.role === 'admin' || (user.permissions && user.permissions.canAccessExecutiveDesk === true);
+      execNav.style.display = canAccessExecutive ? 'flex' : 'none';
+      if (execTitle) execTitle.style.display = canAccessExecutive ? 'block' : 'none';
     }
 
     // Reports Navigation visibility (Member & Manager không xem báo cáo hệ thống)
@@ -3026,7 +3057,8 @@ const App = {
       canManageDept: true,
       canManageUsers: true,
       canManageAutomation: true,
-      canViewReports: true
+      canViewReports: true,
+      canAccessExecutiveDesk: true
     },
     manager: {
       canCreateTask: true,
@@ -3036,7 +3068,8 @@ const App = {
       canManageDept: false,
       canManageUsers: false,
       canManageAutomation: true,
-      canViewReports: false // Manager không xem báo cáo hệ thống
+      canViewReports: false, // Manager không xem báo cáo hệ thống
+      canAccessExecutiveDesk: false // Phân quyền cao cấp - Có thể được Admin bật
     },
     user: {
       canCreateTask: true,
@@ -3046,7 +3079,8 @@ const App = {
       canManageDept: false,
       canManageUsers: false,
       canManageAutomation: false,
-      canViewReports: false // Member không xem báo cáo hệ thống
+      canViewReports: false, // Member không xem báo cáo hệ thống
+      canAccessExecutiveDesk: false
     },
     viewer: {
       canCreateTask: false,
@@ -3056,7 +3090,8 @@ const App = {
       canManageDept: false,
       canManageUsers: false,
       canManageAutomation: false,
-      canViewReports: true
+      canViewReports: true,
+      canAccessExecutiveDesk: false
     }
   },
 
@@ -3289,7 +3324,7 @@ const App = {
   setModalPermissionCheckboxes(perms = {}) {
     const keys = [
       'canCreateTask', 'canEditTask', 'canDeleteTask', 'canReviewTask',
-      'canManageDept', 'canManageUsers', 'canManageAutomation', 'canViewReports'
+      'canManageDept', 'canManageUsers', 'canManageAutomation', 'canViewReports', 'canAccessExecutiveDesk'
     ];
     keys.forEach(k => {
       const el = document.getElementById(`perm_${k}`);
@@ -3302,7 +3337,7 @@ const App = {
   getModalPermissionCheckboxes() {
     const keys = [
       'canCreateTask', 'canEditTask', 'canDeleteTask', 'canReviewTask',
-      'canManageDept', 'canManageUsers', 'canManageAutomation', 'canViewReports'
+      'canManageDept', 'canManageUsers', 'canManageAutomation', 'canViewReports', 'canAccessExecutiveDesk'
     ];
     const perms = {};
     keys.forEach(k => {
@@ -5074,6 +5109,619 @@ const App = {
         });
       });
     }, 30 * 1000);
+  },
+
+  // -------------------------------------------------------------
+  // EXECUTIVE DESK (BÀN LÀM VIỆC ĐIỀU HÀNH & TRỢ LÝ AI)
+  // -------------------------------------------------------------
+  async renderExecutiveDeskView() {
+    const user = this.state.user;
+    const canAccess = user && (user.role === 'admin' || (user.permissions && user.permissions.canAccessExecutiveDesk === true));
+    
+    const accessDeniedEl = document.getElementById('executiveDeskAccessDenied');
+    const mainContentEl = document.getElementById('executiveDeskMainContent');
+
+    if (!canAccess) {
+      if (accessDeniedEl) accessDeniedEl.style.display = 'block';
+      if (mainContentEl) mainContentEl.style.display = 'none';
+      return;
+    }
+
+    if (accessDeniedEl) accessDeniedEl.style.display = 'none';
+    if (mainContentEl) mainContentEl.style.display = 'block';
+
+    // Populate department filter dropdown
+    this.populateExecutiveDeptDropdown();
+
+    try {
+      const targetDept = this.state.executiveTargetDept || 'all';
+      const data = await API.getExecutiveDeskAnalytics(targetDept);
+      this.state.executiveDeskData = data;
+
+      // Scope Text
+      const scopeText = document.getElementById('executiveScopeDeptText');
+      if (scopeText) {
+        scopeText.innerText = data.scope?.deptName || 'Toàn Doanh Nghiệp (16 Phòng Ban)';
+      }
+
+      // Update KPIs
+      const kpis = data.kpis || {};
+      const elHealth = document.getElementById('exeKpiHealthScore');
+      const elHealthSub = document.getElementById('exeKpiHealthSub');
+      if (elHealth) {
+        elHealth.innerText = `${kpis.enterpriseHealthScore || 0}/100`;
+        elHealth.style.color = (kpis.enterpriseHealthScore >= 75) ? '#10b981' : (kpis.enterpriseHealthScore >= 55 ? '#f59e0b' : '#ef4444');
+      }
+      if (elHealthSub) {
+        elHealthSub.innerText = `Tỷ lệ đúng hạn toàn hệ thống: ${kpis.onTimeRateOverall || 0}%`;
+      }
+
+      const elStaff = document.getElementById('exeKpiDelayedStaff');
+      const elStaffSub = document.getElementById('exeKpiDelayedStaffSub');
+      if (elStaff) elStaff.innerText = kpis.highRiskPersonnelCount || 0;
+      if (elStaffSub) elStaffSub.innerText = `${kpis.warningPersonnelCount || 0} nhân sự ở mức Cảnh báo`;
+
+      const elForecast = document.getElementById('exeKpiForecastOverdue');
+      const elForecastSub = document.getElementById('exeKpiForecastOverdueSub');
+      if (elForecast) elForecast.innerText = kpis.totalOverdueCount || 0;
+      if (elForecastSub) elForecastSub.innerText = `Việc đang quá hạn trên ${kpis.activeTasksCount || 0} việc đang chạy`;
+
+      const elDepts = document.getElementById('exeKpiCriticalDepts');
+      const elDeptsSub = document.getElementById('exeKpiCriticalDeptsSub');
+      if (elDepts) elDepts.innerText = kpis.criticalDeptsCount || 0;
+      if (elDeptsSub) elDeptsSub.innerText = `Trên tổng số ${data.departmentForecasts?.length || 16} phòng ban`;
+
+      // Top Urgent Matters Banner
+      this.renderExecutiveUrgentBanner(data.topUrgentMatters || []);
+
+      // Badges on sub-tabs
+      const pBadge = document.getElementById('exePersonnelTabBadge');
+      if (pBadge) pBadge.innerText = kpis.highRiskPersonnelCount || 0;
+
+      const rBadge = document.getElementById('exeRebalanceBadge');
+      if (rBadge) rBadge.innerText = (data.rebalanceSuggestions || []).length;
+
+      // Render Active Sub-tab
+      this.renderActiveExecutiveSubTab();
+
+    } catch (err) {
+      console.error('Error loading executive desk analytics:', err);
+      this.showToast(`Lỗi tải dữ liệu Bàn Làm Việc: ${err.message}`, 'danger');
+    }
+  },
+
+  populateExecutiveDeptDropdown() {
+    const select = document.getElementById('executiveDeptFilter');
+    if (!select || select.dataset.populated === 'true') return;
+
+    const depts = this.state.departments || [];
+    let html = `<option value="all">🏢 Tất cả 16 phòng ban</option>`;
+    depts.forEach(d => {
+      html += `<option value="${this.escapeHtml(d.name)}">${this.escapeHtml(d.name)}</option>`;
+    });
+    select.innerHTML = html;
+    select.value = this.state.executiveTargetDept || 'all';
+    select.dataset.populated = 'true';
+  },
+
+  onExecutiveDeptFilterChange(dept) {
+    this.state.executiveTargetDept = dept;
+    this.renderExecutiveDeskView();
+  },
+
+  renderExecutiveUrgentBanner(urgentMatters = []) {
+    const banner = document.getElementById('executiveUrgentBanner');
+    const container = document.getElementById('exeUrgentListContainer');
+    const countBadge = document.getElementById('exeUrgentCountBadge');
+    if (!banner || !container) return;
+
+    if (!urgentMatters || urgentMatters.length === 0) {
+      banner.style.display = 'none';
+      return;
+    }
+
+    banner.style.display = 'block';
+    if (countBadge) countBadge.innerText = `${urgentMatters.length} việc khẩn cấp`;
+
+    container.innerHTML = urgentMatters.map(m => `
+      <div class="executive-urgent-item">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:16px;">🔴</span>
+          <div>
+            <div style="font-weight:700; font-size:13px; color:var(--text-main);">${this.escapeHtml(m.title)} <span style="font-size:11px; color:var(--text-muted);">(#${m.id})</span></div>
+            <div style="font-size:11.5px; color:var(--text-secondary); margin-top:2px;">
+              Phụ trách: <strong>${this.escapeHtml(m.assigneeName)}</strong> | Phòng ban: <strong>${this.escapeHtml(m.department)}</strong> | Hạn: <span style="color:#dc2626; font-weight:700;">${m.dueDate ? new Date(m.dueDate).toLocaleDateString('vi-VN') : 'N/A'}</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button type="button" class="btn btn-outline btn-xs" onclick="App.openTaskDetail('${m.id}')" style="font-weight:600;">
+            🔍 Xem Chi Tiết
+          </button>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  switchExecutiveSubTab(tabName) {
+    this.state.executiveSubTab = tabName;
+    ['personnel', 'forecast', 'rebalance', 'assistant'].forEach(t => {
+      const btn = document.getElementById(`exeTabBtn${t.charAt(0).toUpperCase() + t.slice(1)}`);
+      const content = document.getElementById(`exeSubContent${t.charAt(0).toUpperCase() + t.slice(1)}`);
+      if (btn) btn.classList.toggle('active', t === tabName);
+      if (content) content.style.display = (t === tabName) ? 'block' : 'none';
+    });
+    this.renderActiveExecutiveSubTab();
+  },
+
+  renderActiveExecutiveSubTab() {
+    const data = this.state.executiveDeskData;
+    if (!data) return;
+
+    switch (this.state.executiveSubTab) {
+      case 'personnel':
+        this.renderExecutivePersonnelGrid(data.personnelList || []);
+        break;
+      case 'forecast':
+        this.renderExecutiveDeptForecasts(data.departmentForecasts || []);
+        this.renderExecutiveDeptChart(data.departmentForecasts || []);
+        break;
+      case 'rebalance':
+        this.renderExecutiveRebalanceTable(data.rebalanceSuggestions || []);
+        break;
+      case 'assistant':
+        break;
+    }
+  },
+
+  filterExecutivePersonnel(filter) {
+    this.state.executiveRiskFilter = filter;
+    ['all', 'critical', 'warning', 'healthy'].forEach(f => {
+      const btn = document.getElementById(`exeRiskFilter${f.charAt(0).toUpperCase() + f.slice(1)}`);
+      if (btn) btn.classList.toggle('active', f === filter);
+    });
+    if (this.state.executiveDeskData) {
+      this.renderExecutivePersonnelGrid(this.state.executiveDeskData.personnelList || []);
+    }
+  },
+
+  renderExecutivePersonnelGrid(personnelList = []) {
+    const grid = document.getElementById('executivePersonnelGrid');
+    if (!grid) return;
+
+    const filter = this.state.executiveRiskFilter || 'all';
+    const filtered = filter === 'all' 
+      ? personnelList 
+      : personnelList.filter(p => p.riskLevel === filter);
+
+    if (filtered.length === 0) {
+      grid.innerHTML = `
+        <div style="text-align:center; padding:40px; color:var(--text-muted); grid-column:1/-1; background:var(--card-bg); border:1px solid var(--border-color); border-radius:var(--radius-sm);">
+          🎉 Không có nhân sự nào trong nhóm lọc này!
+        </div>
+      `;
+      return;
+    }
+
+    grid.innerHTML = filtered.map(p => {
+      const u = p.user;
+      const s = p.stats;
+      const riskClass = p.riskLevel;
+      const riskLabel = riskClass === 'critical' ? '🔴 RỦI RO CAO' : (riskClass === 'warning' ? '🟡 CẢNH BÁO' : '🟢 AN TOÀN');
+
+      const overdueListHtml = (p.overdueTasks || []).slice(0, 3).map(t => `
+        <div class="personnel-task-item" onclick="App.openTaskDetail('${t.id}')" style="cursor:pointer;" title="Bấm để xem chi tiết task">
+          <div class="title">#${t.id}: ${this.escapeHtml(t.title)}</div>
+          <div class="days">Trễ ${t.daysOverdue} ngày</div>
+        </div>
+      `).join('');
+
+      const remainingOverdue = (p.overdueTasks || []).length - 3;
+      const moreOverdueHtml = remainingOverdue > 0 
+        ? `<div style="font-size:11px; text-align:center; color:var(--text-muted); padding:2px;">+ và ${remainingOverdue} việc quá hạn khác...</div>` 
+        : '';
+
+      return `
+        <div class="executive-personnel-card ${riskClass}">
+          <div class="personnel-card-header">
+            <div class="personnel-profile">
+              <div class="personnel-avatar">${u.avatar}</div>
+              <div>
+                <div class="personnel-name">${this.escapeHtml(u.name)}</div>
+                <div class="personnel-role-dept">${this.escapeHtml(u.position)} • <strong>${this.escapeHtml(u.department)}</strong></div>
+              </div>
+            </div>
+            <span class="risk-badge ${riskClass}">${riskLabel}</span>
+          </div>
+
+          <div class="personnel-stats-row">
+            <div class="personnel-stat-box">
+              <div class="num" style="color:#ef4444;">${s.overdueCount}</div>
+              <div class="lbl">Việc trễ hạn</div>
+            </div>
+            <div class="personnel-stat-box">
+              <div class="num">${s.activeTasks}</div>
+              <div class="lbl">Đang chạy</div>
+            </div>
+            <div class="personnel-stat-box">
+              <div class="num" style="color:#10b981;">${s.onTimeRate}%</div>
+              <div class="lbl">Tỷ lệ đúng hạn</div>
+            </div>
+            <div class="personnel-stat-box">
+              <div class="num" style="color:#8b5cf6;">${p.riskScore}</div>
+              <div class="lbl">Điểm rủi ro AI</div>
+            </div>
+          </div>
+
+          <!-- AI Root Cause Diagnostics -->
+          <div class="ai-diagnostics-box">
+            <div class="ai-box-title">
+              <span>🧠 Chẩn đoán AI nguyên nhân:</span>
+            </div>
+            <div class="ai-box-desc">
+              ${(p.rootCauses || []).map(r => `<div>${r}</div>`).join('') || 'Tiến độ đồng đều, không ghi nhận bất thường.'}
+            </div>
+          </div>
+
+          <!-- AI Smart Action Recommendation -->
+          <div class="ai-action-box">
+            <div class="ai-box-title">
+              <span>⚡ Hành động AI đề xuất cho Lãnh đạo:</span>
+            </div>
+            <div class="ai-box-desc" style="font-weight:600;">
+              ${p.recommendedAction}
+            </div>
+          </div>
+
+          <!-- Task Mini List if overdue -->
+          ${s.overdueCount > 0 ? `
+            <div style="font-size:11.5px; font-weight:700; color:var(--text-secondary); margin-bottom:6px;">
+              Danh sách việc quá hạn cần xử lý:
+            </div>
+            <div class="personnel-task-list">
+              ${overdueListHtml}
+              ${moreOverdueHtml}
+            </div>
+          ` : ''}
+
+          <div style="margin-top:auto; padding-top:12px; border-top:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            <span style="font-size:11px; color:var(--text-muted);">${u.email}</span>
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="btn btn-outline btn-xs" onclick="App.switchExecutiveSubTab('rebalance')" title="Chuyển sang công cụ Cân bằng tải">
+                ⚖️ San việc
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  },
+
+  renderExecutiveDeptForecasts(departmentForecasts = []) {
+    const grid = document.getElementById('executiveDeptGrid');
+    if (!grid) return;
+
+    grid.innerHTML = departmentForecasts.map(d => {
+      const statusClass = d.healthStatus;
+      const statusLabel = statusClass === 'critical' ? '🔴 NGUY CƠ CAO' : (statusClass === 'warning' ? '🟡 CẦN CHÚ Ý' : (statusClass === 'excellent' ? '🟢 XUẤT SẮC' : '🔵 ỔN ĐỊNH'));
+
+      return `
+        <div class="executive-dept-card">
+          <div class="dept-card-header">
+            <div>
+              <div class="dept-name">${this.escapeHtml(d.name)}</div>
+              <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
+                Nhân sự: <strong>${d.memberCount}</strong> người | Tải: <strong>${d.stats.workloadRatio}</strong> việc/người (${d.capacityStatus})
+              </div>
+            </div>
+            <span class="dept-score-badge risk-badge ${statusClass}">
+              ${d.healthScore}/100 • ${statusLabel}
+            </span>
+          </div>
+
+          <div class="personnel-stats-row">
+            <div class="personnel-stat-box">
+              <div class="num">${d.stats.totalTasks}</div>
+              <div class="lbl">Tổng việc</div>
+            </div>
+            <div class="personnel-stat-box">
+              <div class="num" style="color:#ef4444;">${d.stats.overdueTasks}</div>
+              <div class="lbl">Trễ hạn (${d.stats.overdueRate}%)</div>
+            </div>
+            <div class="personnel-stat-box">
+              <div class="num" style="color:#f59e0b;">${d.stats.reviewTasks}</div>
+              <div class="lbl">Chờ duyệt</div>
+            </div>
+            <div class="personnel-stat-box">
+              <div class="num" style="color:#10b981;">${d.stats.completedTasks}</div>
+              <div class="lbl">Hoàn thành</div>
+            </div>
+          </div>
+
+          <!-- Bottlenecks -->
+          <div class="ai-diagnostics-box" style="margin-bottom:8px;">
+            <div class="ai-box-title" style="color:#dc2626;">
+              <span>🚨 Nút thắt quy trình phát hiện được:</span>
+            </div>
+            <div class="ai-box-desc">
+              ${(d.bottlenecks || []).map(b => `<div>${b}</div>`).join('')}
+            </div>
+          </div>
+
+          <!-- AI Forecast 7 - 30 days -->
+          <div style="background:rgba(59,130,246,0.06); border:1px solid rgba(59,130,246,0.25); border-radius:var(--radius-sm); padding:10px 12px; margin-bottom:8px;">
+            <div class="ai-box-title" style="color:#2563eb;">
+              <span>🔮 Dự báo AI 7 ngày tới:</span>
+            </div>
+            <div class="ai-box-desc">
+              ${d.forecast7Days.summary}
+            </div>
+            <div style="font-size:11.5px; color:var(--text-secondary); margin-top:4px;">
+              Triển vọng tháng (30 ngày): <em>${d.forecast30Days.riskAlert}</em>
+            </div>
+          </div>
+
+          <!-- Strategic Advisory -->
+          <div class="ai-action-box" style="margin-top:auto; margin-bottom:0;">
+            <div class="ai-box-title">
+              <span>💡 Khuyến nghị chiến lược cho Ban Lãnh Đạo:</span>
+            </div>
+            <div class="ai-box-desc">
+              ${d.aiAdvisory}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  },
+
+  renderExecutiveDeptChart(departmentForecasts = []) {
+    const canvas = document.getElementById('executiveDeptChart');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    if (this.state.executiveDeptChartInstance) {
+      this.state.executiveDeptChartInstance.destroy();
+      this.state.executiveDeptChartInstance = null;
+    }
+
+    const topDepts = departmentForecasts.slice(0, 10);
+    const labels = topDepts.map(d => d.name.replace('Phòng ', '').replace('Ban Giám Đốc ', 'BGĐ '));
+    const healthScores = topDepts.map(d => d.healthScore);
+    const overdueRates = topDepts.map(d => d.stats.overdueRate);
+
+    const ctx = canvas.getContext('2d');
+    this.state.executiveDeptChartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Điểm Sức Khỏe (Health Score / 100)',
+            data: healthScores,
+            backgroundColor: healthScores.map(s => s >= 75 ? 'rgba(16, 185, 129, 0.7)' : (s >= 55 ? 'rgba(245, 158, 11, 0.7)' : 'rgba(239, 68, 68, 0.7)')),
+            borderColor: healthScores.map(s => s >= 75 ? '#10b981' : (s >= 55 ? '#f59e0b' : '#ef4444')),
+            borderWidth: 1.5,
+            borderRadius: 4
+          },
+          {
+            label: 'Tỷ Lệ Quá Hạn (%)',
+            data: overdueRates,
+            type: 'line',
+            borderColor: '#ef4444',
+            backgroundColor: 'rgba(239, 68, 68, 0.15)',
+            borderWidth: 2,
+            tension: 0.3,
+            fill: false,
+            pointRadius: 4
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            ticks: {
+              callback: val => `${val}`
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              boxWidth: 12,
+              font: { size: 12 }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => `${context.dataset.label}: ${context.raw}`
+            }
+          }
+        }
+      }
+    });
+  },
+
+  renderExecutiveRebalanceTable(suggestions = []) {
+    const tbody = document.getElementById('executiveRebalanceTableBody');
+    if (!tbody) return;
+
+    if (!suggestions || suggestions.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align:center; padding:35px; color:var(--text-muted);">
+            🎉 Khối lượng công việc toàn doanh nghiệp đang ở trạng thái tương đối cân bằng! Chưa phát hiện điểm lệch tải cần can thiệp.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = suggestions.map((s, idx) => `
+      <tr>
+        <td>
+          <strong>${this.escapeHtml(s.department)}</strong>
+        </td>
+        <td>
+          <div style="font-weight:700; color:var(--text-main);">#${s.taskId}: ${this.escapeHtml(s.taskTitle)}</div>
+          <span class="badge-priority ${s.priority || 'medium'}" style="font-size:10.5px; padding:2px 6px;">${(s.priority || 'medium').toUpperCase()}</span>
+        </td>
+        <td>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="color:#ef4444; font-weight:700;">${s.fromUser.avatar} ${this.escapeHtml(s.fromUser.name)}</span>
+            <span>➔</span>
+            <span style="color:#10b981; font-weight:700;">${s.toUser.avatar} ${this.escapeHtml(s.toUser.name)}</span>
+          </div>
+        </td>
+        <td>
+          <div style="font-size:12px; color:var(--text-secondary); line-height:1.4;">${s.reason}</div>
+        </td>
+        <td style="text-align:center;">
+          <button type="button" class="btn btn-sm btn-primary" onclick="App.confirmAndExecuteRebalance('${s.taskId}', '${s.toUser.id}', '${this.escapeHtml(s.taskTitle)}', '${this.escapeHtml(s.toUser.name)}')" style="white-space:nowrap; font-weight:700; background:linear-gradient(135deg, #8b5cf6, #3b82f6); border:none;">
+            ⚡ Chuyển Việc
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  },
+
+  async confirmAndExecuteRebalance(taskId, targetUserId, taskTitle, targetUserName) {
+    if (!confirm(`Xác nhận thực hiện điều phối công việc:\n\nChuyển việc #${taskId}: "${taskTitle}" sang cho nhân sự [${targetUserName}]?`)) {
+      return;
+    }
+
+    try {
+      const res = await API.rebalanceExecutiveDeskTask(taskId, targetUserId);
+      this.showToast(`🎉 ${res.message || 'Đã tái phân bổ công việc thành công!'}`, 'success');
+      // Reload current analytics
+      this.renderExecutiveDeskView();
+    } catch (err) {
+      this.showToast(`Lỗi khi chuyển việc: ${err.message}`, 'danger');
+    }
+  },
+
+  askExecutiveAiPrompt(promptText) {
+    const input = document.getElementById('executiveAiInput');
+    if (input) {
+      input.value = promptText;
+      this.handleExecutiveAiSubmit(new Event('submit'));
+    }
+  },
+
+  async handleExecutiveAiSubmit(e) {
+    if (e) e.preventDefault();
+    const input = document.getElementById('executiveAiInput');
+    const box = document.getElementById('executiveAiResponseBox');
+    const btn = document.getElementById('btnExecutiveAiSend');
+    if (!input || !box) return;
+
+    const question = input.value.trim();
+    if (!question) return;
+
+    box.innerHTML = `
+      <div style="display:flex; align-items:center; gap:10px; color:#7c3aed; font-weight:600;">
+        <span class="spinner" style="width:18px; height:18px; border-width:2px;"></span>
+        <span>Trợ Lý AI đang phân tích toàn bộ dữ liệu thời gian thực...</span>
+      </div>
+    `;
+    if (btn) btn.disabled = true;
+
+    try {
+      const targetDept = this.state.executiveTargetDept || 'all';
+      const res = await API.askExecutiveDeskAi(question, targetDept);
+      
+      // Render simple markdown conversion
+      let answerHtml = res.answer || 'Không có phản hồi từ AI.';
+      answerHtml = answerHtml
+        .replace(/^### (.*$)/gim, '<h3 style="margin:10px 0 6px 0; font-size:15px; font-weight:800; color:#7c3aed;">$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2 style="margin:12px 0 8px 0; font-size:16px; font-weight:800;">$1</h2>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\n\n/g, '<div style="margin-bottom:8px;"></div>')
+        .replace(/\n/g, '<br>');
+
+      box.innerHTML = answerHtml;
+    } catch (err) {
+      box.innerHTML = `<div style="color:#ef4444; font-weight:600;">❌ Lỗi: ${err.message}</div>`;
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  },
+
+  openExecutiveBriefingModal() {
+    const data = this.state.executiveDeskData;
+    const modal = document.getElementById('executiveBriefingModal');
+    const body = document.getElementById('briefingModalBody');
+    const timeEl = document.getElementById('briefingModalTime');
+    if (!modal || !body) return;
+
+    const summary = data?.executiveSummary;
+    if (!summary) {
+      this.showToast('Chưa có dữ liệu bản tin AI. Vui lòng làm mới dữ liệu trước.', 'warning');
+      return;
+    }
+
+    if (timeEl) {
+      timeEl.innerText = `Cập nhật: ${new Date(summary.generatedAt).toLocaleString('vi-VN')} | Phạm vi: ${data.scope?.deptName || 'Toàn công ty'}`;
+    }
+
+    body.innerHTML = `
+      <div style="background:var(--bg-main); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:16px; margin-bottom:18px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span style="font-weight:800; font-size:13.5px; color:var(--text-main);">🎯 ĐIỂM SỨC KHỎE DOANH NGHIỆP:</span>
+          <span class="badge" style="background:#7c3aed; color:#fff; font-weight:800; font-size:13px; padding:4px 10px; border-radius:12px;">
+            ${summary.healthScore}/100 • ${summary.healthLabel}
+          </span>
+        </div>
+        <div style="font-size:13px; color:var(--text-main); line-height:1.6;">
+          ${summary.narrative}
+        </div>
+      </div>
+
+      <div style="margin-bottom:18px;">
+        <h4 style="margin:0 0 10px 0; font-size:14px; font-weight:800; color:#7c3aed;">
+          📋 3 HÀNH ĐỘNG CHỈ ĐẠO TRỌNG TÂM CHO LÃNH ĐẠO HÔM NAY:
+        </h4>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          ${(summary.topDecisions || []).map((d, i) => `
+            <div style="background:var(--card-bg); border:1px solid var(--border-color); border-left:4px solid #7c3aed; border-radius:var(--radius-sm); padding:10px 14px; font-size:12.5px; font-weight:600; line-height:1.5;">
+              <strong>${i + 1}.</strong> ${d}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div style="background:rgba(239, 68, 68, 0.05); border:1px solid rgba(239, 68, 68, 0.25); border-radius:var(--radius-sm); padding:12px 14px; font-size:12px; color:var(--text-secondary);">
+        💡 <em>Bản tin này được tạo tự động bởi Trí Tuệ Nhân Tạo (Executive AI Engine) dựa trên tiến độ và nhật ký thực thi thực tế của 16 phòng ban.</em>
+      </div>
+    `;
+
+    this.openModal('executiveBriefingModal');
+  },
+
+  copyBriefingContent() {
+    const data = this.state.executiveDeskData?.executiveSummary;
+    if (!data) return;
+
+    const text = `=== BẢN TIN GIAO BAN ĐIỀU HÀNH AI (TASKFLOW PRO) ===\n` +
+      `Điểm sức khỏe: ${data.healthScore}/100 (${data.healthLabel})\n\n` +
+      `Tình hình chung:\n${data.narrative}\n\n` +
+      `3 Hành động chỉ đạo trọng tâm:\n` +
+      (data.topDecisions || []).map((d, i) => `${i + 1}. ${d}`).join('\n');
+
+    navigator.clipboard.writeText(text).then(() => {
+      this.showToast('📋 Đã sao chép nội dung Bản tin Điều hành vào Clipboard!', 'success');
+    }).catch(() => {
+      this.showToast('Không thể tự động sao chép. Vui lòng bôi đen và copy thủ công.', 'warning');
+    });
+  },
+
+  printExecutiveDeskReport() {
+    window.print();
   },
 
 };
