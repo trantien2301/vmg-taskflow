@@ -42,12 +42,27 @@ const API = {
     try {
       const res = await fetch(endpoint, config);
       if (res.status === 401) {
-        // Token expired or invalid
         console.warn('Session expired or unauthorized');
       }
-      const data = await res.json();
+
+      const contentType = res.headers.get('content-type') || '';
+      let data;
+      if (contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        if (!res.ok) {
+          throw new Error(`Lỗi máy chủ (${res.status}): ${text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120)}`);
+        }
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          data = { text };
+        }
+      }
+
       if (!res.ok) {
-        throw new Error(data.error || 'Đã có lỗi xảy ra');
+        throw new Error(data.error || data.message || `Lỗi máy chủ (${res.status})`);
       }
       return data;
     } catch (err) {

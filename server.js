@@ -1,4 +1,5 @@
 const express = require('express');
+const fs = require('fs');
 const http = require('http');
 const path = require('path');
 const cors = require('cors');
@@ -16,8 +17,20 @@ const JWT_SECRET = process.env.JWT_SECRET || 'taskflow-super-secret-key-2026';
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Payload and JSON error handler
+app.use((err, req, res, next) => {
+  if (err && (err.type === 'entity.too.large' || err.status === 413)) {
+    return res.status(413).json({ error: 'Dung lượng ảnh poster hoặc dữ liệu quá lớn (vượt quá 50MB).' });
+  }
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ error: 'Định dạng dữ liệu JSON không hợp lệ.' });
+  }
+  next(err);
+});
 
 // Health check endpoint for keep-alive monitoring & uptime pings
 app.get('/api/health', (req, res) => {
@@ -1670,7 +1683,21 @@ app.get('/api/announcement-poster', (req, res) => {
 // 5. Cập nhật / Xuất bản Poster thông báo nhiệm vụ đặc biệt (Admin / Executive Desk)
 app.post('/api/announcement-poster', authenticate, requireExecutiveDeskAccess, (req, res) => {
   try {
-    const poster = db.updateAnnouncementPoster(req.body, req.user);
+    let posterData = { ...req.body };
+    if (posterData.imageDataUrl && posterData.imageDataUrl.startsWith('data:image/')) {
+      try {
+        const base64Data = posterData.imageDataUrl.replace(/^data:image\/\w+;base64,/, '');
+        const buffer = Buffer.from(base64Data, 'base64');
+        const imgPath = path.join(__dirname, 'public', 'images', 'active-announcement-poster.png');
+        fs.writeFileSync(imgPath, buffer);
+        posterData.imageUrl = `/images/active-announcement-poster.png?v=${Date.now()}`;
+        delete posterData.imageDataUrl;
+      } catch (imgErr) {
+        console.warn('Could not save poster image to disk:', imgErr);
+      }
+    }
+
+    const poster = db.updateAnnouncementPoster(posterData, req.user);
     // Realtime broadcast
     broadcast('announcement:updated', { poster, updatedBy: req.user.name });
     res.json({ success: true, poster, message: 'Đã cập nhật và xuất bản poster thông báo thành công!' });

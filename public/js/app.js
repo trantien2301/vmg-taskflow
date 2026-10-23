@@ -5761,8 +5761,9 @@ const App = {
           if (badge) badge.innerText = res.poster.badgeText || 'NHIỆM VỤ ĐẶC BIỆT';
           if (title) title.innerText = res.poster.title || 'Thông Báo Từ Ban Giám Đốc';
 
-          if (res.poster.imageDataUrl) {
-            if (img) img.src = res.poster.imageDataUrl;
+          const posterSrc = res.poster.imageUrl || res.poster.imageDataUrl;
+          if (posterSrc) {
+            if (img) img.src = posterSrc;
             if (overlay) overlay.style.display = 'flex';
           } else {
             // Draw immediately on the fly
@@ -5792,7 +5793,7 @@ const App = {
   },
 
   downloadActivePoster() {
-    const dataUrl = this.state.generatedPosterDataUrl || this.state.currentPoster?.imageDataUrl;
+    const dataUrl = this.state.generatedPosterDataUrl || this.state.currentPoster?.imageUrl || this.state.currentPoster?.imageDataUrl;
     if (!dataUrl) {
       this.showToast('Chưa có ảnh poster để tải về.', 'warning');
       return;
@@ -5809,7 +5810,7 @@ const App = {
   },
 
   openFullPosterModal() {
-    const dataUrl = this.state.generatedPosterDataUrl || this.state.currentPoster?.imageDataUrl;
+    const dataUrl = this.state.generatedPosterDataUrl || this.state.currentPoster?.imageUrl || this.state.currentPoster?.imageDataUrl;
     const fullImg = document.getElementById('fullPosterModalImg');
     if (fullImg && dataUrl) {
       fullImg.src = dataUrl;
@@ -5818,7 +5819,7 @@ const App = {
   },
 
   previewPreLoginPosterModal() {
-    const dataUrl = this.state.generatedPosterDataUrl || this.state.currentPoster?.imageDataUrl;
+    const dataUrl = this.state.generatedPosterDataUrl || this.state.currentPoster?.imageUrl || this.state.currentPoster?.imageDataUrl;
     if (!dataUrl) {
       this.showToast('Vui lòng đợi ảnh poster vẽ xong trước khi xem thử.', 'warning');
       return;
