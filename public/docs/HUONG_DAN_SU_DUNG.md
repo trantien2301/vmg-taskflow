@@ -100,19 +100,17 @@ flowchart TD
 
 ### 3.1. Truy Cập Hệ Thống & Các Hình Thức Đăng Nhập
 
-Mở trình duyệt (Google Chrome, Cốc Cốc, Edge, Safari...) và nhập địa chỉ hệ thống. Màn hình đăng nhập cung cấp 3 cách truy cập linh hoạt:
+Mở trình duyệt (Google Chrome, Cốc Cốc, Edge, Safari...) và nhập địa chỉ hệ thống. Màn hình đăng nhập cung cấp 2 phương thức bảo mật:
 
-1. **Cách 1: Đăng nhập bằng Email & Mật khẩu**
+1. **Phương thức 1: Đăng nhập bằng Email & Mật khẩu**
    - Nhập địa chỉ Email được cấp (ví dụ: `nguyenvana@company.com`).
    - Nhập Mật khẩu (mặc định ban đầu do Admin cấp: `password123` hoặc `123456`).
    - Nhấn **Đăng Nhập**.
 
-2. **Cách 2: Đăng nhập nhanh 1-Click qua SSO Google Workspace**
+2. **Phương thức 2: Đăng nhập nhanh 1-Click qua SSO Google Workspace**
    - Dành cho tài khoản email doanh nghiệp (ví dụ: `@vmg.edu.vn` hoặc `@company.com`).
    - Nhấp vào nút **"Đăng nhập với Google Workspace"** để xác thực tự động mà không cần gõ mật khẩu.
-
-3. **Cách 3: Chuyển đổi tài khoản trải nghiệm (Demo Switcher)**
-   - Ở chân trang đăng nhập hoặc thanh điều hướng có mục chọn nhanh tài khoản thử nghiệm mẫu (Admin, Trưởng phòng Marketing, Nhân viên...) giúp người dùng mới dễ dàng làm quen với vai trò của mình.
+   - Hệ thống tự động nhận diện danh tính và kích hoạt chính xác vai trò cùng phân quyền làm việc của bạn ngay lập tức.
 
 ---
 
