@@ -351,6 +351,13 @@
           <span class="icon">📜</span>
           <span>Nhật Ký Hoạt Động</span>
         </a>
+
+        <div class="nav-section-title">Hỗ Trợ & Tài Liệu</div>
+        <a class="nav-item" data-view="guide" id="sidebarNavGuide">
+          <span class="icon">📖</span>
+          <span>Hướng Dẫn Sử Dụng</span>
+          <span class="nav-badge" style="background:#0284c7; color:#fff; font-size:9.5px; font-weight:800;">ALL</span>
+        </a>
       </nav>
 
       <div class="sidebar-footer">
@@ -431,6 +438,11 @@
           <!-- Google Calendar & Nhắc Lịch button -->
           <button class="btn btn-outline btn-sm" id="btnHeaderGoogleCal" onclick="App.openGoogleCalendarModal()" title="Đồng bộ Google Calendar & Nhắc lịch tự động trên tài khoản này" style="color:var(--primary); font-weight:600; display:inline-flex; align-items:center; gap:5px;">
             📅 <span class="hide-mobile">Google Calendar</span>
+          </button>
+
+          <!-- User Guide button -->
+          <button class="btn btn-outline btn-sm" id="btnHeaderGuide" onclick="App.switchView('guide')" title="Cẩm nang hướng dẫn sử dụng toàn diện từ cơ bản đến quản trị viên" style="color:var(--primary); font-weight:600; display:inline-flex; align-items:center; gap:5px;">
+            📖 <span class="hide-mobile">Hướng Dẫn</span>
           </button>
 
           <!-- Notification Bell -->
@@ -1578,7 +1590,584 @@
             </div>
           </div>
         </section>
-      </main>
+
+        <!-- ========================================================
+             VIEW: CẨM NANG HƯỚNG DẪN SỬ DỤNG (USER GUIDE)
+             ======================================================== -->
+        <section class="view-panel" id="view-guide">
+          <div class="guide-container">
+            <!-- Hero Banner -->
+            <div class="guide-hero-card">
+              <div class="guide-hero-content">
+                <div class="guide-hero-badge">📚 CẨM NANG VẬN HÀNH CHUẨN DOANH NGHIỆP</div>
+                <h2 class="guide-hero-title">Hướng Dẫn Sử Dụng Hệ Thống TaskFlow Pro</h2>
+                <p class="guide-hero-desc">
+                  Tài liệu chuẩn hóa toàn diện từ <strong>Người mới bắt đầu (cấp độ 0)</strong> đến <strong>Quản trị viên tối cao (Super Admin)</strong>. 
+                  Tìm kiếm thông tin, chọn theo vai trò của bạn hoặc tải tài liệu offline.
+                </p>
+                
+                <!-- Search & Filter Bar -->
+                <div class="guide-search-wrapper">
+                  <div class="guide-search-box">
+                    <span class="guide-search-icon">🔍</span>
+                    <input type="text" id="guideSearchInput" class="guide-search-input" placeholder="Tìm kiếm nhanh chủ đề (ví dụ: đổi mật khẩu, google meet, giao việc, nhân sự...)" oninput="App.handleGuideSearch(this.value)">
+                    <button class="guide-search-clear" id="guideSearchClearBtn" onclick="App.clearGuideSearch()" style="display:none;" title="Xóa tìm kiếm">✕</button>
+                  </div>
+                  <div class="guide-hero-actions">
+                    <a href="/docs/HUONG_DAN_SU_DUNG.md" download="HUONG_DAN_SU_DUNG_TASKFLOW_PRO.md" class="btn btn-sm btn-outline" style="background:rgba(255,255,255,0.15); color:#fff; border-color:rgba(255,255,255,0.3); font-weight:600;" title="Tải tệp Markdown về máy">
+                      📥 Tải File (.md)
+                    </a>
+                    <button type="button" class="btn btn-sm btn-outline" onclick="window.print()" style="background:rgba(255,255,255,0.15); color:#fff; border-color:rgba(255,255,255,0.3); font-weight:600;" title="In hoặc lưu PDF">
+                      🖨️ In / PDF
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Role Filter Pills -->
+                <div class="guide-filter-pills" id="guideRoleFilterPills">
+                  <button type="button" class="guide-pill active" data-guide-role="all" onclick="App.filterGuideByRole('all')">🌟 Tất Cả Chủ Đề</button>
+                  <button type="button" class="guide-pill" data-guide-role="beginner" onclick="App.filterGuideByRole('beginner')">🚀 Người Mới (Cấp 0)</button>
+                  <button type="button" class="guide-pill" data-guide-role="user" onclick="App.filterGuideByRole('user')">👤 Nhân Viên (Staff)</button>
+                  <button type="button" class="guide-pill" data-guide-role="manager" onclick="App.filterGuideByRole('manager')">⭐ Quản Lý (Manager)</button>
+                  <button type="button" class="guide-pill" data-guide-role="admin" onclick="App.filterGuideByRole('admin')">👑 Quản Trị (Admin)</button>
+                  <button type="button" class="guide-pill" data-guide-role="shortcuts" onclick="App.filterGuideByRole('shortcuts')">⌨️ Phím Tắt</button>
+                  <button type="button" class="guide-pill" data-guide-role="faq" onclick="App.filterGuideByRole('faq')">❓ FAQ & Khắc Phục</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Main Layout: Sticky Sidebar TOC + Content Area -->
+            <div class="guide-layout">
+              <!-- Sticky Table of Contents -->
+              <aside class="guide-toc-sidebar">
+                <div class="guide-toc-header">
+                  <span>📌 MỤC LỤC TÀI LIỆU</span>
+                </div>
+                <nav class="guide-toc-nav" id="guideTocNav">
+                  <a href="#guide-sec-intro" class="guide-toc-link active" onclick="App.scrollToGuideSection('guide-sec-intro')">
+                    <span class="toc-icon">🌐</span>
+                    <span class="toc-text">1. Tổng Quan Hệ Thống</span>
+                  </a>
+                  <a href="#guide-sec-matrix" class="guide-toc-link" onclick="App.scrollToGuideSection('guide-sec-matrix')">
+                    <span class="toc-icon">🛡️</span>
+                    <span class="toc-text">2. Cơ Cấu Phân Quyền</span>
+                  </a>
+                  <a href="#guide-sec-beginner" class="guide-toc-link" onclick="App.scrollToGuideSection('guide-sec-beginner')">
+                    <span class="toc-icon">🚀</span>
+                    <span class="toc-text">3. Người Mới Bắt Đầu</span>
+                  </a>
+                  <a href="#guide-sec-user" class="guide-toc-link" onclick="App.scrollToGuideSection('guide-sec-user')">
+                    <span class="toc-icon">👤</span>
+                    <span class="toc-text">4. Quy Trình Nhân Viên</span>
+                  </a>
+                  <a href="#guide-sec-manager" class="guide-toc-link" onclick="App.scrollToGuideSection('guide-sec-manager')">
+                    <span class="toc-icon">⭐</span>
+                    <span class="toc-text">5. Cẩm Nang Quản Lý</span>
+                  </a>
+                  <a href="#guide-sec-admin" class="guide-toc-link" onclick="App.scrollToGuideSection('guide-sec-admin')">
+                    <span class="toc-icon">👑</span>
+                    <span class="toc-text">6. Dành Cho Admin</span>
+                  </a>
+                  <a href="#guide-sec-shortcuts" class="guide-toc-link" onclick="App.scrollToGuideSection('guide-sec-shortcuts')">
+                    <span class="toc-icon">⌨️</span>
+                    <span class="toc-text">7. Phím Tắt & Mẹo Nhanh</span>
+                  </a>
+                  <a href="#guide-sec-faq" class="guide-toc-link" onclick="App.scrollToGuideSection('guide-sec-faq')">
+                    <span class="toc-icon">❓</span>
+                    <span class="toc-text">8. FAQ & Hỗ Trợ</span>
+                  </a>
+                </nav>
+                <div class="guide-toc-footer">
+                  <div class="guide-support-badge">
+                    <span style="font-size:16px;">💬</span>
+                    <div>
+                      <div style="font-weight:700; font-size:12px;">Cần Hỗ Trợ Kỹ Thuật?</div>
+                      <div style="font-size:11px; opacity:0.8;">Liên hệ Quản trị viên hệ thống</div>
+                    </div>
+                  </div>
+                </div>
+              </aside>
+
+              <!-- Content Area -->
+              <div class="guide-content-area" id="guideContentArea">
+                <!-- 1. TỔNG QUAN -->
+                <section class="guide-section" id="guide-sec-intro" data-guide-category="all beginner">
+                  <div class="guide-section-header">
+                    <span class="guide-section-badge">PHẦN 1</span>
+                    <h3 class="guide-section-title">🌐 Giới Thiệu Hệ Thống TaskFlow Pro</h3>
+                  </div>
+                  <div class="guide-card">
+                    <p>
+                      <strong>TaskFlow Pro</strong> là nền tảng quản trị công việc, điều hành dự án và cộng tác thời gian thực (Realtime Workspace) dành cho doanh nghiệp và các phòng ban.
+                    </p>
+                    <div class="guide-feature-grid">
+                      <div class="guide-feature-box">
+                        <span class="guide-feature-icon">📋</span>
+                        <strong>Quản Lý Trực Quan</strong>
+                        <p>Bảng Kanban kéo thả, Danh sách chi tiết, Lịch biểu và Dòng thời gian Gantt.</p>
+                      </div>
+                      <div class="guide-feature-box">
+                        <span class="guide-feature-icon">🛡️</span>
+                        <strong>Bảo Vệ Thẩm Quyền</strong>
+                        <p>Phân quyền 4 tầng nghiêm ngặt: Admin, Quản lý, Nhân viên, Người quan sát.</p>
+                      </div>
+                      <div class="guide-feature-box">
+                        <span class="guide-feature-icon">📹</span>
+                        <strong>Google Meet 1-Click</strong>
+                        <p>Họp trực tuyến gắn liền từng công việc & Phòng họp khẩn cấp War-Room toàn công ty.</p>
+                      </div>
+                      <div class="guide-feature-box">
+                        <span class="guide-feature-icon">🤖</span>
+                        <strong>Tự Động Hóa 24/7</strong>
+                        <p>Bot AI tự động quét hạn chót, phát hiện việc trễ hạn và cảnh báo tức thời.</p>
+                      </div>
+                    </div>
+
+                    <div class="guide-callout info">
+                      <strong>💡 Địa chỉ truy cập hệ thống:</strong>
+                      <ul>
+                        <li><strong>Mạng nội bộ / Máy chủ văn phòng:</strong> <code>http://localhost:3000</code></li>
+                        <li><strong>Môi trường đám mây (Public Web / Mobile):</strong> Liên kết Render hoặc Cloudflare Tunnel do Quản trị viên cung cấp.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- 2. MA TRẬN PHÂN QUYỀN -->
+                <section class="guide-section" id="guide-sec-matrix" data-guide-category="all beginner manager admin">
+                  <div class="guide-section-header">
+                    <span class="guide-section-badge">PHẦN 2</span>
+                    <h3 class="guide-section-title">🛡️ Cơ Cấu Phân Quyền & Ma Trận Thẩm Quyền</h3>
+                  </div>
+                  <div class="guide-card">
+                    <p>Hệ thống thiết lập nguyên tắc phân quyền phân tầng chặt chẽ nhằm triệt tiêu hoàn toàn tình trạng giao chéo việc hoặc vượt quyền:</p>
+
+                    <!-- Flow Hierarchy Graphic -->
+                    <div class="guide-hierarchy-diagram">
+                      <div class="hierarchy-level admin-level">
+                        <div class="level-badge">👑 QUẢN TRỊ VIÊN TỐI CAO (Admin)</div>
+                        <div class="level-desc">Toàn quyền hệ thống: Cấu hình, Nhân sự, Giao việc toàn công ty, Bàn điều hành, War-Room</div>
+                      </div>
+                      <div class="hierarchy-arrow">⬇️ Chỉ đạo & Giao việc cấp phòng</div>
+                      <div class="hierarchy-level manager-level">
+                        <div class="level-badge">⭐ TRƯỞNG PHÒNG / QUẢN LÝ (Manager)</div>
+                        <div class="level-desc">Quản lý nội bộ: Giao việc cho nhân viên cùng phòng ban, Duyệt nghiệm thu kết quả, Giám sát tiến độ phòng</div>
+                      </div>
+                      <div class="hierarchy-arrow">⬇️ Phân bổ công việc thực thi</div>
+                      <div class="hierarchy-level user-level">
+                        <div class="level-badge">👤 NHÂN VIÊN (User / Staff)</div>
+                        <div class="level-desc">Thực thi công việc: Nhận việc từ Quản lý, Tự tạo việc cho chính mình, Báo cáo tiến độ (Không được giao việc cho Quản lý)</div>
+                      </div>
+                      <div class="hierarchy-arrow">⬇️ Quyền hạn cơ sở</div>
+                      <div class="hierarchy-level viewer-level">
+                        <div class="level-badge">👁️ NGƯỜI QUAN SÁT (Viewer)</div>
+                        <div class="level-desc">Chỉ xem: Theo dõi tiến độ công việc được cấp quyền, không được chỉnh sửa dữ liệu</div>
+                      </div>
+                    </div>
+
+                    <!-- Comparison Table -->
+                    <h4 style="margin:20px 0 10px; font-size:15px;">Bảng Ma Trận Phân Quyền Chi Tiết:</h4>
+                    <div class="table-responsive">
+                      <table class="guide-table">
+                        <thead>
+                          <tr>
+                            <th>Hành Động / Chức Năng</th>
+                            <th style="text-align:center;">👑 Admin</th>
+                            <th style="text-align:center;">⭐ Manager</th>
+                            <th style="text-align:center;">👤 User</th>
+                            <th style="text-align:center;">👁️ Viewer</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td><strong>Tự tạo việc cho chính mình</strong></td>
+                            <td class="text-center text-success">✅ Có</td>
+                            <td class="text-center text-success">✅ Có</td>
+                            <td class="text-center text-success">✅ Có</td>
+                            <td class="text-center text-danger">❌ Không</td>
+                          </tr>
+                          <tr>
+                            <td><strong>Giao việc cho cấp dưới</strong></td>
+                            <td class="text-center text-success">✅ Toàn công ty</td>
+                            <td class="text-center text-success">✅ Cùng phòng ban</td>
+                            <td class="text-center text-danger">❌ Bị chặn</td>
+                            <td class="text-center text-danger">❌ Không</td>
+                          </tr>
+                          <tr>
+                            <td><strong>Giao việc cho Quản lý / Ban Giám Đốc</strong></td>
+                            <td class="text-center text-success">✅ Có</td>
+                            <td class="text-center text-danger">❌ Bị chặn</td>
+                            <td class="text-center text-danger">❌ Bị chặn</td>
+                            <td class="text-center text-danger">❌ Không</td>
+                          </tr>
+                          <tr>
+                            <td><strong>Tạo phòng họp Google Meet công việc</strong></td>
+                            <td class="text-center text-success">✅ Có</td>
+                            <td class="text-center text-success">✅ Có</td>
+                            <td class="text-center text-success">✅ Có</td>
+                            <td class="text-center text-danger">❌ Không</td>
+                          </tr>
+                          <tr>
+                            <td><strong>Triệu tập War-Room khẩn cấp</strong></td>
+                            <td class="text-center text-success">✅ Độc quyền</td>
+                            <td class="text-center text-danger">❌ Không</td>
+                            <td class="text-center text-danger">❌ Không</td>
+                            <td class="text-center text-danger">❌ Không</td>
+                          </tr>
+                          <tr>
+                            <td><strong>Quản trị nhân sự & Phân quyền</strong></td>
+                            <td class="text-center text-success">✅ Toàn quyền</td>
+                            <td class="text-center text-danger">❌ Không</td>
+                            <td class="text-center text-danger">❌ Không</td>
+                            <td class="text-center text-danger">❌ Không</td>
+                          </tr>
+                          <tr>
+                            <td><strong>Tự đổi mật khẩu & Ảnh đại diện cá nhân</strong></td>
+                            <td class="text-center text-success">✅ Có</td>
+                            <td class="text-center text-success">✅ Có</td>
+                            <td class="text-center text-success">✅ Có</td>
+                            <td class="text-center text-success">✅ Có</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- 3. NGƯỜI MỚI BẮT ĐẦU -->
+                <section class="guide-section" id="guide-sec-beginner" data-guide-category="all beginner">
+                  <div class="guide-section-header">
+                    <span class="guide-section-badge">PHẦN 3</span>
+                    <h3 class="guide-section-title">🚀 Cẩm Nang Cho Người Mới Bắt Đầu (Cấp Độ 0)</h3>
+                  </div>
+                  <div class="guide-card">
+                    <h4>3.1. Các Hình Thức Đăng Nhập</h4>
+                    <div class="guide-steps-container">
+                      <div class="guide-step-card">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                          <strong>Đăng nhập với Mật khẩu cá nhân</strong>
+                          <p>Nhập email công việc và mật khẩu ban đầu được quản trị viên cấp (mặc định: <code>123456</code> hoặc <code>password123</code>).</p>
+                        </div>
+                      </div>
+                      <div class="guide-step-card">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                          <strong>Đăng nhập 1-Click qua SSO Google Workspace</strong>
+                          <p>Nếu bạn sử dụng email doanh nghiệp <code>@vmg.edu.vn</code>, chỉ cần bấm nút <em>"Đăng nhập Google Workspace"</em> để vào hệ thống ngay mà không cần nhớ mật khẩu.</p>
+                        </div>
+                      </div>
+                      <div class="guide-step-card">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                          <strong>Trải nghiệm nhanh các vai trò (Demo Switcher)</strong>
+                          <p>Trên thanh Topbar hoặc trang đăng nhập, có danh sách chọn nhanh để bạn trải nghiệm giao diện dưới góc nhìn của Admin, Trưởng phòng hay Nhân viên.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <h4 style="margin-top:24px;">3.2. Cập Nhật Hồ Sơ Cá Nhân, Ảnh Avatar & Đổi Mật Khẩu</h4>
+                    <p>Hãy bảo mật tài khoản và thể hiện phong cách làm việc của bạn bằng cách tùy chỉnh hồ sơ:</p>
+                    
+                    <div class="guide-action-box">
+                      <div style="flex:1;">
+                        <strong style="display:block; font-size:15px; margin-bottom:4px;">👤 Tự Quản Lý Hồ Sơ & Mật Khẩu</strong>
+                        <span style="font-size:13px; color:var(--text-secondary);">
+                          Nhấp vào tên hoặc ảnh đại diện ở góc trên bên phải hoặc dưới thanh Sidebar để mở bảng điều khiển cá nhân.
+                        </span>
+                      </div>
+                      <button type="button" class="btn btn-primary btn-sm" onclick="App.openProfileModal()">
+                        ⚙️ Mở Bảng Hồ Sơ Ngay
+                      </button>
+                    </div>
+
+                    <div class="guide-two-col" style="margin-top:16px;">
+                      <div class="guide-subcard">
+                        <strong>🖼️ Tải Ảnh Đại Diện Chân Dung</strong>
+                        <ul>
+                          <li>Chọn ảnh PNG, JPG hoặc WEBP từ máy tính của bạn (tối đa 8MB).</li>
+                          <li>Hoặc chọn các biểu tượng Emoji ngộ nghĩnh (👑, ⚡, 🚀, 💻...).</li>
+                          <li>Ảnh đại diện sẽ tự động đồng bộ trên toàn bộ thẻ việc và bình luận bạn tham gia.</li>
+                        </ul>
+                      </div>
+                      <div class="guide-subcard">
+                        <strong>🔒 Tự Đổi Mật Khẩu An Toàn</strong>
+                        <ul>
+                          <li>Chuyển sang tab <strong>"Đổi Mật Khẩu"</strong>.</li>
+                          <li>Nhập mật khẩu hiện tại, nhập mật khẩu mới (tối thiểu 6 ký tự).</li>
+                          <li>Bấm vào biểu tượng con mắt 👁️ để kiểm tra xem đã nhập đúng ký tự hay chưa.</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- 4. QUY TRÌNH NHÂN VIÊN -->
+                <section class="guide-section" id="guide-sec-user" data-guide-category="all user">
+                  <div class="guide-section-header">
+                    <span class="guide-section-badge">PHẦN 4</span>
+                    <h3 class="guide-section-title">👤 Hướng Dẫn Dành Cho Nhân Viên (Role: User)</h3>
+                  </div>
+                  <div class="guide-card">
+                    <p>Là nhân viên, bạn tập trung vào việc quản lý thời gian, phối hợp nhóm và hoàn thành xuất sắc các đầu việc được giao:</p>
+
+                    <h4>4.1. Lọc và Theo Dõi "Việc Của Tôi"</h4>
+                    <div class="guide-callout success">
+                      <strong>🎯 Mẹo tập trung:</strong> Trên thanh công cụ Bảng Kanban, bấm nút <strong>"Việc của tôi"</strong> để màn hình chỉ hiển thị các công việc do chính bạn phụ trách, giúp bạn không bị xao nhãng bởi công việc của người khác.
+                    </div>
+
+                    <h4 style="margin-top:20px;">4.2. Tự Tạo Việc Cho Chính Mình</h4>
+                    <p>Khi có đầu việc phát sinh, bạn có thể tự tạo công việc cho chính mình:</p>
+                    <ol class="guide-numbered-list">
+                      <li>Bấm nút <strong>"+ Thêm Công Việc"</strong> (hoặc phím tắt <code>N</code>).</li>
+                      <li>Nhập tiêu đề, mô tả yêu cầu, chọn mức độ ưu tiên và ngày hoàn thành (Deadline).</li>
+                      <li>Ô <strong>Người thực hiện</strong> sẽ được cố định là chính bạn (theo đúng ma trận phân quyền).</li>
+                      <li>Bấm <strong>Tạo Công Việc</strong> để lưu.</li>
+                    </ol>
+
+                    <h4 style="margin-top:20px;">4.3. Cập Nhật Tiến Độ & Họp Google Meet Gắn Liền Công Việc</h4>
+                    <p>Nhấp vào bất kỳ thẻ công việc nào để mở bảng làm việc chi tiết:</p>
+                    <div class="guide-feature-grid">
+                      <div class="guide-feature-box">
+                        <span class="guide-feature-icon">☑️</span>
+                        <strong>Checklist Từng Bước</strong>
+                        <p>Tích vào từng mục đã xong để tự động tăng % thanh tiến độ hoàn thành.</p>
+                      </div>
+                      <div class="guide-feature-box">
+                        <span class="guide-feature-icon">📎</span>
+                        <strong>Tệp Đính Kèm</strong>
+                        <p>Tải tài liệu kết quả, hình ảnh nghiệm thu hoặc liên kết Google Drive.</p>
+                      </div>
+                      <div class="guide-feature-box">
+                        <span class="guide-feature-icon">💬</span>
+                        <strong>Trao Đổi Realtime</strong>
+                        <p>Bình luận trao đổi vướng mắc với đồng nghiệp và Quản lý theo thời gian thực.</p>
+                      </div>
+                      <div class="guide-feature-box">
+                        <span class="guide-feature-icon">📹</span>
+                        <strong>Vào Họp Google Meet</strong>
+                        <p>Nhấp nút màu xanh <em>"Tham gia Google Meet"</em> để vào trao đổi trực tuyến 1-click.</p>
+                      </div>
+                    </div>
+
+                    <h4 style="margin-top:20px;">4.4. Vòng Đời Kéo Thả Trạng Thái Kanban</h4>
+                    <div class="guide-kanban-flow">
+                      <div class="kanban-stage stage-todo">
+                        <strong>1. CẦN LÀM</strong>
+                        <span>Việc mới giao đang chờ</span>
+                      </div>
+                      <div class="kanban-flow-arrow">➔</div>
+                      <div class="kanban-stage stage-progress">
+                        <strong>2. ĐANG LÀM</strong>
+                        <span>Đang bắt tay thực hiện</span>
+                      </div>
+                      <div class="kanban-flow-arrow">➔</div>
+                      <div class="kanban-stage stage-review">
+                        <strong>3. CHỜ DUYỆT</strong>
+                        <span>Gửi Sếp nghiệm thu</span>
+                      </div>
+                      <div class="kanban-flow-arrow">➔</div>
+                      <div class="kanban-stage stage-done">
+                        <strong>4. HOÀN THÀNH</strong>
+                        <span>Đã nghiệm thu xong</span>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- 5. CẨM NANG QUẢN LÝ -->
+                <section class="guide-section" id="guide-sec-manager" data-guide-category="all manager">
+                  <div class="guide-section-header">
+                    <span class="guide-section-badge">PHẦN 5</span>
+                    <h3 class="guide-section-title">⭐ Hướng Dẫn Dành Cho Quản Lý / Trưởng Phòng (Role: Manager)</h3>
+                  </div>
+                  <div class="guide-card">
+                    <p>Quản lý là người chịu trách nhiệm phân công, giám sát và đảm bảo toàn bộ công việc của phòng ban hoàn thành đúng chất lượng và tiến độ:</p>
+
+                    <h4>5.1. Quy Trình Giao Việc Nội Bộ Phòng Ban</h4>
+                    <p>Khi Trưởng phòng tạo công việc mới:</p>
+                    <ul>
+                      <li>Hệ thống <strong>tự động giới hạn danh sách người nhận việc</strong>: Bạn chỉ thấy chính mình và các nhân viên thuộc cùng phòng ban của bạn.</li>
+                      <li>Hệ thống chặn không cho phép giao việc sang phòng ban khác hoặc giao vượt cấp lên Ban Giám Đốc/Admin.</li>
+                      <li>Sau khi bấm lưu, chuông thông báo trên máy tính của nhân viên sẽ reo ngay lập tức qua WebSocket realtime.</li>
+                    </ul>
+
+                    <h4 style="margin-top:20px;">5.2. Làm Chủ 4 Góc Nhìn Điều Phối</h4>
+                    <div class="guide-views-list">
+                      <div class="guide-view-row">
+                        <span class="guide-view-icon">📋</span>
+                        <div>
+                          <strong>Bảng Kanban:</strong> Dành cho họp giao ban hàng ngày (Daily Standup), nắm bắt dòng chảy công việc qua 4 cột trạng thái.
+                        </div>
+                      </div>
+                      <div class="guide-view-row">
+                        <span class="guide-view-icon">📑</span>
+                        <div>
+                          <strong>Danh Sách (Table View):</strong> Duyệt danh mục lớn, lọc theo nhân sự phụ trách, xuất báo cáo.
+                        </div>
+                      </div>
+                      <div class="guide-view-row">
+                        <span class="guide-view-icon">📅</span>
+                        <div>
+                          <strong>Lịch Biểu (Calendar):</strong> Giám sát hạn chót theo ngày, tuần, tháng; phát hiện ngày dồn ứ deadline.
+                        </div>
+                      </div>
+                      <div class="guide-view-row">
+                        <span class="guide-view-icon">📈</span>
+                        <div>
+                          <strong>Dòng Thời Gian (Gantt/Reports):</strong> Kiểm soát tiến độ các dự án dài hơi và khối lượng công việc tổng thể.
+                        </div>
+                      </div>
+                    </div>
+
+                    <h4 style="margin-top:20px;">5.3. Nghiệm Thu & Quản Lý Cảnh Báo Trễ Hạn</h4>
+                    <ul>
+                      <li>Kiểm tra cột <strong>Chờ duyệt (Review)</strong>: Mở thẻ việc, kiểm tra tài liệu đính kèm của nhân viên và bấm chuyển sang <strong>Hoàn thành</strong>.</li>
+                      <li>Bấm nút <strong>⚡ Quét Cảnh Báo</strong> trên thanh Topbar bất cứ lúc nào để Bot rà soát ngay lập tức toàn bộ các đầu việc sắp đến hạn hoặc đã quá hạn của phòng ban.</li>
+                    </ul>
+                  </div>
+                </section>
+
+                <!-- 6. DÀNH CHO ADMIN -->
+                <section class="guide-section" id="guide-sec-admin" data-guide-category="all admin">
+                  <div class="guide-section-header">
+                    <span class="guide-section-badge">PHẦN 6</span>
+                    <h3 class="guide-section-title">👑 Dành Cho Quản Trị Viên Tối Cao (Role: Admin / Super Admin)</h3>
+                  </div>
+                  <div class="guide-card">
+                    <p>Quản trị viên sở hữu quyền lực cao nhất toàn hệ thống, chịu trách nhiệm định hình cơ cấu tổ chức, bảo mật và chỉ đạo chiến lược:</p>
+
+                    <h4>6.1. Bàn Điều Hành Lãnh Đạo (Executive Desk) & Phân Tích AI</h4>
+                    <p>Trung tâm chỉ huy dành riêng cho Ban Lãnh Đạo:</p>
+                    <ul>
+                      <li><strong>Tổng quan sức khỏe doanh nghiệp:</strong> Tỷ lệ hoàn thành công việc, phân tích khối lượng việc theo từng phòng ban.</li>
+                      <li><strong>Bảng xếp hạng hiệu suất:</strong> Tuyên dương nhân sự tích cực, cảnh báo nhân sự đang tồn đọng nhiều việc trễ hạn.</li>
+                      <li><strong>Trợ lý AI phân tích:</strong> Đưa ra đề xuất tối ưu hóa nguồn lực và phòng ngừa rủi ro dự án.</li>
+                    </ul>
+
+                    <h4 style="margin-top:20px;">6.2. Phòng Họp Khẩn Cấp War-Room Google Meet</h4>
+                    <div class="guide-callout danger">
+                      <strong>🚨 Đặc quyền kích hoạt War-Room:</strong>
+                      Khi có sự cố nghiêm trọng hoặc cần triệu tập họp đột xuất toàn công ty, Admin nhấp vào nút <strong>"Triệu Tập Phòng Họp War-Room Khẩn Cấp"</strong> tại Bàn điều hành. Hệ thống sẽ:
+                      <ol style="margin-top:8px; padding-left:20px;">
+                        <li>Tự động khởi tạo ngay một phòng họp Google Meet độc quyền.</li>
+                        <li>Phát lệnh thông báo khẩn cấp toàn màn hình đến toàn thể Quản lý và Nhân sự liên quan.</li>
+                        <li>Người dùng nhấp thông báo là vào thẳng phòng họp ngay lập tức mà không cần copy link.</li>
+                      </ol>
+                    </div>
+
+                    <h4 style="margin-top:20px;">6.3. Quản Trị Nhân Sự & Cơ Chế Lưu Trữ Vĩnh Viễn (Registry)</h4>
+                    <p>Truy cập mục <strong>Quản Lý Nhân Sự</strong>:</p>
+                    <ul>
+                      <li><strong>Thêm thành viên mới:</strong> Điền tên, email, mật khẩu ban đầu, phòng ban và phân cấp vai trò (Admin, Manager, User, Viewer).</li>
+                      <li><strong>Cơ chế Persistent Registry:</strong> Toàn bộ dữ liệu nhân sự được lưu cố định hai lớp vào <code>users-registry.json</code> và <code>db.json</code>, tuyệt đối không bị mất dữ liệu hay bị reset khi triển khai tính năng mới hoặc khởi động lại máy chủ.</li>
+                      <li><strong>Khóa tài khoản:</strong> Tạm ngưng quyền truy cập của nhân sự khi nghỉ việc mà vẫn lưu giữ nguyên vẹn lịch sử công việc của họ.</li>
+                    </ul>
+
+                    <h4 style="margin-top:20px;">6.4. Tự Động Hóa (Bot AI), Nhật Ký Giám Sát & Sao Lưu</h4>
+                    <ul>
+                      <li><strong>Bot AI tự động hóa:</strong> Tự động gắn nhãn "Quá hạn" và kích hoạt cảnh báo real-time mỗi 5 phút một lần.</li>
+                      <li><strong>Nhật ký hoạt động (Audit Trail):</strong> Ghi vết chính xác từng hành động đăng nhập, sửa việc, xóa việc, đổi mật khẩu của toàn bộ thành viên.</li>
+                      <li><strong>Sao lưu dữ liệu:</strong> Xuất dữ liệu ra Excel/CSV định kỳ phục vụ báo cáo và lưu trữ an toàn.</li>
+                    </ul>
+                  </div>
+                </section>
+
+                <!-- 7. PHÍM TẮT -->
+                <section class="guide-section" id="guide-sec-shortcuts" data-guide-category="all shortcuts beginner">
+                  <div class="guide-section-header">
+                    <span class="guide-section-badge">PHẦN 7</span>
+                    <h3 class="guide-section-title">⌨️ Bảng Phím Tắt & Mẹo Thao Tác Nhanh</h3>
+                  </div>
+                  <div class="guide-card">
+                    <p>Sử dụng các phím tắt bàn phím sau để tăng tốc độ xử lý công việc lên gấp 3 lần:</p>
+                    <div class="guide-shortcut-grid">
+                      <div class="guide-shortcut-item">
+                        <kbd class="shortcut-key">N</kbd> hoặc <kbd class="shortcut-key">Alt + N</kbd>
+                        <span>Mở nhanh cửa sổ tạo mới công việc</span>
+                      </div>
+                      <div class="guide-shortcut-item">
+                        <kbd class="shortcut-key">/</kbd>
+                        <span>Nhảy con trỏ chuột vào ô Tìm kiếm công việc</span>
+                      </div>
+                      <div class="guide-shortcut-item">
+                        <kbd class="shortcut-key">Esc</kbd>
+                        <span>Đóng ngay cửa sổ chi tiết / Hộp thoại đang mở</span>
+                      </div>
+                      <div class="guide-shortcut-item">
+                        <kbd class="shortcut-key">F</kbd>
+                        <span>Bật / Tắt thanh bộ lọc công việc nhanh</span>
+                      </div>
+                      <div class="guide-shortcut-item">
+                        <kbd class="shortcut-key">Click đúp</kbd>
+                        <span>Nhấp đúp vào thẻ việc bất kỳ để mở sửa chi tiết</span>
+                      </div>
+                      <div class="guide-shortcut-item">
+                        <kbd class="shortcut-key">Kéo & Thả</kbd>
+                        <span>Kéo thẻ việc giữa các cột Kanban để đổi trạng thái tức thì</span>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- 8. FAQ -->
+                <section class="guide-section" id="guide-sec-faq" data-guide-category="all faq beginner user manager admin">
+                  <div class="guide-section-header">
+                    <span class="guide-section-badge">PHẦN 8</span>
+                    <h3 class="guide-section-title">❓ Câu Hỏi Thường Gặp (FAQ) & Xử Lý Sự Cố</h3>
+                  </div>
+                  <div class="guide-card">
+                    <div class="guide-faq-accordion">
+                      <!-- FAQ 1 -->
+                      <details class="guide-faq-item" open>
+                        <summary class="guide-faq-question">
+                          <span>1. Tôi là nhân viên, tại sao trong ô Người thực hiện tôi không thấy tên Sếp hoặc đồng nghiệp?</span>
+                          <span class="faq-toggle-icon">▾</span>
+                        </summary>
+                        <div class="guide-faq-answer">
+                          Đây là <strong>quy tắc bảo vệ thẩm quyền cốt lõi</strong> của hệ thống. Nhân viên chỉ có thẩm quyền nhận việc từ cấp trên và tự tạo việc cho chính mình. Chỉ có Quản lý phòng ban hoặc Admin mới có thẩm quyền phân công việc cho người khác nhằm tránh việc giao việc lộn xộn hoặc đùn đẩy trách nhiệm.
+                        </div>
+                      </details>
+
+                      <!-- FAQ 2 -->
+                      <details class="guide-faq-item">
+                        <summary class="guide-faq-question">
+                          <span>2. Tôi quên mật khẩu đăng nhập cá nhân thì phải làm thế nào?</span>
+                          <span class="faq-toggle-icon">▾</span>
+                        </summary>
+                        <div class="guide-faq-answer">
+                          Nếu bạn dùng email doanh nghiệp Google Workspace (ví dụ <code>@vmg.edu.vn</code>), bạn chỉ cần nhấp nút <strong>"Đăng nhập với Google Workspace"</strong> để vào hệ thống ngay mà không cần mật khẩu. Trường hợp dùng mật khẩu thường, hãy liên hệ Quản trị viên (Admin) để được đặt lại mật khẩu về mặc định, sau đó bạn vào mục Hồ sơ cá nhân để đổi mật khẩu mới.
+                        </div>
+                      </details>
+
+                      <!-- FAQ 3 -->
+                      <details class="guide-faq-item">
+                        <summary class="guide-faq-question">
+                          <span>3. Ảnh đại diện tải lên và mật khẩu mới đổi có bị mất khi khởi động lại máy chủ không?</span>
+                          <span class="faq-toggle-icon">▾</span>
+                        </summary>
+                        <div class="guide-faq-answer">
+                          Hoàn toàn không. Tệp ảnh đại diện được lưu vật lý vào thư mục lưu trữ đĩa cứng <code>public/uploads/avatars/</code>, đồng thời mật khẩu đã mã hóa bcrypt được ghi đồng bộ vào Sổ bộ đăng ký nhân sự vĩnh viễn <code>users-registry.json</code>. Dữ liệu được bảo tồn an toàn 100%.
+                        </div>
+                      </details>
+
+                      <!-- FAQ 4 -->
+                      <details class="guide-faq-item">
+                        <summary class="guide-faq-question">
+                          <span>4. Phòng họp Google Meet có bị giới hạn thời gian họp không?</span>
+                          <span class="faq-toggle-icon">▾</span>
+                        </summary>
+                        <div class="guide-faq-answer">
+                          Hệ thống tích hợp tạo phòng họp chuẩn của Google Meet. Thời lượng và số lượng người tham gia tuân theo chính sách tài khoản Google của tổ chức (tài khoản cá nhân tối đa 100 người, tài khoản Google Workspace doanh nghiệp lên đến 250 - 500 người và không giới hạn thời gian).
+                        </div>
+                      </details>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </section>
     </div>
   </div>
 

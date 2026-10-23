@@ -1423,7 +1423,8 @@ const App = {
       users: '👥 Quản Trị Nhân Sự',
       activities: '📜 Nhật Ký Hoạt Động',
       automation: '⚡ Tự Động Hóa (Automation)',
-      'executive-desk': '💼 Bàn Làm Việc Điều Hành & Trợ Lý AI'
+      'executive-desk': '💼 Bàn Làm Việc Điều Hành & Trợ Lý AI',
+      guide: '📖 Cẩm Nang Hướng Dẫn Sử Dụng'
     };
     const titleEl = document.getElementById('currentViewTitle');
     if (titleEl) {
@@ -1470,6 +1471,9 @@ const App = {
         break;
       case 'executive-desk':
         this.renderExecutiveDeskView();
+        break;
+      case 'guide':
+        this.renderGuideView();
         break;
     }
     this.renderKPIs();
@@ -7070,6 +7074,101 @@ const App = {
 
     this.renderPosterCanvas();
     this.showToast('✨ Đã điền nội dung thông báo mẫu từ AI!', 'info');
+  },
+
+  // ========================================================
+  // USER GUIDE (CẨM NANG HƯỚNG DẪN SỬ DỤNG)
+  // ========================================================
+  renderGuideView() {
+    // Setup scroll spy for TOC sidebar if not already bound
+    if (!this._guideScrollSpyBound) {
+      this._guideScrollSpyBound = true;
+      window.addEventListener('scroll', () => {
+        if (this.state.activeView !== 'guide') return;
+        const sections = document.querySelectorAll('#guideContentArea .guide-section:not(.hidden)');
+        let currentSecId = '';
+        const scrollPos = window.scrollY + 120;
+        sections.forEach(sec => {
+          const top = sec.offsetTop;
+          const height = sec.offsetHeight;
+          if (scrollPos >= top && scrollPos < top + height) {
+            currentSecId = sec.id;
+          }
+        });
+        if (currentSecId) {
+          document.querySelectorAll('#guideTocNav .guide-toc-link').forEach(link => {
+            const href = link.getAttribute('href') || '';
+            link.classList.toggle('active', href === `#${currentSecId}`);
+          });
+        }
+      });
+    }
+  },
+
+  scrollToGuideSection(secId) {
+    const el = document.getElementById(secId);
+    if (el) {
+      el.classList.remove('hidden');
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.querySelectorAll('#guideTocNav .guide-toc-link').forEach(link => {
+        const href = link.getAttribute('href') || '';
+        link.classList.toggle('active', href === `#${secId}`);
+      });
+    }
+  },
+
+  handleGuideSearch(query) {
+    const q = (query || '').toLowerCase().trim();
+    const clearBtn = document.getElementById('guideSearchClearBtn');
+    if (clearBtn) {
+      clearBtn.style.display = q ? 'inline-flex' : 'none';
+    }
+
+    const sections = document.querySelectorAll('#guideContentArea .guide-section');
+    sections.forEach(sec => {
+      if (!q) {
+        const activePill = document.querySelector('#guideRoleFilterPills .guide-pill.active');
+        const role = activePill ? activePill.getAttribute('data-guide-role') : 'all';
+        const cats = (sec.getAttribute('data-guide-category') || '').split(' ');
+        sec.classList.toggle('hidden', role !== 'all' && !cats.includes(role));
+        return;
+      }
+      const text = (sec.innerText || '').toLowerCase();
+      const match = text.includes(q);
+      sec.classList.toggle('hidden', !match);
+    });
+  },
+
+  clearGuideSearch() {
+    const input = document.getElementById('guideSearchInput');
+    if (input) input.value = '';
+    this.handleGuideSearch('');
+  },
+
+  filterGuideByRole(role) {
+    document.querySelectorAll('#guideRoleFilterPills .guide-pill').forEach(pill => {
+      pill.classList.toggle('active', pill.getAttribute('data-guide-role') === role);
+    });
+
+    const input = document.getElementById('guideSearchInput');
+    if (input) input.value = '';
+    const clearBtn = document.getElementById('guideSearchClearBtn');
+    if (clearBtn) clearBtn.style.display = 'none';
+
+    const sections = document.querySelectorAll('#guideContentArea .guide-section');
+    sections.forEach(sec => {
+      if (role === 'all') {
+        sec.classList.remove('hidden');
+      } else {
+        const cats = (sec.getAttribute('data-guide-category') || '').split(' ');
+        sec.classList.toggle('hidden', !cats.includes(role));
+      }
+    });
+
+    const guidePanel = document.getElementById('view-guide');
+    if (guidePanel) {
+      guidePanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   },
 
 };
