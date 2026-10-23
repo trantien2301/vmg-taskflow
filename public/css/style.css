@@ -5232,3 +5232,94 @@ body {
   min-height: 80px;
 }
 
+/* ========================================================
+   PRE-LOGIN VMG POSTER ANNOUNCEMENT OVERLAY & STYLES
+   ======================================================== */
+.prelogin-poster-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: preloginFadeIn 0.3s ease-out;
+}
+
+@keyframes preloginFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.prelogin-poster-modal {
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  max-width: 580px;
+  width: 100%;
+  max-height: 94vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1.5px solid rgba(166, 29, 36, 0.35);
+  position: relative;
+}
+
+.prelogin-poster-header {
+  padding: 12px 18px;
+  background: linear-gradient(135deg, rgba(166, 29, 36, 0.08), rgba(212, 175, 55, 0.08));
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.btn-close-poster {
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0 4px;
+  transition: color 0.2s;
+}
+
+.btn-close-poster:hover {
+  color: #ef4444;
+}
+
+.prelogin-poster-body {
+  padding: 16px;
+  overflow-y: auto;
+  max-height: calc(85vh - 130px);
+  display: flex;
+  justify-content: center;
+  background: #f8fafc;
+}
+
+.poster-image-container {
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  justify-content: center;
+}
+
+.prelogin-poster-footer {
+  padding: 12px 18px;
+  background: var(--card-bg);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+

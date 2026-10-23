@@ -492,6 +492,29 @@ class Database {
           this.data.automations = getDefaultData().automations || [];
           this.save();
         }
+        if (!this.data.announcementPoster) {
+          this.data.announcementPoster = {
+            active: true,
+            type: 'special_mission',
+            badgeText: 'NHIỆM VỤ ĐẶC BIỆT',
+            title: 'CHIẾN DỊCH CAO ĐIỂM QUÝ IV / 2026',
+            subtitle: 'TĂNG TỐC HOÀN THÀNH 100% MỤC TIÊU TUYỂN SINH & ĐÀO TẠO',
+            message: 'Toàn thể Cán bộ - Nhân viên VMG English tập trung cao độ, chủ động tháo gỡ điểm nghẽn, đẩy nhanh tiến độ các dự án trọng điểm theo chỉ đạo trực tiếp từ Ban Giám Đốc.',
+            details: [
+              'Tập trung xử lý dứt điểm 100% công việc quá hạn trong 48 giờ tới',
+              'Phối hợp liên phòng ban chặt chẽ giữa Khối Tuyển Sinh, Marketing và Đào Tạo',
+              'Cập nhật tiến độ hàng ngày và tuân thủ báo cáo nghiêm ngặt trên TaskFlow'
+            ],
+            deadline: '2026-11-15',
+            targetAudience: 'Toàn thể Cán bộ - Nhân viên VMG English',
+            issuedBy: 'BAN GIÁM ĐỐC VMG',
+            theme: 'vmg_classic',
+            imageDataUrl: '',
+            updatedAt: new Date().toISOString(),
+            updatedBy: 'Trần Quản Trị'
+          };
+          this.save();
+        }
 
         // Ensure user permissions and active status
         if (this.data.users && Array.isArray(this.data.users)) {
@@ -1323,6 +1346,36 @@ class Database {
     const ExecutiveDeskEngine = require('./executiveDesk');
     const engine = new ExecutiveDeskEngine(this);
     return engine.executeRebalance(taskId, targetUserId, currentUser);
+  }
+
+  // --- Announcement Poster (Thông Báo Nhiệm Vụ Đặc Biệt / Mẩu Tin Quan Trọng) ---
+  getAnnouncementPoster() {
+    return this.data.announcementPoster || null;
+  }
+
+  updateAnnouncementPoster(updates, updaterUser) {
+    if (!this.data.announcementPoster) {
+      this.data.announcementPoster = {};
+    }
+    this.data.announcementPoster = {
+      ...this.data.announcementPoster,
+      ...updates,
+      updatedAt: new Date().toISOString(),
+      updatedBy: updaterUser?.name || 'Admin'
+    };
+
+    this.logActivity({
+      userId: updaterUser?.id || 'admin',
+      userName: updaterUser?.name || 'Admin',
+      userRole: updaterUser?.role || 'admin',
+      userAvatar: '📢',
+      action: 'update_announcement_poster',
+      category: 'executive_desk',
+      details: `[Bàn Làm Việc AI] Cập nhật poster thông báo: "${this.data.announcementPoster.title}" (Kích hoạt: ${this.data.announcementPoster.active ? 'BẬT' : 'TẮT'})`
+    });
+
+    this.save();
+    return this.data.announcementPoster;
   }
 }
 

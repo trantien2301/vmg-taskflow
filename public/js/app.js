@@ -144,6 +144,9 @@ const App = {
   },
 
   showLoginView() {
+    // Check and display active pre-login VMG announcement poster if any
+    this.checkAndShowPreLoginPoster();
+
     const loginScreen = document.getElementById('loginScreen');
     const appContainer = document.getElementById('appContainer');
     if (loginScreen) loginScreen.style.display = 'flex';
@@ -514,6 +517,15 @@ const App = {
       case 'executive:rebalance_applied':
         if (this.state.activeView === 'executive-desk') {
           this.renderExecutiveDeskView();
+        }
+        break;
+
+      case 'announcement:updated':
+        if (data && data.poster) {
+          this.state.currentPoster = data.poster;
+          if (this.state.activeView === 'executive-desk' && this.state.executiveSubTab === 'poster') {
+            this.initPosterCanvasGenerator();
+          }
         }
         break;
 
@@ -5245,7 +5257,7 @@ const App = {
 
   switchExecutiveSubTab(tabName) {
     this.state.executiveSubTab = tabName;
-    ['personnel', 'forecast', 'rebalance', 'assistant'].forEach(t => {
+    ['personnel', 'forecast', 'rebalance', 'assistant', 'poster'].forEach(t => {
       const btn = document.getElementById(`exeTabBtn${t.charAt(0).toUpperCase() + t.slice(1)}`);
       const content = document.getElementById(`exeSubContent${t.charAt(0).toUpperCase() + t.slice(1)}`);
       if (btn) btn.classList.toggle('active', t === tabName);
@@ -5270,6 +5282,9 @@ const App = {
         this.renderExecutiveRebalanceTable(data.rebalanceSuggestions || []);
         break;
       case 'assistant':
+        break;
+      case 'poster':
+        this.initPosterCanvasGenerator();
         break;
     }
   },
@@ -5722,6 +5737,549 @@ const App = {
 
   printExecutiveDeskReport() {
     window.print();
+  },
+
+  // -------------------------------------------------------------
+  // VMG PRE-LOGIN ANNOUNCEMENT POSTER & CANVAS GENERATOR
+  // -------------------------------------------------------------
+  async checkAndShowPreLoginPoster() {
+    try {
+      const res = await API.getAnnouncementPoster();
+      if (!res || !res.poster) return;
+      this.state.currentPoster = res.poster;
+
+      if (res.poster.active) {
+        const dismissKey = 'vmg_poster_dismissed_' + (res.poster.updatedAt || 'latest');
+        const isDismissed = localStorage.getItem(dismissKey) === 'true';
+
+        if (!isDismissed) {
+          const overlay = document.getElementById('preLoginPosterOverlay');
+          const img = document.getElementById('preLoginPosterImg');
+          const badge = document.getElementById('preLoginBadgeText');
+          const title = document.getElementById('preLoginHeaderTitle');
+
+          if (badge) badge.innerText = res.poster.badgeText || 'NHIỆM VỤ ĐẶC BIỆT';
+          if (title) title.innerText = res.poster.title || 'Thông Báo Từ Ban Giám Đốc';
+
+          if (res.poster.imageDataUrl) {
+            if (img) img.src = res.poster.imageDataUrl;
+            if (overlay) overlay.style.display = 'flex';
+          } else {
+            // Draw immediately on the fly
+            this.drawPosterToCanvas(res.poster, (url) => {
+              if (img) img.src = url;
+              if (overlay) overlay.style.display = 'flex';
+            });
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Could not check announcement poster:', e);
+    }
+  },
+
+  dismissPreLoginPoster() {
+    const overlay = document.getElementById('preLoginPosterOverlay');
+    const chk = document.getElementById('chkDismissPosterToday');
+    if (overlay) overlay.style.display = 'none';
+
+    if (chk && chk.checked && this.state.currentPoster?.updatedAt) {
+      localStorage.setItem('vmg_poster_dismissed_' + this.state.currentPoster.updatedAt, 'true');
+    }
+
+    const emailInput = document.getElementById('loginEmail');
+    if (emailInput) emailInput.focus();
+  },
+
+  downloadActivePoster() {
+    const dataUrl = this.state.generatedPosterDataUrl || this.state.currentPoster?.imageDataUrl;
+    if (!dataUrl) {
+      this.showToast('Chưa có ảnh poster để tải về.', 'warning');
+      return;
+    }
+
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = `VMG-Thong-Bao-Nhiem-Vu-Dac-Biet-${new Date().toISOString().slice(0, 10)}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    this.showToast('📥 Đang tải poster ảnh VMG về máy...', 'success');
+  },
+
+  openFullPosterModal() {
+    const dataUrl = this.state.generatedPosterDataUrl || this.state.currentPoster?.imageDataUrl;
+    const fullImg = document.getElementById('fullPosterModalImg');
+    if (fullImg && dataUrl) {
+      fullImg.src = dataUrl;
+      this.openModal('fullPosterModal');
+    }
+  },
+
+  previewPreLoginPosterModal() {
+    const dataUrl = this.state.generatedPosterDataUrl || this.state.currentPoster?.imageDataUrl;
+    if (!dataUrl) {
+      this.showToast('Vui lòng đợi ảnh poster vẽ xong trước khi xem thử.', 'warning');
+      return;
+    }
+    const overlay = document.getElementById('preLoginPosterOverlay');
+    const img = document.getElementById('preLoginPosterImg');
+    const badge = document.getElementById('preLoginBadgeText');
+    const title = document.getElementById('preLoginHeaderTitle');
+
+    if (img) img.src = dataUrl;
+    if (badge) badge.innerText = document.getElementById('posterTypeSelect')?.selectedOptions[0]?.text || 'NHIỆM VỤ ĐẶC BIỆT';
+    if (title) title.innerText = document.getElementById('posterTitleInput')?.value || 'Thông Báo Từ Ban Giám Đốc';
+
+    if (overlay) overlay.style.display = 'flex';
+  },
+
+  async initPosterCanvasGenerator() {
+    try {
+      if (!this.state.currentPoster) {
+        const res = await API.getAnnouncementPoster();
+        this.state.currentPoster = res?.poster || null;
+      }
+    } catch (e) {
+      console.warn('Error loading poster data:', e);
+    }
+
+    const p = this.state.currentPoster || {
+      active: true,
+      type: 'special_mission',
+      title: 'CHIẾN DỊCH CAO ĐIỂM QUÝ IV / 2026',
+      subtitle: 'TĂNG TỐC HOÀN THÀNH 100% MỤC TIÊU TUYỂN SINH & ĐÀO TẠO',
+      message: 'Toàn thể Cán bộ - Nhân viên VMG English tập trung cao độ, chủ động tháo gỡ điểm nghẽn, đẩy nhanh tiến độ các dự án trọng điểm theo chỉ đạo trực tiếp từ Ban Giám Đốc.',
+      details: [
+        'Tập trung xử lý dứt điểm 100% công việc quá hạn trong 48 giờ tới',
+        'Phối hợp liên phòng ban chặt chẽ giữa Khối Tuyển Sinh, Marketing và Đào Tạo',
+        'Cập nhật tiến độ hàng ngày và tuân thủ báo cáo nghiêm ngặt trên TaskFlow'
+      ],
+      deadline: '2026-11-15',
+      issuedBy: 'BAN GIÁM ĐỐC VMG',
+      theme: 'vmg_classic'
+    };
+
+    const toggle = document.getElementById('posterActiveToggle');
+    const typeSelect = document.getElementById('posterTypeSelect');
+    const themeSelect = document.getElementById('posterThemeSelect');
+    const titleInput = document.getElementById('posterTitleInput');
+    const subInput = document.getElementById('posterSubtitleInput');
+    const msgInput = document.getElementById('posterMessageInput');
+    const d1 = document.getElementById('posterDetail1');
+    const d2 = document.getElementById('posterDetail2');
+    const d3 = document.getElementById('posterDetail3');
+    const deadInput = document.getElementById('posterDeadlineInput');
+    const issueInput = document.getElementById('posterIssuedByInput');
+
+    if (toggle) toggle.checked = Boolean(p.active);
+    this.onPosterActiveToggle(Boolean(p.active));
+
+    if (typeSelect) typeSelect.value = p.type || 'special_mission';
+    if (themeSelect) themeSelect.value = p.theme || 'vmg_classic';
+    if (titleInput) titleInput.value = p.title || '';
+    if (subInput) subInput.value = p.subtitle || '';
+    if (msgInput) msgInput.value = p.message || '';
+    if (d1) d1.value = p.details?.[0] || '';
+    if (d2) d2.value = p.details?.[1] || '';
+    if (d3) d3.value = p.details?.[2] || '';
+    if (deadInput) deadInput.value = p.deadline || '';
+    if (issueInput) issueInput.value = p.issuedBy || 'BAN GIÁM ĐỐC VMG';
+
+    this.renderPosterCanvas();
+  },
+
+  onPosterActiveToggle(checked) {
+    const textEl = document.getElementById('posterActiveStatusText');
+    const badgeEl = document.getElementById('exePosterStatusBadge');
+    if (textEl) {
+      textEl.innerText = checked ? '🟢 Đang Kích Hoạt Trước Đăng Nhập' : '⚪ Đang Tạm Ẩn';
+      textEl.style.color = checked ? '#10b981' : 'var(--text-muted)';
+    }
+    if (badgeEl) {
+      badgeEl.innerText = checked ? 'BẬT' : 'TẮT';
+      badgeEl.style.background = checked ? '#10b981' : '#64748b';
+    }
+  },
+
+  posterDebounceTimer: null,
+  onPosterFormChange() {
+    clearTimeout(this.posterDebounceTimer);
+    this.posterDebounceTimer = setTimeout(() => {
+      this.renderPosterCanvas();
+    }, 120);
+  },
+
+  renderPosterCanvas() {
+    return this.drawPosterToCanvas();
+  },
+
+  drawPosterToCanvas(posterObj = null, callback = null) {
+    const canvas = document.getElementById('posterCanvas');
+    const previewImg = document.getElementById('posterLivePreviewImg');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width;
+    const H = canvas.height;
+
+    const p = posterObj || {};
+    const theme = document.getElementById('posterThemeSelect')?.value || p.theme || 'vmg_classic';
+    const typeLabel = document.getElementById('posterTypeSelect')?.selectedOptions[0]?.text || p.badgeText || '⚡ NHIỆM VỤ ĐẶC BIỆT';
+    const title = (document.getElementById('posterTitleInput')?.value || p.title || 'CHIẾN DỊCH CAO ĐIỂM QUÝ IV / 2026').toUpperCase();
+    const subtitle = (document.getElementById('posterSubtitleInput')?.value || p.subtitle || '').toUpperCase();
+    const message = document.getElementById('posterMessageInput')?.value || p.message || '';
+    const d1 = document.getElementById('posterDetail1')?.value || p.details?.[0] || '';
+    const d2 = document.getElementById('posterDetail2')?.value || p.details?.[1] || '';
+    const d3 = document.getElementById('posterDetail3')?.value || p.details?.[2] || '';
+    const deadline = document.getElementById('posterDeadlineInput')?.value || p.deadline || '';
+    const issuedBy = (document.getElementById('posterIssuedByInput')?.value || p.issuedBy || 'BAN GIÁM ĐỐC VMG').toUpperCase();
+
+    // 1. Background & Border
+    if (theme === 'vmg_royal_dark') {
+      const grad = ctx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, '#0f172a');
+      grad.addColorStop(1, '#1e1b4b');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 2.5;
+      ctx.strokeRect(16, 16, W - 32, H - 32);
+
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(22, 22, W - 44, H - 44);
+    } else if (theme === 'vmg_minimal_white') {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.strokeStyle = '#a61d24';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(16, 16, W - 32, H - 32);
+    } else {
+      const grad = ctx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(1, '#fbf8f2');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.strokeStyle = '#a61d24';
+      ctx.lineWidth = 3.5;
+      ctx.strokeRect(16, 16, W - 32, H - 32);
+
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(23, 23, W - 46, H - 46);
+
+      const drawDiamond = (cx, cy) => {
+        ctx.fillStyle = '#d4af37';
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - 5);
+        ctx.lineTo(cx + 5, cy);
+        ctx.lineTo(cx, cy + 5);
+        ctx.lineTo(cx - 5, cy);
+        ctx.closePath();
+        ctx.fill();
+      };
+      drawDiamond(23, 23);
+      drawDiamond(W - 23, 23);
+      drawDiamond(23, H - 23);
+      drawDiamond(W - 23, H - 23);
+    }
+
+    const wrapText = (text, x, y, maxWidth, lineHeight, font, color, align = 'center') => {
+      ctx.font = font;
+      ctx.fillStyle = color;
+      ctx.textAlign = align;
+      const words = (text || '').split(' ');
+      let line = '';
+      let curY = y;
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+          ctx.fillText(line.trim(), x, curY);
+          line = words[n] + ' ';
+          curY += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line.trim(), x, curY);
+      return curY;
+    };
+
+    const logoImg = new Image();
+    logoImg.src = (theme === 'vmg_royal_dark') ? 'images/vmg-logo-white.png' : 'images/vmg-logo-red.png';
+
+    const drawPosterContent = () => {
+      // Draw Logo
+      const logoW = 180;
+      const logoH = 101;
+      const logoX = (W - logoW) / 2;
+      const logoY = 38;
+      try {
+        ctx.drawImage(logoImg, logoX, logoY, logoW, logoH);
+      } catch (e) {}
+
+      // Divider line under logo
+      ctx.strokeStyle = (theme === 'vmg_royal_dark') ? '#d4af37' : '#c5a059';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(140, 155);
+      ctx.lineTo(W - 140, 155);
+      ctx.stroke();
+
+      // Center ornament
+      ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#fbbf24' : '#a61d24';
+      ctx.font = 'bold 12px serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('◆  VMG ENGLISH  ◆', W / 2, 172);
+
+      // Badge Pill
+      const badgeY = 195;
+      const badgeW = 280;
+      const badgeH = 32;
+      const badgeX = (W - badgeW) / 2;
+
+      ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#d4af37' : '#a61d24';
+      ctx.beginPath();
+      ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 16);
+      ctx.fill();
+
+      ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#0f172a' : '#ffffff';
+      ctx.font = 'bold 13px "Inter", "Segoe UI", Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(typeLabel, W / 2, badgeY + 21);
+
+      // Title
+      const titleColor = (theme === 'vmg_royal_dark') ? '#ffffff' : '#a61d24';
+      let titleEndY = wrapText(title, W / 2, 268, 680, 36, 'bold 27px "Inter", "Segoe UI", Arial, sans-serif', titleColor, 'center');
+
+      // Subtitle
+      let subEndY = titleEndY;
+      if (subtitle) {
+        const subColor = (theme === 'vmg_royal_dark') ? '#fbbf24' : '#475569';
+        subEndY = wrapText(subtitle, W / 2, titleEndY + 32, 680, 24, 'bold 15px "Inter", "Segoe UI", Arial, sans-serif', subColor, 'center');
+      }
+
+      // Separator line
+      const sepY = subEndY + 22;
+      ctx.strokeStyle = (theme === 'vmg_royal_dark') ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(180, sepY);
+      ctx.lineTo(W - 180, sepY);
+      ctx.stroke();
+
+      // Message Paragraph
+      const msgColor = (theme === 'vmg_royal_dark') ? '#e2e8f0' : '#334155';
+      let msgEndY = wrapText(`"${message}"`, W / 2, sepY + 28, 660, 25, 'italic 15.5px "Inter", "Segoe UI", Arial, sans-serif', msgColor, 'center');
+
+      // Directive Points Box
+      const boxY = Math.max(msgEndY + 24, 490);
+      const boxW = 680;
+      const boxH = 200;
+      const boxX = (W - boxW) / 2;
+
+      ctx.fillStyle = (theme === 'vmg_royal_dark') ? 'rgba(255,255,255,0.05)' : '#faf7f0';
+      ctx.strokeStyle = (theme === 'vmg_royal_dark') ? 'rgba(212,175,55,0.4)' : '#e5d7be';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(boxX, boxY, boxW, boxH, 10);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#fbbf24' : '#a61d24';
+      ctx.font = 'bold 13px "Inter", "Segoe UI", Arial, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('🎯 CÁC MỤC TIÊU & NHIỆM VỤ TRỌNG TÂM:', boxX + 24, boxY + 34);
+
+      ctx.strokeStyle = (theme === 'vmg_royal_dark') ? 'rgba(255,255,255,0.1)' : '#e8decb';
+      ctx.beginPath();
+      ctx.moveTo(boxX + 24, boxY + 44);
+      ctx.lineTo(boxX + boxW - 24, boxY + 44);
+      ctx.stroke();
+
+      const items = [d1, d2, d3].filter(Boolean);
+      const itemTextColor = (theme === 'vmg_royal_dark') ? '#f1f5f9' : '#1e293b';
+      const bulletColor = (theme === 'vmg_royal_dark') ? '#fbbf24' : '#a61d24';
+
+      items.forEach((item, idx) => {
+        const itemY = boxY + 76 + (idx * 40);
+        ctx.fillStyle = bulletColor;
+        ctx.beginPath();
+        ctx.arc(boxX + 32, itemY - 4, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.font = '600 14px "Inter", "Segoe UI", Arial, sans-serif';
+        ctx.fillStyle = itemTextColor;
+        ctx.fillText(item, boxX + 48, itemY);
+      });
+
+      // Footer Section
+      const footY = 825;
+      ctx.strokeStyle = (theme === 'vmg_royal_dark') ? 'rgba(212,175,55,0.4)' : '#d4af37';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(60, footY);
+      ctx.lineTo(W - 60, footY);
+      ctx.stroke();
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#94a3b8' : '#64748b';
+      ctx.font = 'bold 11.5px "Inter", "Segoe UI", Arial, sans-serif';
+      ctx.fillText('ĐỐI TƯỢNG THỰC HIỆN:', 60, footY + 30);
+
+      ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#f8fafc' : '#1e293b';
+      ctx.font = 'bold 13px "Inter", "Segoe UI", Arial, sans-serif';
+      ctx.fillText('Toàn thể Cán bộ - Nhân viên VMG English', 60, footY + 48);
+
+      if (deadline) {
+        ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#94a3b8' : '#64748b';
+        ctx.font = 'bold 11.5px "Inter", "Segoe UI", Arial, sans-serif';
+        ctx.fillText('HẠN CHÓT HOÀN THÀNH:', 60, footY + 76);
+
+        ctx.fillStyle = '#dc2626';
+        ctx.font = 'bold 14px "Inter", "Segoe UI", Arial, sans-serif';
+        ctx.fillText(`📅 ${new Date(deadline).toLocaleDateString('vi-VN')}`, 60, footY + 96);
+      }
+
+      ctx.textAlign = 'right';
+      ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#94a3b8' : '#64748b';
+      ctx.font = 'bold 11.5px "Inter", "Segoe UI", Arial, sans-serif';
+      ctx.fillText('CHỈ ĐẠO BAN HÀNH:', W - 60, footY + 30);
+
+      ctx.fillStyle = (theme === 'vmg_royal_dark') ? '#fbbf24' : '#a61d24';
+      ctx.font = 'bold 15px "Inter", "Segoe UI", Arial, sans-serif';
+      ctx.fillText(issuedBy, W - 60, footY + 50);
+
+      // Stamp
+      ctx.save();
+      ctx.translate(W - 170, footY + 85);
+      ctx.rotate(-4 * Math.PI / 180);
+      ctx.strokeStyle = '#dc2626';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(-80, -18, 160, 36);
+
+      ctx.fillStyle = '#dc2626';
+      ctx.font = 'bold 11px "Inter", "Segoe UI", Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('★ ĐÃ BAN HÀNH ★', 0, -2);
+      ctx.font = '9px "Inter", "Segoe UI", Arial, sans-serif';
+      ctx.fillText(new Date().toLocaleDateString('vi-VN'), 0, 10);
+      ctx.restore();
+
+      try {
+        const dataUrl = canvas.toDataURL('image/png');
+        this.state.generatedPosterDataUrl = dataUrl;
+        if (previewImg) {
+          previewImg.src = dataUrl;
+        }
+        if (typeof callback === 'function') {
+          callback(dataUrl);
+        }
+      } catch (err) {
+        console.warn('Canvas export warning:', err);
+      }
+    };
+
+    if (logoImg.complete) {
+      drawPosterContent();
+    } else {
+      logoImg.onload = drawPosterContent;
+    }
+  },
+
+  async savePosterAnnouncement(e) {
+    if (e) e.preventDefault();
+    const btn = document.getElementById('btnSavePoster');
+    if (btn) btn.disabled = true;
+
+    try {
+      this.renderPosterCanvas();
+
+      const posterData = {
+        active: Boolean(document.getElementById('posterActiveToggle')?.checked),
+        type: document.getElementById('posterTypeSelect')?.value || 'special_mission',
+        badgeText: document.getElementById('posterTypeSelect')?.selectedOptions[0]?.text || '⚡ NHIỆM VỤ ĐẶC BIỆT',
+        theme: document.getElementById('posterThemeSelect')?.value || 'vmg_classic',
+        title: document.getElementById('posterTitleInput')?.value || '',
+        subtitle: document.getElementById('posterSubtitleInput')?.value || '',
+        message: document.getElementById('posterMessageInput')?.value || '',
+        details: [
+          document.getElementById('posterDetail1')?.value || '',
+          document.getElementById('posterDetail2')?.value || '',
+          document.getElementById('posterDetail3')?.value || ''
+        ].filter(Boolean),
+        deadline: document.getElementById('posterDeadlineInput')?.value || '',
+        issuedBy: document.getElementById('posterIssuedByInput')?.value || 'BAN GIÁM ĐỐC VMG',
+        imageDataUrl: this.state.generatedPosterDataUrl || ''
+      };
+
+      const res = await API.updateAnnouncementPoster(posterData);
+      this.state.currentPoster = res.poster;
+
+      this.showToast('🎉 Đã lưu và xuất bản Poster Thông Báo lên trang đăng nhập thành công!', 'success');
+      this.onPosterActiveToggle(Boolean(res.poster?.active));
+    } catch (err) {
+      this.showToast(`Lỗi khi lưu poster: ${err.message}`, 'danger');
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  },
+
+  fillAiSamplePosterContent() {
+    const samples = [
+      {
+        type: 'special_mission',
+        theme: 'vmg_classic',
+        title: 'CHIẾN DỊCH CAO ĐIỂM QUÝ IV / 2026',
+        subtitle: 'TĂNG TỐC HOÀN THÀNH 100% CHỈ TIÊU & MỤC TIÊU NĂM',
+        message: 'Toàn thể Cán bộ - Nhân viên VMG English tập trung cao độ, chủ động tháo gỡ điểm nghẽn, tăng tốc hoàn thành các chỉ tiêu trọng điểm theo chỉ đạo trực tiếp từ Ban Giám Đốc.',
+        d1: 'Tập trung xử lý dứt điểm 100% công việc quá hạn trong 48 giờ tới',
+        d2: 'Phối hợp liên phòng ban chặt chẽ giữa Tuyển Sinh, Marketing và Đào Tạo',
+        d3: 'Cập nhật tiến độ hàng ngày và thực hiện báo cáo nghiêm túc trên TaskFlow',
+        deadline: '2026-11-15'
+      },
+      {
+        type: 'urgent_alert',
+        theme: 'vmg_royal_dark',
+        title: 'THÔNG BÁO KHẨN CẤP: NÂNG CẤP HỆ THỐNG',
+        subtitle: 'CHUYỂN ĐỔI SỐ TOÀN DIỆN HỆ THỐNG VMG ENGLISH',
+        message: 'Ban Lãnh Đạo yêu cầu các Khối/Phòng ban hoàn tất đồng bộ dữ liệu và chuẩn hóa quy trình báo cáo trên hệ thống mới đúng hạn định.',
+        d1: 'Rà soát và nghiệm thu các đầu việc đang ở trạng thái Chờ Duyệt',
+        d2: 'Kiểm tra tài khoản và xác nhận kết nối Lịch Google Calendar cá nhân',
+        d3: 'Trực kỹ thuật 24/7 hỗ trợ toàn bộ các trung tâm khu vực',
+        deadline: '2026-10-31'
+      }
+    ];
+
+    const pick = samples[Math.floor(Math.random() * samples.length)];
+    const typeSelect = document.getElementById('posterTypeSelect');
+    const themeSelect = document.getElementById('posterThemeSelect');
+    const titleInput = document.getElementById('posterTitleInput');
+    const subInput = document.getElementById('posterSubtitleInput');
+    const msgInput = document.getElementById('posterMessageInput');
+    const d1 = document.getElementById('posterDetail1');
+    const d2 = document.getElementById('posterDetail2');
+    const d3 = document.getElementById('posterDetail3');
+    const deadInput = document.getElementById('posterDeadlineInput');
+
+    if (typeSelect) typeSelect.value = pick.type;
+    if (themeSelect) themeSelect.value = pick.theme;
+    if (titleInput) titleInput.value = pick.title;
+    if (subInput) subInput.value = pick.subtitle;
+    if (msgInput) msgInput.value = pick.message;
+    if (d1) d1.value = pick.d1;
+    if (d2) d2.value = pick.d2;
+    if (d3) d3.value = pick.d3;
+    if (deadInput) deadInput.value = pick.deadline;
+
+    this.renderPosterCanvas();
+    this.showToast('✨ Đã điền nội dung thông báo mẫu từ AI!', 'info');
   },
 
 };

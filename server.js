@@ -1657,6 +1657,29 @@ app.post('/api/executive-desk/rebalance', authenticate, requireExecutiveDeskAcce
   }
 });
 
+// 4. Lấy Poster thông báo nhiệm vụ đặc biệt (Công khai trước màn hình đăng nhập)
+app.get('/api/announcement-poster', (req, res) => {
+  try {
+    const poster = db.getAnnouncementPoster();
+    res.json({ success: true, poster });
+  } catch (err) {
+    res.status(500).json({ error: 'Lỗi lấy poster thông báo: ' + err.message });
+  }
+});
+
+// 5. Cập nhật / Xuất bản Poster thông báo nhiệm vụ đặc biệt (Admin / Executive Desk)
+app.post('/api/announcement-poster', authenticate, requireExecutiveDeskAccess, (req, res) => {
+  try {
+    const poster = db.updateAnnouncementPoster(req.body, req.user);
+    // Realtime broadcast
+    broadcast('announcement:updated', { poster, updatedBy: req.user.name });
+    res.json({ success: true, poster, message: 'Đã cập nhật và xuất bản poster thông báo thành công!' });
+  } catch (err) {
+    console.error('Error updating announcement poster:', err);
+    res.status(500).json({ error: 'Lỗi cập nhật poster thông báo: ' + err.message });
+  }
+});
+
 // -------------------------------------------------------------
 // USER MANAGEMENT ROUTES (Admin)
 // -------------------------------------------------------------

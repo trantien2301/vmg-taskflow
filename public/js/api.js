@@ -212,6 +212,18 @@ const API = {
     });
   },
 
+  // Announcement Poster (Thông Báo Đặc Biệt & Nhiệm Vụ Trước Đăng Nhập)
+  async getAnnouncementPoster() {
+    return this.request('/api/announcement-poster');
+  },
+
+  async updateAnnouncementPoster(posterData) {
+    return this.request('/api/announcement-poster', {
+      method: 'POST',
+      body: JSON.stringify(posterData)
+    });
+  },
+
   // Users
   async getUsers() {
     return this.request('/api/users');

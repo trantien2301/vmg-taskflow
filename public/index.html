@@ -10,6 +10,45 @@
 </head>
 <body>
   <!-- ========================================================
+       PRE-LOGIN VMG POSTER ANNOUNCEMENT OVERLAY
+       ======================================================== -->
+  <div class="prelogin-poster-overlay" id="preLoginPosterOverlay" style="display:none;">
+    <div class="prelogin-poster-modal">
+      <div class="prelogin-poster-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <img src="images/vmg-logo-red.png" alt="VMG English" style="height:26px; object-fit:contain;">
+          <div>
+            <span class="badge" style="background:#dc2626; color:#fff; font-size:10px; font-weight:800; padding:2px 8px; border-radius:10px;" id="preLoginBadgeText">NHIỆM VỤ ĐẶC BIỆT</span>
+            <span style="font-size:12px; font-weight:700; color:var(--text-main); margin-left:6px;" id="preLoginHeaderTitle">Thông Báo Từ Ban Giám Đốc</span>
+          </div>
+        </div>
+        <button type="button" class="btn-close-poster" onclick="App.dismissPreLoginPoster()" title="Đóng thông báo">&times;</button>
+      </div>
+
+      <div class="prelogin-poster-body" id="preLoginPosterBody">
+        <div class="poster-image-container" id="posterImageContainer">
+          <img id="preLoginPosterImg" src="" alt="Poster Thông Báo Đặc Biệt VMG" style="width:100%; border-radius:8px; display:block; box-shadow:0 4px 16px rgba(0,0,0,0.15); cursor:pointer;" onclick="App.openFullPosterModal()" title="Bấm để xem ảnh phóng to">
+        </div>
+      </div>
+
+      <div class="prelogin-poster-footer">
+        <label style="display:inline-flex; align-items:center; gap:6px; font-size:12px; cursor:pointer; color:var(--text-secondary);">
+          <input type="checkbox" id="chkDismissPosterToday">
+          <span>Không hiển thị lại trong ngày hôm nay</span>
+        </label>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn btn-outline btn-sm" onclick="App.downloadActivePoster()" title="Tải ảnh poster này về máy">
+            📥 Tải Poster
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" onclick="App.dismissPreLoginPoster()" style="font-weight:700; background:linear-gradient(135deg, #a61d24, #b91c1c); border:none; padding:8px 18px;">
+            <span>Đã Đọc & Tiếp Tục Đăng Nhập ➔</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
        EMAIL LOGIN SCREEN
        ======================================================== -->
   <div class="login-screen" id="loginScreen">
@@ -967,6 +1006,10 @@
               <button type="button" class="executive-tab-btn" id="exeTabBtnAssistant" onclick="App.switchExecutiveSubTab('assistant')">
                 <span>🤖 Trợ Lý AI Hỏi Đáp Điều Hành</span>
               </button>
+              <button type="button" class="executive-tab-btn" id="exeTabBtnPoster" onclick="App.switchExecutiveSubTab('poster')">
+                <span>📢 Thông Báo & Poster Trước Đăng Nhập</span>
+                <span class="badge" id="exePosterStatusBadge" style="background:#10b981; color:#fff; font-size:10px; padding:2px 6px;">BẬT</span>
+              </button>
             </div>
 
             <!-- SUB-TAB 1: PERSONNEL RISK INTELLIGENCE -->
@@ -1104,6 +1147,135 @@
                 <div class="ai-response-box" id="executiveAiResponseBox">
                   <div style="color:var(--text-muted); font-style:italic;">
                     💡 Chọn câu hỏi gợi ý phía trên hoặc gõ câu hỏi của bạn để nhận phân tích thời gian thực từ Trợ Lý AI...
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SUB-TAB 5: VMG ANNOUNCEMENT POSTER GENERATOR -->
+            <div id="exeSubContentPoster" style="display:none;">
+              <div style="background:linear-gradient(135deg, rgba(166,29,36,0.08), rgba(212,175,55,0.08)); border:1.5px solid rgba(166,29,36,0.3); border-radius:var(--radius-md); padding:18px 20px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                  <img src="images/vmg-logo-red.png" alt="VMG English" style="height:34px; object-fit:contain;">
+                  <div>
+                    <div style="font-weight:800; font-size:14.5px; color:#a61d24; display:flex; align-items:center; gap:6px;">
+                      <span>📢 THÔNG BÁO NHIỆM VỤ ĐẶC BIỆT & POSTER TRƯỚC TRANG ĐĂNG NHẬP</span>
+                    </div>
+                    <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
+                      Quản trị viên phát hành mẩu tin quan trọng hoặc nhiệm vụ trọng yếu. Hệ thống tự động tạo poster ảnh chuyên nghiệp hiển thị ngay trước màn hình đăng nhập.
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Activation Status Switch -->
+                <div style="display:flex; align-items:center; gap:10px; background:var(--card-bg); padding:8px 14px; border-radius:24px; border:1px solid var(--border-color); box-shadow:var(--shadow-sm);">
+                  <label class="switch-toggle" style="margin:0;">
+                    <input type="checkbox" id="posterActiveToggle" onchange="App.onPosterActiveToggle(this.checked)">
+                    <span class="slider-toggle"></span>
+                  </label>
+                  <span id="posterActiveStatusText" style="font-weight:700; font-size:12px; color:#10b981;">🟢 Đang Kích Hoạt Trước Đăng Nhập</span>
+                </div>
+              </div>
+
+              <!-- Two Column Layout: Editor Form & Live Canvas Preview -->
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap:24px; margin-bottom:30px;">
+                <!-- Column 1: Poster Configuration Editor -->
+                <div style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:22px; box-shadow:var(--shadow-sm);">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                    <h3 style="margin:0; font-size:15px; font-weight:800; color:var(--text-main);">
+                      ✍️ Nội Dung Nhiệm Vụ & Thông Báo
+                    </h3>
+                    <button type="button" class="btn btn-outline btn-xs" onclick="App.fillAiSamplePosterContent()" style="color:#7c3aed; border-color:#c4b5fd; font-weight:700;">
+                      ✨ AI Gợi Ý Mẫu
+                    </button>
+                  </div>
+
+                  <form id="posterConfigForm" onsubmit="App.savePosterAnnouncement(event)">
+                    <div class="form-row" style="margin-bottom:12px;">
+                      <div>
+                        <label class="form-label" style="font-weight:700; font-size:12px;">Loại Thông Báo / Huy Hiệu</label>
+                        <select class="form-control form-control-sm" id="posterTypeSelect" onchange="App.onPosterFormChange()">
+                          <option value="special_mission">⚡ NHIỆM VỤ ĐẶC BIỆT</option>
+                          <option value="important_news">📢 MẨU TIN QUAN TRỌNG</option>
+                          <option value="urgent_alert">🚨 THÔNG BÁO KHẨN CẤP</option>
+                          <option value="campaign">🎯 CHIẾN DỊCH TRỌNG ĐIỂM</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label class="form-label" style="font-weight:700; font-size:12px;">Phong Cách Thiết Kế (Theme)</label>
+                        <select class="form-control form-control-sm" id="posterThemeSelect" onchange="App.onPosterFormChange()">
+                          <option value="vmg_classic">👑 VMG Classic (Đỏ Đô & Vàng Gold - Nền Sáng)</option>
+                          <option value="vmg_royal_dark">🌙 VMG Royal Dark (Đen Navy & Chữ Gold)</option>
+                          <option value="vmg_minimal_white">⚪ VMG Minimalist White (Trắng Tối Giản)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:12px;">
+                      <label class="form-label" style="font-weight:700; font-size:12px;">Tiêu Đề Thông Báo / Chiến Dịch</label>
+                      <input type="text" class="form-control form-control-sm" id="posterTitleInput" placeholder="Ví dụ: CHIẾN DỊCH CAO ĐIỂM QUÝ IV / 2026" required oninput="App.onPosterFormChange()">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:12px;">
+                      <label class="form-label" style="font-weight:700; font-size:12px;">Phụ Đề Nhấn Mạnh</label>
+                      <input type="text" class="form-control form-control-sm" id="posterSubtitleInput" placeholder="Ví dụ: TĂNG TỐC HOÀN THÀNH 100% MỤC TIÊU TUYỂN SINH & ĐÀO TẠO" oninput="App.onPosterFormChange()">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:12px;">
+                      <label class="form-label" style="font-weight:700; font-size:12px;">Thông Điệp Chỉ Đạo Chính</label>
+                      <textarea class="form-control form-control-sm" id="posterMessageInput" rows="3" placeholder="Nhập thông điệp chỉ đạo ngắn gọn, súc tích từ Ban Giám Đốc..." required oninput="App.onPosterFormChange()"></textarea>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:12px;">
+                      <label class="form-label" style="font-weight:700; font-size:12px;">3 Ý Chỉ Đạo Then Chốt (Key Action Directives)</label>
+                      <input type="text" class="form-control form-control-sm" id="posterDetail1" placeholder="Ý 1: Xử lý dứt điểm công việc quá hạn trong 48h tới" style="margin-bottom:6px;" oninput="App.onPosterFormChange()">
+                      <input type="text" class="form-control form-control-sm" id="posterDetail2" placeholder="Ý 2: Tăng cường phối hợp liên phòng ban nhịp nhàng" style="margin-bottom:6px;" oninput="App.onPosterFormChange()">
+                      <input type="text" class="form-control form-control-sm" id="posterDetail3" placeholder="Ý 3: Cập nhật và báo cáo tiến độ nghiêm túc trên TaskFlow" oninput="App.onPosterFormChange()">
+                    </div>
+
+                    <div class="form-row" style="margin-bottom:16px;">
+                      <div>
+                        <label class="form-label" style="font-weight:700; font-size:12px;">Hạn Chót Thực Hiện</label>
+                        <input type="date" class="form-control form-control-sm" id="posterDeadlineInput" onchange="App.onPosterFormChange()">
+                      </div>
+                      <div>
+                        <label class="form-label" style="font-weight:700; font-size:12px;">Đơn Vị Ký / Ban Hành</label>
+                        <input type="text" class="form-control form-control-sm" id="posterIssuedByInput" placeholder="BAN GIÁM ĐỐC VMG" value="BAN GIÁM ĐỐC VMG" oninput="App.onPosterFormChange()">
+                      </div>
+                    </div>
+
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                      <button type="submit" class="btn btn-primary" id="btnSavePoster" style="font-weight:700; background:linear-gradient(135deg, #a61d24, #b91c1c); border:none; padding:9px 20px;">
+                        💾 Lưu & Xuất Bản Poster Ngay
+                      </button>
+                      <button type="button" class="btn btn-outline" onclick="App.downloadActivePoster()" style="font-weight:600;">
+                        📥 Tải Ảnh Poster PNG
+                      </button>
+                      <button type="button" class="btn btn-outline" onclick="App.previewPreLoginPosterModal()" style="font-weight:600;">
+                        👁️ Xem Thử Trước Đăng Nhập
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- Column 2: Live Poster Canvas & Preview -->
+                <div style="display:flex; flex-direction:column; align-items:center;">
+                  <div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="font-weight:700; font-size:13px; color:var(--text-secondary);">
+                      🖼️ Bản Xem Trước Poster Ảnh Tự Động (HD Quality):
+                    </span>
+                    <span class="badge" style="background:rgba(166,29,36,0.1); color:#a61d24; font-weight:700; font-size:11px;">
+                      Canvas HD 800 x 1000px
+                    </span>
+                  </div>
+
+                  <!-- Canvas Element (hidden) & Image Preview Container -->
+                  <div style="width:100%; max-width:440px; background:var(--card-bg); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px; box-shadow:0 6px 20px rgba(0,0,0,0.08); text-align:center;">
+                    <canvas id="posterCanvas" width="800" height="1000" style="display:none;"></canvas>
+                    <img id="posterLivePreviewImg" src="" alt="Poster Preview" style="width:100%; height:auto; border-radius:6px; box-shadow:0 3px 12px rgba(0,0,0,0.15); display:block; cursor:pointer;" onclick="App.openFullPosterModal()" title="Bấm để xem ảnh phóng to">
+                    <div style="font-size:11.5px; color:var(--text-muted); margin-top:8px;">
+                      💡 Poster được vẽ tự động bằng Canvas 2D kèm logo VMG, phong cách đơn giản, tinh tế.
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2282,6 +2454,23 @@
           <button type="button" class="btn btn-outline" onclick="App.printExecutiveDeskReport()">🖨️ In Báo Cáo</button>
           <button type="button" class="btn btn-primary" data-close-modal="executiveBriefingModal">Đóng</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PHÓNG TO POSTER ẢNH VMG -->
+  <div class="modal-overlay" id="fullPosterModal" style="z-index: 10009;">
+    <div class="modal-content" style="max-width: 640px; background: transparent; box-shadow: none; border: none; padding: 0;">
+      <div style="display:flex; justify-content:flex-end; margin-bottom: 8px;">
+        <button type="button" class="btn btn-sm btn-outline" data-close-modal="fullPosterModal" style="background:#fff; font-weight:700; border-radius:50%; width:32px; height:32px; padding:0; display:flex; align-items:center; justify-content:center;">&times;</button>
+      </div>
+      <div style="text-align: center;">
+        <img id="fullPosterModalImg" src="" alt="Poster Full View" style="max-width: 100%; max-height: 85vh; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: inline-block;">
+      </div>
+      <div style="text-align: center; margin-top: 12px;">
+        <button type="button" class="btn btn-primary btn-sm" onclick="App.downloadActivePoster()" style="font-weight:700; background:linear-gradient(135deg, #a61d24, #b91c1c); border:none; padding:8px 20px;">
+          📥 Tải Ảnh Poster Này Về Máy (PNG)
+        </button>
       </div>
     </div>
   </div>
