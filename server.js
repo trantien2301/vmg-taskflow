@@ -995,6 +995,57 @@ app.post('/api/tasks/:id/comments', authenticate, (req, res) => {
 });
 
 // -------------------------------------------------------------
+// GOOGLE MEET INTEGRATION FOR TASKS
+// -------------------------------------------------------------
+app.post('/api/tasks/:id/meet', authenticate, (req, res) => {
+  const { meetUrl } = req.body;
+  const task = db.getTaskById(req.params.id);
+  if (!task) return res.status(404).json({ error: 'Không tìm thấy công việc' });
+
+  const cleanUrl = meetUrl ? meetUrl.trim() : null;
+  const updatedTask = db.updateTask(req.params.id, { 
+    meetUrl: cleanUrl,
+    meetUpdatedAt: new Date().toISOString()
+  }, req.user);
+
+  // Ghi nhật ký tự động vào trao đổi realtime của task
+  if (cleanUrl) {
+    db.addComment(req.params.id, req.user, `📹 [Google Meet] Đã tạo/gắn phòng họp trực tuyến cho công việc này: ${cleanUrl}`);
+    
+    // Gửi thông báo tới người phụ trách nếu người tạo không phải là người nhận việc
+    if (task.assignedTo && task.assignedTo !== req.user.id) {
+      const notif = db.addNotification({
+        userId: task.assignedTo,
+        type: 'info',
+        level: 'info',
+        title: '📹 Phòng Họp Google Meet Mới',
+        message: `${req.user.name} đã gắn link họp Google Meet vào "${task.title}": ${cleanUrl}`,
+        taskId: task.id
+      });
+      broadcast('alert:new', notif, task.assignedTo);
+    }
+  }
+
+  broadcast('task:updated', { task: updatedTask, updatedBy: req.user.name });
+  broadcast('task:meet_updated', { taskId: req.params.id, meetUrl: updatedTask.meetUrl, updatedBy: req.user.name });
+
+  res.json({ success: true, task: updatedTask, meetUrl: updatedTask.meetUrl });
+});
+
+app.delete('/api/tasks/:id/meet', authenticate, (req, res) => {
+  const task = db.getTaskById(req.params.id);
+  if (!task) return res.status(404).json({ error: 'Không tìm thấy công việc' });
+
+  const updatedTask = db.updateTask(req.params.id, { meetUrl: null }, req.user);
+  db.addComment(req.params.id, req.user, `📹 [Google Meet] Đã gỡ bỏ phòng họp trực tuyến khỏi công việc.`);
+
+  broadcast('task:updated', { task: updatedTask, updatedBy: req.user.name });
+  broadcast('task:meet_updated', { taskId: req.params.id, meetUrl: null, updatedBy: req.user.name });
+
+  res.json({ success: true, task: updatedTask });
+});
+
+// -------------------------------------------------------------
 // NOTIFICATIONS & ALERTS ROUTES
 // -------------------------------------------------------------
 app.get('/api/notifications', authenticate, (req, res) => {
@@ -1667,6 +1718,74 @@ app.post('/api/executive-desk/rebalance', authenticate, requireExecutiveDeskAcce
   } catch (err) {
     console.error('Error executing executive rebalance:', err);
     res.status(500).json({ error: 'Lỗi khi cân bằng tải công việc: ' + err.message });
+  }
+});
+
+// -------------------------------------------------------------
+// 3.1. KÍCH HOẠT HỌP KHẨN CẤP GOOGLE MEET (AI WAR-ROOM SUMMON)
+// -------------------------------------------------------------
+app.post('/api/executive-desk/war-room/summon', authenticate, requireExecutiveDeskAccess, (req, res) => {
+  try {
+    const { meetUrl, title, agenda, targetUserIds, department } = req.body || {};
+    if (!meetUrl) {
+      return res.status(400).json({ error: 'Vui lòng cung cấp hoặc khởi tạo liên kết Google Meet.' });
+    }
+
+    const meetingTitle = title || '🚨 HỌP KHẨN CẤP ĐIỀU HÀNH XỬ LÝ TRỄ HẠN (AI WAR-ROOM)';
+    const cleanMeetUrl = meetUrl.trim();
+
+    // Xác định danh sách nhân sự nhận lệnh triệu tập
+    const allUsers = db.getUsers();
+    let targetUsers = [];
+    if (Array.isArray(targetUserIds) && targetUserIds.length > 0) {
+      targetUsers = allUsers.filter(u => targetUserIds.includes(u.id));
+    } else if (department && department !== 'all') {
+      targetUsers = allUsers.filter(u => u.department === department);
+    } else {
+      // Mặc định: những người đang có việc quá hạn + toàn bộ admin/trưởng phòng
+      const tasks = db.getTasks();
+      const overdueAssignees = new Set(
+        tasks.filter(t => t.status !== 'completed' && t.dueDate && new Date(t.dueDate) < new Date()).map(t => t.assignedTo)
+      );
+      targetUsers = allUsers.filter(u => u.role === 'admin' || overdueAssignees.has(u.id));
+    }
+
+    const notifiedUserIds = [];
+    targetUsers.forEach(u => {
+      if (u.id !== req.user.id) {
+        const notif = db.addNotification({
+          userId: u.id,
+          type: 'alert',
+          level: 'danger',
+          title: meetingTitle,
+          message: `${req.user.name} triệu tập họp khẩn: "${meetingTitle}". Nhấp để vào phòng họp Google Meet ngay lập tức!`,
+          meetUrl: cleanMeetUrl
+        });
+        broadcast('alert:new', notif, u.id);
+        notifiedUserIds.push(u.id);
+      }
+    });
+
+    // Realtime War-room broadcast to all or target clients
+    broadcast('executive:war_room_summon', {
+      sender: { id: req.user.id, name: req.user.name, avatar: req.user.avatar },
+      title: meetingTitle,
+      meetUrl: cleanMeetUrl,
+      agenda: agenda || 'Họp rà soát và xử lý các điểm nghẽn công việc quá hạn khẩn cấp.',
+      department: department || 'Toàn Doanh Nghiệp',
+      timestamp: new Date().toISOString(),
+      targetUserIds: notifiedUserIds
+    });
+
+    res.json({
+      success: true,
+      message: `Đã phát lệnh triệu tập họp khẩn cấp thành công tới ${notifiedUserIds.length} nhân sự liên quan!`,
+      notifiedCount: notifiedUserIds.length,
+      meetUrl: cleanMeetUrl
+    });
+  } catch (err) {
+    console.error('Error summoning executive war room:', err);
+    res.status(500).json({ error: 'Lỗi phát lệnh họp khẩn cấp: ' + err.message });
   }
 });
 

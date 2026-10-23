@@ -172,6 +172,20 @@ const API = {
     });
   },
 
+  // Google Meet per Task
+  async updateTaskMeet(id, meetUrl) {
+    return this.request(`/api/tasks/${id}/meet`, {
+      method: 'POST',
+      body: JSON.stringify({ meetUrl })
+    });
+  },
+
+  async deleteTaskMeet(id) {
+    return this.request(`/api/tasks/${id}/meet`, {
+      method: 'DELETE'
+    });
+  },
+
   // Comments
   async getComments(taskId) {
     return this.request(`/api/tasks/${taskId}/comments`);
@@ -224,6 +238,13 @@ const API = {
     return this.request('/api/executive-desk/rebalance', {
       method: 'POST',
       body: JSON.stringify({ taskId, targetUserId })
+    });
+  },
+
+  async summonExecutiveWarRoom(warRoomData) {
+    return this.request('/api/executive-desk/war-room/summon', {
+      method: 'POST',
+      body: JSON.stringify(warRoomData)
     });
   },
 

@@ -520,6 +520,26 @@ const App = {
         }
         break;
 
+      case 'task:meet_updated':
+        if (data && data.taskId) {
+          const t = this.state.tasks.find(x => x.id === data.taskId);
+          if (t) t.meetUrl = data.meetUrl;
+          if (this.state.currentDetailTask && this.state.currentDetailTask.id === data.taskId) {
+            this.state.currentDetailTask.meetUrl = data.meetUrl;
+            this.renderTaskMeetSection(this.state.currentDetailTask);
+          }
+          if (this.state.activeView === 'kanban') {
+            this.renderKanbanView();
+          } else if (this.state.activeView === 'tasks') {
+            this.renderTasksView();
+          }
+        }
+        break;
+
+      case 'executive:war_room_summon':
+        this.handleExecutiveWarRoomSummon(data);
+        break;
+
       case 'announcement:updated':
         if (data && data.poster) {
           this.state.currentPoster = data.poster;
@@ -2014,7 +2034,14 @@ const App = {
            data-task-id="${task.id}">
         <div class="task-card-header">
           <span class="task-id">#${task.id}</span>
-          <span class="badge-priority ${task.priority}">${priorityLabels[task.priority] || task.priority}</span>
+          <div style="display:flex; align-items:center; gap:6px;">
+            ${task.meetUrl ? `
+              <a href="${this.escapeHtml(task.meetUrl)}" target="_blank" onclick="event.stopPropagation();" class="task-card-meet-btn" title="Vào họp Google Meet ngay: ${this.escapeHtml(task.meetUrl)}">
+                <span class="meet-pulse-dot"></span> 📹 Meet
+              </a>
+            ` : ''}
+            <span class="badge-priority ${task.priority}">${priorityLabels[task.priority] || task.priority}</span>
+          </div>
         </div>
         <div class="task-title">${this.escapeHtml(task.title)}</div>
         ${task.description ? `<div class="task-desc-preview">${this.escapeHtml(task.description)}</div>` : ''}
@@ -3904,6 +3931,9 @@ const App = {
       };
     }
 
+    // Render Google Meet Video Call Section
+    this.renderTaskMeetSection(task);
+
     // Render Comments
     if (comments) {
       const commentList = document.getElementById('detailCommentList');
@@ -3912,6 +3942,160 @@ const App = {
       } else {
         commentList.innerHTML = comments.map(c => this.createCommentHtml(c)).join('');
       }
+    }
+  },
+
+  renderTaskMeetSection(task) {
+    const container = document.getElementById('detailTaskMeetCard');
+    const meetBtn = document.getElementById('detailMeetBtn');
+    if (!container) return;
+
+    if (task.meetUrl) {
+      container.className = 'task-meet-card active-meet';
+      container.innerHTML = `
+        <div class="task-meet-header-row">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:18px;">📹</span>
+            <strong style="color:#065f46; font-size:13px;">Phòng Họp Trực Tuyến Google Meet</strong>
+            <span class="badge" style="background:#10b981; color:#fff; font-size:10.5px; padding:2px 7px; border-radius:10px; display:inline-flex; align-items:center; gap:4px;">
+              <span class="meet-pulse-dot" style="background:#fff; width:5px; height:5px;"></span> Đang Sẵn Sàng
+            </span>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline" onclick="App.removeTaskMeet('${task.id}')" style="color:#dc2626; border-color:#fca5a5; font-size:11px; padding:2px 8px;" title="Gỡ bỏ phòng họp này khỏi task">
+            🗑️ Gỡ phòng
+          </button>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:8px;">
+          <a href="${this.escapeHtml(task.meetUrl)}" target="_blank" class="task-meet-link-badge" style="flex:1; text-decoration:none;" title="Mở phòng họp Google Meet">
+            <span>🔗</span>
+            <span style="font-weight:700; color:#059669;">${this.escapeHtml(task.meetUrl)}</span>
+          </a>
+          <button type="button" class="btn btn-sm" onclick="App.openTaskMeetLink('${this.escapeHtml(task.meetUrl)}')" style="background:#059669; color:#fff; font-weight:700; padding:6px 14px; border:none; border-radius:6px; cursor:pointer;">
+            🚀 Vào Họp Ngay
+          </button>
+          <button type="button" class="btn btn-sm btn-outline" onclick="App.copyText('${this.escapeHtml(task.meetUrl)}', 'Đã sao chép liên kết Google Meet!')" title="Sao chép link">
+            📋 Copy
+          </button>
+        </div>
+        <div style="font-size:11.5px; color:#047857; margin-top:6px;">
+          💡 Mọi thành viên tham gia hoặc phụ trách task đều có thể nhấp để kết nối trao đổi trực tiếp tức thì.
+        </div>
+      `;
+
+      if (meetBtn) {
+        meetBtn.innerHTML = '🚀 Vào Họp Meet';
+        meetBtn.className = 'btn btn-primary';
+        meetBtn.style.background = '#059669';
+        meetBtn.style.borderColor = '#059669';
+        meetBtn.style.color = '#fff';
+      }
+    } else {
+      container.className = 'task-meet-card no-meet';
+      container.innerHTML = `
+        <div class="task-meet-header-row">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:18px;">📹</span>
+            <strong style="color:var(--text-main); font-size:13px;">Google Meet Trực Tuyến</strong>
+            <span style="font-size:11.5px; color:var(--text-muted);">(Chưa kết nối phòng họp)</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:6px;">
+          <button type="button" class="btn btn-sm btn-primary" onclick="App.createInstantTaskMeet('${task.id}')" style="background:#059669; border-color:#059669; font-weight:700; display:inline-flex; align-items:center; gap:6px;">
+            ⚡ Tạo Phòng Meet Mới
+          </button>
+          <div style="display:flex; align-items:center; gap:6px; flex:1; min-width:220px;">
+            <input type="text" class="form-control form-control-sm" id="customMeetUrlInput" placeholder="Hoặc dán link Google Meet (https://meet.google.com/...)" style="font-size:11.5px;">
+            <button type="button" class="btn btn-sm btn-outline" onclick="App.saveCustomTaskMeet('${task.id}')" style="white-space:nowrap; font-weight:600;">
+              Lưu Link
+            </button>
+          </div>
+        </div>
+      `;
+
+      if (meetBtn) {
+        meetBtn.innerHTML = '📹 Tạo Họp Meet';
+        meetBtn.className = 'btn btn-outline';
+        meetBtn.style.background = '';
+        meetBtn.style.borderColor = '#6ee7b7';
+        meetBtn.style.color = '#059669';
+      }
+    }
+  },
+
+  openTaskMeetLink(url) {
+    if (url) window.open(url, '_blank');
+  },
+
+  async createInstantTaskMeet(taskId) {
+    try {
+      const randomCode = `${Math.random().toString(36).substring(2, 5)}-${Math.random().toString(36).substring(2, 6)}-${Math.random().toString(36).substring(2, 5)}`;
+      const generatedUrl = `https://meet.google.com/${randomCode}`;
+      
+      const res = await API.updateTaskMeet(taskId, generatedUrl);
+      this.showToast('Đã tạo phòng họp Google Meet thành công cho task!', 'success');
+      
+      // Update local state
+      const t = this.state.tasks.find(x => x.id === taskId);
+      if (t) t.meetUrl = generatedUrl;
+      if (this.state.currentDetailTask && this.state.currentDetailTask.id === taskId) {
+        this.state.currentDetailTask.meetUrl = generatedUrl;
+        this.renderTaskMeetSection(this.state.currentDetailTask);
+      }
+      
+      // Open Google Meet room
+      window.open(generatedUrl, '_blank');
+    } catch (err) {
+      this.showToast('Lỗi tạo phòng họp: ' + err.message, 'danger');
+    }
+  },
+
+  async saveCustomTaskMeet(taskId) {
+    const input = document.getElementById('customMeetUrlInput');
+    if (!input || !input.value.trim()) {
+      this.showToast('Vui lòng nhập liên kết Google Meet hợp lệ', 'warning');
+      return;
+    }
+    let url = input.value.trim();
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+    try {
+      await API.updateTaskMeet(taskId, url);
+      this.showToast('Đã lưu liên kết Google Meet cho task!', 'success');
+      const t = this.state.tasks.find(x => x.id === taskId);
+      if (t) t.meetUrl = url;
+      if (this.state.currentDetailTask && this.state.currentDetailTask.id === taskId) {
+        this.state.currentDetailTask.meetUrl = url;
+        this.renderTaskMeetSection(this.state.currentDetailTask);
+      }
+    } catch (err) {
+      this.showToast('Lỗi lưu liên kết: ' + err.message, 'danger');
+    }
+  },
+
+  async removeTaskMeet(taskId) {
+    if (!confirm('Bạn có chắc chắn muốn gỡ bỏ phòng họp Google Meet khỏi task này?')) return;
+    try {
+      await API.deleteTaskMeet(taskId);
+      this.showToast('Đã gỡ bỏ phòng họp Google Meet', 'info');
+      const t = this.state.tasks.find(x => x.id === taskId);
+      if (t) t.meetUrl = null;
+      if (this.state.currentDetailTask && this.state.currentDetailTask.id === taskId) {
+        this.state.currentDetailTask.meetUrl = null;
+        this.renderTaskMeetSection(this.state.currentDetailTask);
+      }
+    } catch (err) {
+      this.showToast('Lỗi gỡ phòng họp: ' + err.message, 'danger');
+    }
+  },
+
+  triggerTaskMeetAction() {
+    const task = this.state.currentDetailTask;
+    if (!task) return;
+    if (task.meetUrl) {
+      this.openTaskMeetLink(task.meetUrl);
+    } else {
+      this.createInstantTaskMeet(task.id);
     }
   },
 
@@ -5402,6 +5586,11 @@ const App = {
           <div style="margin-top:auto; padding-top:12px; border-top:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; gap:8px;">
             <span style="font-size:11px; color:var(--text-muted);">${u.email}</span>
             <div style="display:flex; gap:6px;">
+              ${s.overdueCount > 0 || riskClass === 'critical' ? `
+                <button type="button" class="btn btn-xs" onclick="App.openExecutiveWarRoomModal(null, '${u.id}')" style="background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; font-weight:700;" title="Kích hoạt phòng họp Google Meet 1-1 với nhân sự này">
+                  📹 Họp 1-1
+                </button>
+              ` : ''}
               <button type="button" class="btn btn-outline btn-xs" onclick="App.switchExecutiveSubTab('rebalance')" title="Chuyển sang công cụ Cân bằng tải">
                 ⚖️ San việc
               </button>
@@ -5477,13 +5666,19 @@ const App = {
           </div>
 
           <!-- Strategic Advisory -->
-          <div class="ai-action-box" style="margin-top:auto; margin-bottom:0;">
+          <div class="ai-action-box" style="margin-top:auto; margin-bottom:8px;">
             <div class="ai-box-title">
               <span>💡 Khuyến nghị chiến lược cho Ban Lãnh Đạo:</span>
             </div>
             <div class="ai-box-desc">
               ${d.aiAdvisory}
             </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end;">
+            <button type="button" class="btn btn-outline btn-xs" onclick="App.openExecutiveWarRoomModal('${this.escapeHtml(d.name)}')" style="color:#059669; border-color:#6ee7b7; font-weight:700;">
+              📹 Họp Ban ${this.escapeHtml(d.name)}
+            </button>
           </div>
         </div>
       `;
@@ -5733,6 +5928,234 @@ const App = {
     }).catch(() => {
       this.showToast('Không thể tự động sao chép. Vui lòng bôi đen và copy thủ công.', 'warning');
     });
+  },
+
+  // -----------------------------------------------------------
+  // EXECUTIVE AI WAR-ROOM (HỌP KHẨN CẤP GOOGLE MEET)
+  // -----------------------------------------------------------
+  openExecutiveWarRoomModal(targetDept = null, targetUserId = null) {
+    const data = this.state.executiveDeskData;
+    if (!data) {
+      this.showToast('Đang tải dữ liệu Bàn làm việc AI, vui lòng thử lại sau giây lát...', 'warning');
+      return;
+    }
+
+    // Default Meet URL with clean structured identifier
+    const randomCode = `vmg-${Math.random().toString(36).substring(2, 6)}-${Math.random().toString(36).substring(2, 5)}`;
+    const meetInput = document.getElementById('warroomMeetUrlInput');
+    if (meetInput) {
+      meetInput.value = `https://meet.google.com/${randomCode}`;
+    }
+
+    // AI Agenda generation
+    const agendaEl = document.getElementById('warroomAgendaContent');
+    const urgentMatters = data.urgentMatters || [];
+    const highRiskStaff = (data.personnelList || []).filter(p => p.riskClass === 'critical');
+    const scopeDept = targetDept || (this.state.executiveTargetDept && this.state.executiveTargetDept !== 'all' ? this.state.executiveTargetDept : 'Toàn Doanh Nghiệp (16 Phòng Ban)');
+
+    let agendaHtml = `
+      <div style="font-weight:700; color:#1e1b4b; margin-bottom:6px;">📋 NỘI DUNG HỌP ĐIỀU HÀNH & GIẢI CỨU TIẾN ĐỘ [${this.escapeHtml(scopeDept)}]:</div>
+      <ul style="margin:0 0 10px 18px; padding:0;">
+        <li><strong>Tình hình chung:</strong> Điểm sức khỏe vận hành ${data.kpis?.enterpriseHealthScore || 0}/100. Hiện có ${urgentMatters.length} điểm nóng khẩn cấp và ${highRiskStaff.length} nhân sự thuộc diện rủi ro trễ hạn cao.</li>
+        ${urgentMatters.length > 0 ? `<li><strong>Các đầu việc nghẽn ưu tiên số 1:</strong> ${urgentMatters.map(m => `<b>#${m.id}</b> (${this.escapeHtml(m.title)}) - Phụ trách: <i>${this.escapeHtml(m.assigneeName)}</i>`).join('; ')}</li>` : '<li>Không có đầu việc khẩn cấp bị nghẽn nghiêm trọng.</li>'}
+        <li><strong>Mục tiêu buổi họp:</strong> Tháo gỡ ngay các nút thắt nghiệm thu, phê duyệt tái phân bổ công việc và chốt hạn hoàn thành dứt điểm trong 24h-48h.</li>
+      </ul>
+    `;
+    if (agendaEl) agendaEl.innerHTML = agendaHtml;
+
+    // Personnel Attendees List
+    const attendeeContainer = document.getElementById('warroomAttendeeList');
+    const attendeeCountEl = document.getElementById('warroomAttendeeCount');
+    const allUsers = this.state.users || [];
+    
+    // Determine pre-selected users
+    const preselectedUserIds = new Set();
+    if (targetUserId) {
+      preselectedUserIds.add(targetUserId);
+    } else if (targetDept && targetDept !== 'all') {
+      allUsers.filter(u => u.department === targetDept).forEach(u => preselectedUserIds.add(u.id));
+    } else {
+      highRiskStaff.forEach(p => preselectedUserIds.add(p.id));
+      urgentMatters.forEach(m => {
+        const u = allUsers.find(x => x.name === m.assigneeName);
+        if (u) preselectedUserIds.add(u.id);
+      });
+      // Include admins
+      allUsers.filter(u => u.role === 'admin').forEach(u => preselectedUserIds.add(u.id));
+    }
+
+    if (attendeeContainer) {
+      attendeeContainer.innerHTML = allUsers.map(u => {
+        const isChecked = preselectedUserIds.has(u.id);
+        const isHighRisk = highRiskStaff.some(p => p.id === u.id);
+        return `
+          <label class="warroom-attendee-item ${isChecked ? 'is-selected' : ''}">
+            <input type="checkbox" class="warroom-user-chk" value="${u.id}" ${isChecked ? 'checked' : ''} onchange="App.onWarRoomAttendeeToggle(this)">
+            <span>${u.avatar || '👤'}</span>
+            <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+              <strong>${this.escapeHtml(u.name)}</strong>
+              <div style="font-size:10.5px; color:var(--text-muted);">${this.escapeHtml(u.department || 'N/A')}</div>
+            </div>
+            ${isHighRisk ? '<span class="badge" style="background:#fee2e2; color:#ef4444; font-size:10px; padding:1px 5px;">🚨 Trễ hạn</span>' : ''}
+          </label>
+        `;
+      }).join('');
+    }
+
+    if (attendeeCountEl) {
+      attendeeCountEl.innerText = preselectedUserIds.size;
+    }
+
+    this.openModal('executiveWarRoomModal');
+  },
+
+  onWarRoomAttendeeToggle(input) {
+    const parent = input.closest('.warroom-attendee-item');
+    if (parent) {
+      parent.classList.toggle('is-selected', input.checked);
+    }
+    const checked = document.querySelectorAll('.warroom-user-chk:checked');
+    const attendeeCountEl = document.getElementById('warroomAttendeeCount');
+    if (attendeeCountEl) attendeeCountEl.innerText = checked.length;
+  },
+
+  toggleAllWarRoomAttendees() {
+    const checkboxes = document.querySelectorAll('.warroom-user-chk');
+    const anyUnchecked = Array.from(checkboxes).some(c => !c.checked);
+    checkboxes.forEach(c => {
+      c.checked = anyUnchecked;
+      const parent = c.closest('.warroom-attendee-item');
+      if (parent) parent.classList.toggle('is-selected', anyUnchecked);
+    });
+    const attendeeCountEl = document.getElementById('warroomAttendeeCount');
+    if (attendeeCountEl) attendeeCountEl.innerText = anyUnchecked ? checkboxes.length : 0;
+  },
+
+  generateNewWarRoomMeetLink() {
+    const randomCode = `vmg-${Math.random().toString(36).substring(2, 6)}-${Math.random().toString(36).substring(2, 5)}`;
+    const url = `https://meet.google.com/${randomCode}`;
+    const input = document.getElementById('warroomMeetUrlInput');
+    if (input) input.value = url;
+    this.showToast('Đã sinh mã phòng Google Meet mới!', 'info');
+  },
+
+  joinWarRoomMeet() {
+    const input = document.getElementById('warroomMeetUrlInput');
+    const url = input && input.value.trim() ? input.value.trim() : 'https://meet.google.com/new';
+    window.open(url, '_blank');
+  },
+
+  copyWarRoomMeetLink() {
+    const input = document.getElementById('warroomMeetUrlInput');
+    if (input && input.value.trim()) {
+      this.copyText(input.value.trim(), 'Đã sao chép liên kết phòng họp Google Meet!');
+    }
+  },
+
+  async submitSummonWarRoom() {
+    const input = document.getElementById('warroomMeetUrlInput');
+    const meetUrl = input ? input.value.trim() : '';
+    if (!meetUrl) {
+      this.showToast('Vui lòng nhập liên kết Google Meet trước khi phát lệnh!', 'warning');
+      return;
+    }
+
+    const checkedInputs = document.querySelectorAll('.warroom-user-chk:checked');
+    const targetUserIds = Array.from(checkedInputs).map(c => c.value);
+    if (targetUserIds.length === 0) {
+      this.showToast('Vui lòng chọn ít nhất một nhân sự nhận lệnh triệu tập!', 'warning');
+      return;
+    }
+
+    const btn = document.getElementById('btnSummonWarRoom');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '⏳ Đang phát lệnh...';
+    }
+
+    try {
+      const res = await API.summonExecutiveWarRoom({
+        meetUrl,
+        title: '🚨 TRIỆU TẬP HỌP KHẨN CẤP GOOGLE MEET (BÀN LÀM VIỆC ĐIỀU HÀNH)',
+        agenda: 'Rà soát và giải tỏa các điểm nghẽn công việc quá hạn khẩn cấp.',
+        targetUserIds,
+        department: this.state.executiveTargetDept || 'all'
+      });
+
+      this.showToast(`📢 ${res.message || 'Đã phát lệnh triệu tập thành công!'}`, 'success');
+      this.playSound('alert');
+
+      // Tự động mở Google Meet cho người triệu tập
+      window.open(meetUrl, '_blank');
+      this.closeModal('executiveWarRoomModal');
+    } catch (err) {
+      this.showToast('Lỗi phát lệnh: ' + err.message, 'danger');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '📢 PHÁT LỆNH TRIỆU TẬP KHẨN CẤP';
+      }
+    }
+  },
+
+  copyWarRoomBriefingForChat() {
+    const input = document.getElementById('warroomMeetUrlInput');
+    const meetUrl = input ? input.value.trim() : '';
+    const data = this.state.executiveDeskData;
+    const health = data?.kpis?.enterpriseHealthScore || 0;
+    const urgentCount = data?.urgentMatters?.length || 0;
+    
+    const text = `🚨 [THÔNG BÁO TRIỆU TẬP HỌP KHẨN CẤP - VMG EXECUTIVE AI]\n` +
+      `-------------------------------------------\n` +
+      `📌 Chủ đề: Họp tháo gỡ điểm nghẽn & xử lý việc quá hạn\n` +
+      `🎯 Tình trạng: ${urgentCount} việc khẩn cấp cần giải cứu | Điểm SK: ${health}/100\n` +
+      `📹 Link tham gia Google Meet: ${meetUrl}\n` +
+      `⏰ Thời gian: Vào phòng họp ngay lập tức\n` +
+      `-------------------------------------------\n` +
+      `Đề nghị các nhân sự nhận thông báo có mặt đầy đủ!`;
+
+    this.copyText(text, 'Đã sao chép nội dung triệu tập họp! Hãy dán vào Zalo hoặc Telegram.');
+  },
+
+  handleExecutiveWarRoomSummon(data) {
+    if (!data || !this.state.user) return;
+    const myId = this.state.user.id;
+    const isTarget = data.targetUserIds && data.targetUserIds.includes(myId);
+    const isAdmin = this.state.user.role === 'admin';
+    
+    if (isTarget || isAdmin) {
+      this.playSound('alert');
+      this.renderWarRoomEmergencyBanner(data);
+    }
+  },
+
+  renderWarRoomEmergencyBanner(data) {
+    const existing = document.getElementById('liveWarRoomEmergencyBanner');
+    if (existing) existing.remove();
+
+    const banner = document.createElement('div');
+    banner.id = 'liveWarRoomEmergencyBanner';
+    banner.className = 'war-room-broadcast-banner';
+    banner.innerHTML = `
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span style="font-size:26px;">🚨</span>
+        <div>
+          <div style="font-weight:800; font-size:14px; text-transform:uppercase; letter-spacing:0.5px;">${this.escapeHtml(data.title)}</div>
+          <div style="font-size:12px; opacity:0.9; margin-top:2px;">
+            ${this.escapeHtml(data.sender ? data.sender.name : 'Ban Giám Đốc')} yêu cầu bạn tham gia họp Google Meet khẩn cấp ngay bây giờ!
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <a href="${this.escapeHtml(data.meetUrl)}" target="_blank" onclick="document.getElementById('liveWarRoomEmergencyBanner').remove();" class="btn btn-sm" style="background:#10b981; color:#fff; font-weight:800; padding:8px 16px; border:none; border-radius:8px; text-decoration:none; white-space:nowrap; box-shadow:0 2px 8px rgba(16,185,129,0.4);">
+          🚀 VÀO HỌP NGAY
+        </a>
+        <button type="button" onclick="document.getElementById('liveWarRoomEmergencyBanner').remove();" style="background:transparent; border:none; color:#fff; font-size:20px; cursor:pointer; padding:0 6px;">
+          &times;
+        </button>
+      </div>
+    `;
+    document.body.appendChild(banner);
   },
 
   printExecutiveDeskReport() {
