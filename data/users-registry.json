@@ -1,13 +1,13 @@
 [
   {
     "id": "usr-1",
-    "name": "Trần Quản Trị",
+    "name": "Trần Tiến",
     "email": "admin@company.com",
     "password": "$2b$10$2aBdogTWuqcZadckGa1c8eKYcAfDnjHluLrDrrdZb//jVcnfIs6Em",
     "role": "admin",
     "department": "Ban Giám Đốc",
-    "position": "Trưởng ban điều hành",
-    "avatar": "👑",
+    "position": "Admin hệ thống",
+    "avatar": "/uploads/avatars/avatar-usr-1-1792747940607.png?t=1792747940608",
     "phone": "0988776655",
     "active": true,
     "createdAt": "2026-10-17T02:40:51.381Z",
