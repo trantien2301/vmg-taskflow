@@ -1466,6 +1466,45 @@ class Database {
     this.save();
     return this.data.announcementPoster;
   }
+
+  // -------------------------------------------------------------
+  // USER FEEDBACKS & WORK SMART AI SUGGESTIONS
+  // -------------------------------------------------------------
+  getFeedbacks() {
+    if (!this.data.feedbacks || !Array.isArray(this.data.feedbacks)) {
+      this.data.feedbacks = [];
+      this.save();
+    }
+    return this.data.feedbacks;
+  }
+
+  createFeedback(feedbackData) {
+    const list = this.getFeedbacks();
+    const newFeedback = {
+      id: `fdb-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      userId: feedbackData.userId || 'guest',
+      userName: feedbackData.userName || 'Người dùng Work Smart AI',
+      userEmail: feedbackData.userEmail || '',
+      userRole: feedbackData.userRole || 'user',
+      userDepartment: feedbackData.userDepartment || '',
+      category: feedbackData.category || 'suggestion',
+      content: (feedbackData.content || '').trim(),
+      status: 'new',
+      createdAt: new Date().toISOString()
+    };
+    list.unshift(newFeedback);
+    this.save();
+    return newFeedback;
+  }
+
+  deleteFeedback(id) {
+    const list = this.getFeedbacks();
+    const idx = list.findIndex(f => f.id === id);
+    if (idx === -1) return false;
+    list.splice(idx, 1);
+    this.save();
+    return true;
+  }
 }
 
 module.exports = new Database();

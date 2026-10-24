@@ -2564,6 +2564,63 @@ app.post('/api/automations/:id/trigger', authenticate, (req, res) => {
   });
 });
 
+// -------------------------------------------------------------
+// WORK SMART AI FEEDBACK & SUGGESTIONS
+// -------------------------------------------------------------
+app.get('/api/feedbacks', authenticate, (req, res) => {
+  const isAdmin = req.user.role === 'admin';
+  const list = db.getFeedbacks();
+  if (isAdmin) {
+    return res.json({ feedbacks: list });
+  }
+  const userList = list.filter(f => f.userId === req.user.id);
+  res.json({ feedbacks: userList });
+});
+
+app.post('/api/feedbacks', (req, res) => {
+  let user = null;
+  const authHeader = req.headers['authorization'];
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    try {
+      user = jwt.verify(authHeader.split(' ')[1], JWT_SECRET);
+    } catch (_) {}
+  }
+
+  const { content, category, rating, email, name } = req.body;
+  if (!content || !content.trim()) {
+    return res.status(400).json({ error: 'Vui lòng nhập nội dung ý kiến đóng góp' });
+  }
+
+  const feedback = db.createFeedback({
+    userId: user ? user.id : 'guest',
+    userName: user ? user.name : (name || 'Người dùng Work Smart AI'),
+    userEmail: user ? user.email : (email || ''),
+    userRole: user ? user.role : 'guest',
+    userDepartment: user ? (user.department || '') : '',
+    category: category || 'suggestion',
+    content: content.trim(),
+    rating: Number(rating) || 5
+  });
+
+  db.logActivity({
+    userId: user ? user.id : 'system',
+    userName: user ? user.name : 'Work Smart AI',
+    userRole: user ? user.role : 'system',
+    userAvatar: '💡',
+    action: 'submit_feedback',
+    category: 'system',
+    details: `Work Smart AI: Tiếp nhận ý kiến đóng góp [${category || 'Góp ý'}]: "${content.substring(0, 80)}${content.length > 80 ? '...' : ''}"`
+  });
+
+  broadcast('feedback:new', { feedback });
+
+  res.status(201).json({
+    success: true,
+    message: 'Cảm ơn bạn! Ý kiến đóng góp đã được gửi thành công tới Ban quản trị TaskFlow Pro.',
+    feedback
+  });
+});
+
 // SPA catch-all
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

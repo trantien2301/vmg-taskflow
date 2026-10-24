@@ -419,5 +419,17 @@ const API = {
 
   async testCalendarReminder() {
     return this.request('/api/calendar/test-reminder', { method: 'POST' });
+  },
+
+  // Work Smart AI - User Feedbacks & Bug Reports
+  async getFeedbacks() {
+    return this.request('/api/feedbacks');
+  },
+
+  async createFeedback(data) {
+    return this.request('/api/feedbacks', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
   }
 };
