@@ -149,6 +149,8 @@ const App = {
 
     const loginScreen = document.getElementById('loginScreen');
     const appContainer = document.getElementById('appContainer');
+    const wrapper = document.getElementById('loginCardWrapper');
+    if (wrapper) wrapper.classList.remove('login-success', 'shake-error');
     if (loginScreen) loginScreen.style.display = 'flex';
     if (appContainer) appContainer.style.display = 'none';
 
@@ -205,6 +207,23 @@ const App = {
     }
   },
 
+  triggerLoginShake() {
+    const wrapper = document.getElementById('loginCardWrapper') || document.querySelector('.login-card');
+    if (wrapper) {
+      wrapper.classList.remove('shake-error');
+      void wrapper.offsetWidth;
+      wrapper.classList.add('shake-error');
+      setTimeout(() => wrapper.classList.remove('shake-error'), 500);
+    }
+  },
+
+  triggerLoginSuccess() {
+    const wrapper = document.getElementById('loginCardWrapper') || document.querySelector('.login-card');
+    if (wrapper) {
+      wrapper.classList.add('login-success');
+    }
+  },
+
   async performLogin(email, password) {
     const alertBox = document.getElementById('loginAlert');
     const alertMsg = document.getElementById('loginAlertMsg');
@@ -219,6 +238,8 @@ const App = {
     try {
       const data = await API.login(email, password);
       this.state.user = data.user;
+      this.triggerLoginSuccess();
+      await new Promise(r => setTimeout(r, 280));
       this.showAppView();
       this.initWebSocket();
       await this.loadInitialData();
@@ -231,6 +252,7 @@ const App = {
         alertMsg.innerText = err.message || 'Email hoặc mật khẩu không chính xác';
         alertBox.style.display = 'flex';
       }
+      this.triggerLoginShake();
       this.playSound('danger');
     } finally {
       if (submitBtn) {
@@ -255,6 +277,8 @@ const App = {
       const data = await API.ssoLogin({ email, name });
       this.closeModal('ssoModal');
       this.state.user = data.user;
+      this.triggerLoginSuccess();
+      await new Promise(r => setTimeout(r, 280));
       this.showAppView();
       this.initWebSocket();
       await this.loadInitialData();
@@ -272,6 +296,7 @@ const App = {
         alertMsg.innerText = err.message || 'Xác thực SSO thất bại!';
         alertBox.style.display = 'flex';
       }
+      this.triggerLoginShake();
       this.showToast(`❌ Lỗi SSO: ${err.message}`, 'danger');
       this.playSound('danger');
     } finally {
@@ -886,6 +911,7 @@ const App = {
             alertMsg.innerText = err.message || 'Không tìm thấy tài khoản với email này!';
             alertBox.style.display = 'flex';
           }
+          this.triggerLoginShake();
           this.playSound('danger');
         } finally {
           if (submitBtn) {
@@ -949,6 +975,7 @@ const App = {
             alertMsg.innerText = err.message || 'Không thể đặt lại mật khẩu!';
             alertBox.style.display = 'flex';
           }
+          this.triggerLoginShake();
           this.playSound('danger');
         } finally {
           if (submitBtn) {
@@ -1246,6 +1273,8 @@ const App = {
           });
 
           this.state.user = res.user;
+          this.triggerLoginSuccess();
+          await new Promise(r => setTimeout(r, 280));
           this.showAppView();
           this.initWebSocket();
           await this.loadInitialData();
@@ -1258,6 +1287,7 @@ const App = {
             alertMsg.innerText = err.message || 'Đăng ký không thành công. Vui lòng thử lại!';
             alertBox.style.display = 'flex';
           }
+          this.triggerLoginShake();
           this.playSound('danger');
         } finally {
           if (submitBtn) {

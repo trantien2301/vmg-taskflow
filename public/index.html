@@ -53,8 +53,17 @@
        EMAIL LOGIN SCREEN
        ======================================================== -->
   <div class="login-screen" id="loginScreen">
-    <div class="login-card">
-      <div class="login-header">
+    <!-- Aurora Floating Mesh Gradient (Background Motion) -->
+    <div class="login-aurora-bg" aria-hidden="true">
+      <div class="aurora-orb aurora-orb-1"></div>
+      <div class="aurora-orb aurora-orb-2"></div>
+      <div class="aurora-orb aurora-orb-3"></div>
+    </div>
+
+    <!-- Login Card Wrapper with Rotating Border Beam -->
+    <div class="login-card-wrapper" id="loginCardWrapper">
+      <div class="login-card">
+        <div class="login-header">
         <div class="login-logo">
           <img src="images/taskflow-icon.png" alt="TaskFlow Logo" class="login-logo-img">
         </div>
@@ -291,6 +300,7 @@
       </div>
     </div>
   </div>
+</div>
 
   <!-- MAIN APP CONTAINER -->
   <div class="app-container" id="appContainer" style="display: none;">
