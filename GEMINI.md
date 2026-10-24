@@ -37,3 +37,11 @@ Mọi tính năng, màn hình giao diện (View), thành phần (Component), Mod
 * Các tính năng quản trị quy tắc hệ thống chỉ hiển thị khi `App.state.user.role === 'admin'`.
 * Backend API luôn có middleware xác thực `authenticate` và kiểm tra `if (req.user.role !== 'admin') return res.status(403).json(...)`.
 * Không đặt element đè lên floating button của Work Smart AI (`bottom: 24px; right: 24px;`). Thông báo Toast đặt tại `bottom: 96px; right: 24px;`.
+
+### 6. Bắt Buộc Đồng Bộ Hướng Dẫn & Chatbot Work Smart AI (Documentation & Knowledge Sync)
+* **Nguyên tắc "No Feature Without Guidance":** Bất kỳ khi nào một tính năng hoặc nâng cấp mới được thêm vào web app, **BẮT BUỘC** phải:
+  1. **Cập nhật Chatbot Work Smart AI (`public/js/workSmartAI.js`)**: Bổ sung `WorkSmartAI.knowledge[newFeatureKey]` với đầy đủ từ khóa (keywords có dấu và không dấu), hướng dẫn súc tích (HTML formatted) và các nút bấm hành động chuyển view tức thì (actions deep link).
+  2. **Cập nhật Cẩm Nang Hướng Dẫn Sử Dụng (`#view-guide` trong `public/index.html`)**: Thêm thẻ hướng dẫn (Guide card) chi tiết, phân quyền ai được dùng và các bước thao tác thực tế.
+  3. **Cập nhật Tài liệu toàn diện offline (`HUONG_DAN_SU_DUNG_TOAN_DIEN_TASKFLOW_PRO.md`)**: Bổ sung chương/mục vào tài liệu markdown nội bộ.
+  4. **Cập nhật Changelog (`server.js`)**: Thêm tóm tắt vào API `/api/system/version`.
+

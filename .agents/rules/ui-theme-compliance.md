@@ -77,3 +77,11 @@ Mọi tính năng mới, giao diện mới (Views), thành phần UI (Components
 * Khi sinh thông báo (Notifications / Alerts):
   * Tôn trọng khung giờ yên tĩnh `Quiet Hours` và mức độ khẩn cấp (P1/P2/P3), tránh spam notification.
   * Cụm thông báo Toast nằm ở `bottom: 96px; right: 24px;` để không đè lên trợ lý Work Smart AI (`bottom: 24px`).
+
+## 6. ĐỒNG BỘ HƯỚNG DẪN & CHATBOT WORK SMART AI (DOCUMENTATION & KNOWLEDGE SYNC)
+
+* **Nguyên tắc "No Feature Without Guidance":** Bất kỳ tính năng mới nào khi hoàn thành **BẮT BUỘC** phải:
+  1. Thêm kiến thức và từ khóa vào Chatbot Work Smart AI (`public/js/workSmartAI.js` -> `WorkSmartAI.knowledge`).
+  2. Bổ sung thẻ hướng dẫn chi tiết trong Tab Cẩm Nang (`#view-guide` trong `public/index.html`).
+  3. Cập nhật tài liệu offline `HUONG_DAN_SU_DUNG_TOAN_DIEN_TASKFLOW_PRO.md`.
+  4. Cập nhật lịch sử nâng cấp Changelog trong `server.js`.
