@@ -149,6 +149,10 @@ const API = {
   },
 
   async logout() {
+    if (!this.getToken()) {
+      this.clearAuth();
+      return;
+    }
     try {
       await this.request('/api/auth/logout', { method: 'POST' });
     } catch (e) {
