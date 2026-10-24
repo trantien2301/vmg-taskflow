@@ -346,7 +346,9 @@ const App = {
   updateThemeButtonIcon(theme) {
     const btn = document.getElementById('themeToggleBtn');
     if (btn) {
-      btn.innerHTML = theme === 'dark' ? '☀️' : '🌙';
+      btn.innerHTML = typeof TFIcons !== 'undefined'
+        ? (theme === 'dark' ? TFIcons.sun : TFIcons.moon)
+        : (theme === 'dark' ? '☀️' : '🌙');
       btn.title = theme === 'dark' ? 'Chuyển sang giao diện Sáng' : 'Chuyển sang giao diện Tối';
     }
   },
@@ -850,10 +852,10 @@ const App = {
       togglePwdBtn.addEventListener('click', () => {
         if (pwdInput.type === 'password') {
           pwdInput.type = 'text';
-          togglePwdBtn.innerText = '🙈';
+          togglePwdBtn.innerHTML = typeof TFIcons !== 'undefined' ? TFIcons.eyeOff : '🙈';
         } else {
           pwdInput.type = 'password';
-          togglePwdBtn.innerText = '👁️';
+          togglePwdBtn.innerHTML = typeof TFIcons !== 'undefined' ? TFIcons.eye : '👁️';
         }
       });
     }
@@ -1463,20 +1465,20 @@ const App = {
 
     // Update view title in header
     const titleMap = {
-      kanban: '📋 Bảng Công Việc',
-      table: '📑 Danh Sách Việc',
-      calendar: '📅 Lịch Biểu Hạn',
-      reports: '📈 Báo Cáo Thống Kê',
-      alerts: '🚨 Trung Tâm Cảnh Báo',
-      users: '👥 Quản Trị Nhân Sự',
-      activities: '📜 Nhật Ký Hoạt Động',
-      automation: '⚡ Tự Động Hóa (Automation)',
-      'executive-desk': '💼 Bàn Làm Việc Điều Hành & Trợ Lý AI',
-      guide: '📖 Cẩm Nang Hướng Dẫn Sử Dụng'
+      kanban: (typeof TFIcons !== 'undefined' ? TFIcons.kanban : '') + '<span>Bảng Công Việc</span>',
+      table: (typeof TFIcons !== 'undefined' ? TFIcons.table : '') + '<span>Danh Sách Việc</span>',
+      calendar: (typeof TFIcons !== 'undefined' ? TFIcons.calendar : '') + '<span>Lịch & Thời Hạn</span>',
+      reports: (typeof TFIcons !== 'undefined' ? TFIcons.reports : '') + '<span>Báo Cáo Thống Kê</span>',
+      alerts: (typeof TFIcons !== 'undefined' ? TFIcons.alerts : '') + '<span>Trung Tâm Cảnh Báo</span>',
+      users: (typeof TFIcons !== 'undefined' ? TFIcons.users : '') + '<span>Quản Trị Nhân Sự</span>',
+      activities: (typeof TFIcons !== 'undefined' ? TFIcons.activities : '') + '<span>Nhật Ký Hoạt Động</span>',
+      automation: (typeof TFIcons !== 'undefined' ? TFIcons.automation : '') + '<span>Tự Động Hóa (Bot)</span>',
+      'executive-desk': (typeof TFIcons !== 'undefined' ? TFIcons.executive : '') + '<span>Bàn Làm Việc Điều Hành & Trợ Lý AI</span>',
+      guide: (typeof TFIcons !== 'undefined' ? TFIcons.guide : '') + '<span>Cẩm Nang Hướng Dẫn Sử Dụng</span>'
     };
     const titleEl = document.getElementById('currentViewTitle');
     if (titleEl) {
-      titleEl.innerText = titleMap[viewName] || 'Quản Lý Công Việc';
+      titleEl.innerHTML = titleMap[viewName] || '<span>Quản Lý Công Việc</span>';
     }
 
     // Show/hide view panels
@@ -2191,7 +2193,7 @@ const App = {
           <div style="display:flex; align-items:center; gap:6px;">
             ${task.meetUrl ? `
               <a href="${this.escapeHtml(task.meetUrl)}" target="_blank" onclick="event.stopPropagation();" class="task-card-meet-btn" title="Vào họp Google Meet ngay: ${this.escapeHtml(task.meetUrl)}">
-                <span class="meet-pulse-dot"></span> 📹 Meet
+                <span class="meet-pulse-dot"></span> ${typeof TFIcons !== 'undefined' ? TFIcons.video : '📹'} <span>Meet</span>
               </a>
             ` : ''}
             <span class="badge-priority ${task.priority}">${priorityLabels[task.priority] || task.priority}</span>
@@ -2206,11 +2208,11 @@ const App = {
 
         <div class="task-card-footer">
           <div class="task-assignee" title="${assignee ? assignee.name : 'Chưa gán'}">
-            <span>${assignee ? this.renderAvatar(assignee.avatar, 20) : '👤'}</span>
+            <span>${assignee ? this.renderAvatar(assignee.avatar, 20) : (typeof TFIcons !== 'undefined' ? TFIcons.user : '👤')}</span>
             <span>${assignee ? assignee.name.split(' ').slice(-1)[0] : 'N/A'}</span>
           </div>
           <div class="task-deadline ${deadlineClass}">
-            <span>${isOverdue ? '🚨' : isDueSoon ? '⏰' : '📅'}</span>
+            <span style="display:inline-flex; align-items:center;">${isOverdue ? (typeof TFIcons !== 'undefined' ? TFIcons.kpiOverdue : '🚨') : isDueSoon ? (typeof TFIcons !== 'undefined' ? TFIcons.clock : '⏰') : (typeof TFIcons !== 'undefined' ? TFIcons.calendar : '📅')}</span>
             <span>${deadlineText}</span>
           </div>
         </div>
@@ -2307,7 +2309,7 @@ const App = {
           </td>
           <td>
             <div style="display:flex; align-items:center; gap:6px;">
-              <span>${assignee ? assignee.avatar : '👤'}</span>
+              <span>${assignee ? assignee.avatar : (typeof TFIcons !== 'undefined' ? TFIcons.user : '👤')}</span>
               <span>${assignee ? assignee.name : 'Chưa gán'}</span>
             </div>
           </td>
@@ -2322,8 +2324,8 @@ const App = {
             </div>
           </td>
           <td>
-            <div style="font-weight:600; color:${isOverdue ? 'var(--danger)' : 'inherit'};">
-              ${isOverdue ? '🚨 ' : ''}${task.dueDate ? new Date(task.dueDate).toLocaleDateString('vi-VN') : 'Không hạn'}
+            <div style="font-weight:600; color:${isOverdue ? 'var(--danger)' : 'inherit'}; display:inline-flex; align-items:center; gap:5px;">
+              ${isOverdue ? (typeof TFIcons !== 'undefined' ? TFIcons.kpiOverdue : '🚨 ') : ''}<span>${task.dueDate ? new Date(task.dueDate).toLocaleDateString('vi-VN') : 'Không hạn'}</span>
             </div>
           </td>
         </tr>

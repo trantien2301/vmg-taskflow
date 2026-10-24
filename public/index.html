@@ -10,6 +10,19 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
+  <!-- Global Brand SVG Gradients for TaskFlow Icons (Cyan-Emerald) -->
+  <svg style="display: none;" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="tfBrandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#0ea5e9" />
+        <stop offset="100%" stop-color="#10b981" />
+      </linearGradient>
+      <linearGradient id="tfBrandGradientGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#38bdf8" />
+        <stop offset="100%" stop-color="#34d399" />
+      </linearGradient>
+    </defs>
+  </svg>
   <!-- ========================================================
        PRE-LOGIN VMG POSTER ANNOUNCEMENT OVERLAY
        ======================================================== -->
@@ -74,10 +87,12 @@
       <!-- Segmented Tabs for Login / Register -->
       <div class="auth-tabs">
         <button type="button" class="auth-tab-btn active" id="tabLoginBtn">
-          <span>🔑 Đăng Nhập</span>
+          <svg class="tf-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-1.5 1.5L16 7l-1.5-1.5L13 7l-1.5-1.5L10 7"/><circle cx="7.5" cy="16.5" r="4.5"/><path d="M10.5 13.5L19 5"/></svg>
+          <span>Đăng Nhập</span>
         </button>
         <button type="button" class="auth-tab-btn" id="tabRegisterBtn">
-          <span>✨ Đăng Ký (@vmg.edu.vn)</span>
+          <svg class="tf-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.912 4.887L18.8 9.8l-4.888 1.913L12 16.6l-1.912-4.887L5.2 9.8l4.888-1.913z"/><path d="M19 16l.8 2.05L21.85 18.85l-2.05.8L19 21.7l-.8-2.05-2.05-.8 2.05-.8z"/></svg>
+          <span>Đăng Ký (@vmg.edu.vn)</span>
         </button>
       </div>
 
@@ -108,7 +123,9 @@
           <div class="form-group">
             <label class="form-label">Email Đăng Nhập</label>
             <div class="input-with-icon">
-              <span class="input-icon">✉️</span>
+              <span class="input-icon">
+                <svg class="tf-icon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </span>
               <input type="email" id="loginEmail" class="form-control" placeholder="admin@company.com" required autocomplete="email">
             </div>
           </div>
@@ -119,15 +136,19 @@
               <a href="#" id="linkToForgot" style="font-size:12px; color:var(--primary); text-decoration:none; font-weight:600;">Quên mật khẩu?</a>
             </div>
             <div class="input-with-icon">
-              <span class="input-icon">🔒</span>
+              <span class="input-icon">
+                <svg class="tf-icon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2.5"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
               <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required autocomplete="current-password">
-              <button type="button" class="btn-toggle-pwd" id="togglePasswordBtn" title="Hiện/Ẩn mật khẩu">👁️</button>
+              <button type="button" class="btn-toggle-pwd" id="togglePasswordBtn" title="Hiện/Ẩn mật khẩu">
+                <svg class="tf-icon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
             </div>
           </div>
 
           <button type="submit" class="btn btn-primary btn-block btn-lg" id="loginSubmitBtn" style="margin-top: 10px;">
             <span>Đăng Nhập Vào Hệ Thống</span>
-            <span>➔</span>
+            <svg class="tf-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
         </form>
 
@@ -319,57 +340,57 @@
       <nav class="sidebar-nav">
         <div class="nav-section-title">Không Gian Làm Việc</div>
         <a class="nav-item active" data-view="kanban">
-          <span class="icon">📋</span>
+          <span class="icon"><svg class="tf-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5.2" height="16" rx="2"/><rect x="10.4" y="4" width="5.2" height="11" rx="2"/><rect x="17.8" y="4" width="4.8" height="7" rx="2"/></svg></span>
           <span>Bảng Kanban</span>
         </a>
         <a class="nav-item" data-view="table">
-          <span class="icon">📑</span>
+          <span class="icon"><svg class="tf-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><line x1="3" y1="9.5" x2="21" y2="9.5"/><line x1="9" y1="9.5" x2="9" y2="20"/><line x1="15" y1="9.5" x2="15" y2="20"/></svg></span>
           <span>Danh Sách Việc</span>
         </a>
         <a class="nav-item" data-view="calendar">
-          <span class="icon">📅</span>
+          <span class="icon"><svg class="tf-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="8" cy="14" r="1.1" fill="currentColor"/><circle cx="12" cy="14" r="1.1" fill="currentColor"/><circle cx="16" cy="14" r="1.1" fill="currentColor"/><circle cx="8" cy="17.5" r="1.1" fill="currentColor"/><circle cx="12" cy="17.5" r="1.1" fill="currentColor"/></svg></span>
           <span>Lịch & Thời Hạn</span>
         </a>
 
         <!-- EXECUTIVE AI COCKPIT: BÀN LÀM VIỆC -->
         <div class="nav-section-title" id="navSectionExecutiveTitle">Điều Hành & Phân Tích AI</div>
         <a class="nav-item" data-view="executive-desk" id="navItemExecutiveDesk">
-          <span class="icon">💼</span>
+          <span class="icon"><svg class="tf-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2.5"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><circle cx="12" cy="12.5" r="1.8"/><path d="M12 14.5v2.5"/></svg></span>
           <span>Bàn Làm Việc</span>
           <span class="nav-badge" style="font-size:9.5px; font-weight:800; background:linear-gradient(135deg, #8b5cf6, #3b82f6); color:#fff; box-shadow:0 2px 6px rgba(139,92,246,0.35);">AI PRO</span>
         </a>
 
         <div class="nav-section-title">Cảnh Báo & Giám Sát</div>
         <a class="nav-item" data-view="alerts">
-          <span class="icon">🚨</span>
+          <span class="icon"><svg class="tf-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="17" r="1" fill="currentColor"/></svg></span>
           <span>Trung Tâm Cảnh Báo</span>
           <span class="nav-badge danger" id="sidebarOverdueBadge" style="display:none;">0</span>
         </a>
         <a class="nav-item" data-view="reports" id="sidebarNavReports">
-          <span class="icon">📈</span>
+          <span class="icon"><svg class="tf-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><path d="M3 20h18"/><polyline points="5 9 10 4 14 8 19 3"/></svg></span>
           <span>Báo Cáo & Thống Kê</span>
         </a>
 
         <div class="nav-section-title" id="navSectionAutomationTitle">Quy Trình & Tự Động Hóa</div>
         <a class="nav-item" data-view="automation" id="navItemAutomation">
-          <span class="icon">⚡</span>
+          <span class="icon"><svg class="tf-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
           <span>Tự Động Hóa (Bot)</span>
           <span class="nav-badge success" id="sidebarAutomationBadge" style="font-size:9.5px; font-weight:800; background:#10b981; color:#fff;">PRO</span>
         </a>
 
         <div class="nav-section-title" id="navSectionAdminTitle">Quản Trị Hệ Thống</div>
         <a class="nav-item" data-view="users" id="adminUsersNavItem">
-          <span class="icon">👥</span>
+          <span class="icon"><svg class="tf-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
           <span>Quản Lý Nhân Sự</span>
         </a>
         <a class="nav-item" data-view="activities" id="adminActivitiesNavItem">
-          <span class="icon">📜</span>
+          <span class="icon"><svg class="tf-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 6 12 12 16 14"/></svg></span>
           <span>Nhật Ký Hoạt Động</span>
         </a>
 
         <div class="nav-section-title">Hỗ Trợ & Tài Liệu</div>
         <a class="nav-item" data-view="guide" id="sidebarNavGuide">
-          <span class="icon">📖</span>
+          <span class="icon"><svg class="tf-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
           <span>Hướng Dẫn Sử Dụng</span>
           <span class="nav-badge" style="background:#0284c7; color:#fff; font-size:9.5px; font-weight:800;">ALL</span>
         </a>
@@ -382,7 +403,7 @@
             <div class="user-name" id="sidebarUserName">Đang tải...</div>
             <span class="user-role-tag admin" id="sidebarUserRole">ADMIN</span>
           </div>
-          <span style="font-size:13px; color:var(--text-muted); margin-left:auto; padding-left:4px;" title="Cài đặt hồ sơ">⚙️</span>
+          <span style="font-size:13px; color:var(--text-muted); margin-left:auto; padding-left:4px; display:flex; align-items:center;" title="Cài đặt hồ sơ"><svg class="tf-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
         </div>
         <button class="sidebar-version-pill" id="sidebarVersionBtn" title="Xem thông tin phiên bản & cập nhật">
           <span class="version-dot"></span>
@@ -390,7 +411,7 @@
           <span class="version-badge-new" id="sidebarVersionNewBadge" style="display:none;">MỚI</span>
         </button>
         <button class="btn-logout" id="btnLogoutSidebar">
-          <span>🚪</span>
+          <svg class="tf-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           <span>Đăng Xuất</span>
         </button>
       </div>
@@ -420,8 +441,13 @@
       <!-- TOP HEADER -->
       <header class="top-header">
         <div class="header-left">
-          <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Menu">☰</button>
-          <h1 class="current-view-title" id="currentViewTitle">📋 Bảng Công Việc</h1>
+          <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Menu">
+            <svg class="tf-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <h1 class="current-view-title" id="currentViewTitle">
+            <svg class="tf-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5.2" height="16" rx="2"/><rect x="10.4" y="4" width="5.2" height="11" rx="2"/><rect x="17.8" y="4" width="4.8" height="7" rx="2"/></svg>
+            <span>Bảng Công Việc</span>
+          </h1>
         </div>
 
         <div class="header-right">
@@ -434,7 +460,7 @@
           <!-- Notification Bell -->
           <div class="notif-btn-wrapper">
             <button class="btn-icon-badge" id="notifBtn" title="Thông báo & Cảnh báo">
-              🔔
+              <svg class="tf-icon" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
               <span class="notif-bubble" id="notifBubble" style="display:none;">0</span>
             </button>
 
@@ -457,7 +483,7 @@
 
           <!-- Dark/Light Theme Toggle -->
           <button class="btn-icon-badge" id="themeToggleBtn" title="Đổi giao diện Sáng/Tối">
-            🌙
+            <svg class="tf-icon" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
           </button>
         </div>
       </header>
@@ -467,7 +493,9 @@
         <!-- GLOBAL KPI STATS BAR (Appears across views) -->
         <div class="kpi-grid">
           <div class="kpi-card">
-            <div class="kpi-icon blue">📊</div>
+            <div class="kpi-icon blue">
+              <svg class="tf-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+            </div>
             <div class="kpi-info">
               <div class="kpi-value" id="kpiTotalTasks">0</div>
               <div class="kpi-label" id="kpiTotalTasksLabel"><span class="hide-mobile">Tổng số </span>công việc</div>
@@ -475,7 +503,9 @@
           </div>
 
           <div class="kpi-card">
-            <div class="kpi-icon green">🎯</div>
+            <div class="kpi-icon green">
+              <svg class="tf-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
             <div class="kpi-info">
               <div class="kpi-value" id="kpiCompletedRate">0%</div>
               <div class="kpi-label"><span class="hide-mobile">Tỷ lệ </span>hoàn thành</div>
@@ -483,7 +513,9 @@
           </div>
 
           <div class="kpi-card">
-            <div class="kpi-icon yellow">⏳</div>
+            <div class="kpi-icon yellow">
+              <svg class="tf-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14M5 2h14m-12 2a6 6 0 0 0 6 6 6 6 0 0 0-6 6v6h12v-6a6 6 0 0 0-6-6 6 6 0 0 0 6-6V2H7z"/></svg>
+            </div>
             <div class="kpi-info">
               <div class="kpi-value" id="kpiInProgress">0</div>
               <div class="kpi-label">Đang triển khai</div>
@@ -491,7 +523,9 @@
           </div>
 
           <div class="kpi-card">
-            <div class="kpi-icon red">🚨</div>
+            <div class="kpi-icon red">
+              <svg class="tf-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
+            </div>
             <div class="kpi-info">
               <div class="kpi-value" id="kpiOverdue" style="color:var(--danger)">0</div>
               <div class="kpi-label"><span class="hide-mobile">Bị </span>trễ hạn<span class="hide-mobile"> chót</span></div>
@@ -499,7 +533,9 @@
           </div>
 
           <div class="kpi-card">
-            <div class="kpi-icon purple">🔥</div>
+            <div class="kpi-icon purple">
+              <svg class="tf-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3.5z"/></svg>
+            </div>
             <div class="kpi-info">
               <div class="kpi-value" id="kpiUrgent">0</div>
               <div class="kpi-label">Ưu tiên khẩn cấp</div>
@@ -510,41 +546,41 @@
         <!-- FILTER & ACTION BAR -->
         <div class="filter-bar">
           <div class="filter-input-group">
-            <span>🔍</span>
+            <span><svg class="tf-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7.5"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></span>
             <input type="text" id="filterSearch" placeholder="Tìm kiếm công việc, mã ID...">
           </div>
 
           <div class="filter-input-group">
-            <span>🎯</span>
+            <span><svg class="tf-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
             <select id="filterPriority">
               <option value="all">Tất cả độ ưu tiên</option>
-              <option value="urgent">🚨 Khẩn cấp</option>
-              <option value="high">🔥 Cao</option>
-              <option value="medium">⚡ Trung bình</option>
-              <option value="low">🌱 Thấp</option>
+              <option value="urgent">Khẩn cấp</option>
+              <option value="high">Cao</option>
+              <option value="medium">Trung bình</option>
+              <option value="low">Thấp</option>
             </select>
           </div>
 
           <div class="filter-input-group" id="filterStatusWrapper">
-            <span>📌</span>
+            <span><svg class="tf-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></span>
             <select id="filterStatus">
               <option value="all">Tất cả trạng thái</option>
-              <option value="todo">📋 Cần làm</option>
-              <option value="in_progress">⚡ Đang làm</option>
-              <option value="review">👀 Chờ duyệt</option>
-              <option value="completed">✅ Hoàn thành</option>
+              <option value="todo">Cần làm</option>
+              <option value="in_progress">Đang làm</option>
+              <option value="review">Chờ duyệt</option>
+              <option value="completed">Hoàn thành</option>
             </select>
           </div>
 
           <div class="filter-input-group" id="filterDeptWrapper">
-            <span>🏢</span>
+            <span><svg class="tf-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="22" x2="9" y2="18"/><line x1="15" y1="22" x2="15" y2="18"/><line x1="9" y1="6" x2="9.01" y2="6"/><line x1="15" y1="6" x2="15.01" y2="6"/><line x1="9" y1="10" x2="9.01" y2="10"/><line x1="15" y1="10" x2="15.01" y2="10"/><line x1="9" y1="14" x2="9.01" y2="14"/><line x1="15" y1="14" x2="15.01" y2="14"/></svg></span>
             <select id="filterDepartment">
               <option value="all">Tất cả phòng ban</option>
             </select>
           </div>
 
           <div class="filter-input-group" id="filterAssigneeWrapper">
-            <span>👤</span>
+            <span><svg class="tf-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
             <select id="filterAssignee">
               <option value="all">Tất cả người phụ trách</option>
             </select>
@@ -555,8 +591,8 @@
           </button>
 
           <div style="margin-left: auto;">
-            <button class="btn btn-primary" id="btnOpenAddTaskModal">
-              <span>+</span>
+            <button class="btn btn-primary" id="btnOpenAddTaskModal" style="display:inline-flex; align-items:center; gap:8px;">
+              <svg class="tf-icon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               <span>Giao Công Việc Mới</span>
             </button>
           </div>
@@ -566,10 +602,10 @@
         <section class="view-panel active" id="view-kanban">
           <!-- Mobile Kanban Column Tab Switcher -->
           <div class="mobile-kanban-nav" id="mobileKanbanNav">
-            <button type="button" class="kanban-tab-btn active" data-col="todo">📌 Cần Làm (<span id="tabCount_todo">0</span>)</button>
-            <button type="button" class="kanban-tab-btn" data-col="in_progress">⚡ Đang Làm (<span id="tabCount_in_progress">0</span>)</button>
-            <button type="button" class="kanban-tab-btn" data-col="review">🔍 Duyệt (<span id="tabCount_review">0</span>)</button>
-            <button type="button" class="kanban-tab-btn" data-col="completed">✅ Xong (<span id="tabCount_completed">0</span>)</button>
+            <button type="button" class="kanban-tab-btn active" data-col="todo">Cần Làm (<span id="tabCount_todo">0</span>)</button>
+            <button type="button" class="kanban-tab-btn" data-col="in_progress">Đang Làm (<span id="tabCount_in_progress">0</span>)</button>
+            <button type="button" class="kanban-tab-btn" data-col="review">Duyệt (<span id="tabCount_review">0</span>)</button>
+            <button type="button" class="kanban-tab-btn" data-col="completed">Xong (<span id="tabCount_completed">0</span>)</button>
           </div>
 
           <div class="kanban-board" id="kanbanBoard">
@@ -577,7 +613,7 @@
             <div class="kanban-col col-todo">
               <div class="kanban-col-header todo">
                 <div class="col-title">
-                  <span>📌</span>
+                  <span class="col-icon"><svg class="tf-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
                   <span>Cần Làm (To Do)</span>
                 </div>
                 <span class="col-count" id="kanbanCount_todo">0</span>
@@ -589,7 +625,7 @@
             <div class="kanban-col col-in_progress">
               <div class="kanban-col-header in_progress">
                 <div class="col-title">
-                  <span>⚡</span>
+                  <span class="col-icon"><svg class="tf-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
                   <span>Đang Làm (In Progress)</span>
                 </div>
                 <span class="col-count" id="kanbanCount_in_progress">0</span>
@@ -601,7 +637,7 @@
             <div class="kanban-col col-review">
               <div class="kanban-col-header review">
                 <div class="col-title">
-                  <span>👀</span>
+                  <span class="col-icon"><svg class="tf-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span>
                   <span>Chờ Duyệt (Review)</span>
                 </div>
                 <span class="col-count" id="kanbanCount_review">0</span>
@@ -613,7 +649,7 @@
             <div class="kanban-col col-completed">
               <div class="kanban-col-header completed">
                 <div class="col-title">
-                  <span>✅</span>
+                  <span class="col-icon"><svg class="tf-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
                   <span>Hoàn Thành (Done)</span>
                 </div>
                 <span class="col-count" id="kanbanCount_completed">0</span>
@@ -3358,6 +3394,7 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- APPLICATION SCRIPTS -->
+  <script src="js/icons.js?v=3.2.0"></script>
   <script src="js/api.js?v=3.2.0"></script>
   <script src="js/charts.js?v=3.2.0"></script>
   <script src="js/app.js?v=3.2.0"></script>

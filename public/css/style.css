@@ -104,6 +104,208 @@ body, .sidebar, .top-header, .kpi-card, .kanban-col, .task-card, .table-card, .m
 }
 
 /* ========================================================
+   TASKFLOW PRO - MODERN BRAND SVG ICON SYSTEM
+   Styling to match the new TF Ribbon Logo (Cyan-Emerald Flow)
+   ======================================================== */
+.tf-icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1.25em;
+  height: 1.25em;
+  stroke: currentColor;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Sidebar Nav Icons */
+.sidebar-nav .nav-item .icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  color: var(--sidebar-text);
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-nav .nav-item .icon svg {
+  width: 19px;
+  height: 19px;
+  stroke-width: 1.85;
+}
+
+.sidebar-nav .nav-item:hover .icon {
+  color: var(--primary);
+  transform: scale(1.12);
+}
+
+.sidebar-nav .nav-item.active .icon {
+  color: #10b981 !important;
+  transform: scale(1.14);
+  filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.75)) drop-shadow(0 0 14px rgba(14, 165, 233, 0.45)) !important;
+}
+
+[data-theme="dark"] .sidebar-nav .nav-item.active .icon {
+  color: #34d399 !important;
+  filter: drop-shadow(0 0 10px rgba(52, 211, 153, 0.85)) drop-shadow(0 0 16px rgba(56, 189, 248, 0.55)) !important;
+}
+
+/* Header & Tool Icons */
+.btn-icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.btn-icon-badge:hover {
+  color: var(--primary);
+  box-shadow: 0 0 12px rgba(14, 165, 233, 0.25);
+}
+
+.btn-icon-badge svg {
+  width: 19px;
+  height: 19px;
+}
+
+.mobile-menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-menu-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Current view title in Header */
+.current-view-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.current-view-title svg {
+  color: var(--primary);
+  width: 22px;
+  height: 22px;
+  filter: drop-shadow(0 0 6px rgba(14, 165, 233, 0.4));
+}
+
+/* KPI Icons */
+.kpi-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kpi-icon svg {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.kpi-card:hover .kpi-icon svg {
+  transform: scale(1.15);
+}
+
+/* Filter Input Icons */
+.filter-input-group span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filter-input-group span svg {
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+}
+
+/* Login Screen Input Icons */
+.input-with-icon .input-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-with-icon .input-icon svg {
+  width: 17px;
+  height: 17px;
+  color: var(--text-muted);
+  transition: color 0.2s ease, filter 0.2s ease;
+}
+
+.input-with-icon:focus-within .input-icon svg {
+  color: var(--primary);
+  filter: drop-shadow(0 0 6px rgba(14, 165, 233, 0.5));
+}
+
+.btn-toggle-pwd {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-toggle-pwd svg {
+  width: 17px;
+  height: 17px;
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+}
+
+.btn-toggle-pwd:hover svg {
+  color: var(--text-primary);
+}
+
+/* Auth segmented tabs */
+.auth-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.auth-tab-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Kanban Column Headers */
+.kanban-col-header .col-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kanban-col-header .col-title svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Logout Button */
+.btn-logout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-logout svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+}
+
+.btn-logout:hover svg {
+  transform: translateX(2px);
+}
+
+/* ========================================================
    LOGIN SCREEN & AURORA MOTION
    ======================================================== */
 .login-screen {
@@ -1900,6 +2102,15 @@ body, .sidebar, .top-header, .kpi-card, .kanban-col, .task-card, .table-card, .m
   align-items: center;
   gap: 4px;
   font-weight: 600;
+}
+
+.task-deadline svg,
+.task-card-meet-btn svg,
+.task-assignee svg {
+  width: 13.5px;
+  height: 13.5px;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .task-deadline.danger {
