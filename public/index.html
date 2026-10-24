@@ -731,33 +731,74 @@
         </section>
 
         <!-- VIEW 4: ALERTS CENTER -->
+        <!-- VIEW 4: ALERTS CENTER (ANTI-FATIGUE & ADMIN CONTROL) -->
         <section class="view-panel" id="view-alerts">
-          <div class="alert-banner danger">
-            <div style="display:flex; align-items:center; gap:12px;">
-              <span style="font-size:26px;">🚨</span>
+          <div class="alert-banner danger" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+            <div style="display:flex; align-items:center; gap:14px;">
+              <span style="font-size:28px;">🚨</span>
               <div>
-                <strong style="font-size:15px;">Hệ Thống Giám Sát Cảnh Báo Thời Hạn Tự Động</strong>
-                <div style="font-size:12px; margin-top:2px;">
-                  Hệ thống tự động quét liên tục mỗi phút và gửi thông báo Realtime ngay khi công việc trễ hạn hoặc đến hạn chót!
+                <strong style="font-size:15.5px;">Hệ Thống Giám Sát Cảnh Báo Thời Hạn & Rủi Ro</strong>
+                <div style="font-size:12px; margin-top:2px; opacity:0.9;">
+                  Tự động theo dõi tiến độ, phân tầng mức độ khẩn cấp và bảo vệ chống làm phiền (Anti-Alert Fatigue).
                 </div>
               </div>
             </div>
-            <div style="font-weight:700; font-size:18px;">
-              <span id="alertTotalCount">0</span> Mục Cần Chú Ý
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="font-weight:700; font-size:15px; background:rgba(0,0,0,0.18); padding:7px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.22);">
+                <span id="alertTotalCount">0</span> Mục Cần Chú Ý
+              </div>
+              <!-- Admin Only Settings Button -->
+              <button id="btnAdminAlertSettings" class="btn btn-sm" onclick="App.openAlertSettingsModal()" style="display:none; background:rgba(255,255,255,0.22); color:#fff; border:1.5px solid rgba(255,255,255,0.45); font-weight:700; border-radius:10px; padding:7px 14px; cursor:pointer;" title="Chỉ Quản trị viên (Admin) mới có quyền cấu hình quy tắc">
+                ⚙️ Cấu Hình Quy Tắc (Admin)
+              </button>
             </div>
           </div>
 
-          <h3 style="font-size:16px; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
-            <span>🔴</span>
-            <span>Công Việc Đã Quá Hạn (Trễ Deadline)</span>
-          </h3>
-          <div class="alert-cards-grid" id="alertsOverdueGrid" style="margin-bottom:28px;"></div>
+          <!-- Alert Filter Pills -->
+          <div class="alert-filter-bar">
+            <button type="button" class="alert-filter-pill active" data-filter="all" onclick="App.setAlertsFilter('all')">
+              Tất cả (<span id="pillCountAll">0</span>)
+            </button>
+            <button type="button" class="alert-filter-pill" data-filter="overdue" onclick="App.setAlertsFilter('overdue')">
+              🔴 Quá Hạn (<span id="pillCountOverdue">0</span>)
+            </button>
+            <button type="button" class="alert-filter-pill" data-filter="duesoon" onclick="App.setAlertsFilter('duesoon')">
+              🟠 Sắp Đến Hạn (<span id="pillCountDueSoon">0</span>)
+            </button>
+            <button type="button" class="alert-filter-pill" data-filter="snoozed" onclick="App.setAlertsFilter('snoozed')">
+              💤 Đang Tạm Hoãn (<span id="pillCountSnoozed">0</span>)
+            </button>
+            <button type="button" class="alert-filter-pill" data-filter="my" onclick="App.setAlertsFilter('my')">
+              👤 Việc Của Tôi (<span id="pillCountMy">0</span>)
+            </button>
+          </div>
 
-          <h3 style="font-size:16px; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
-            <span>🟠</span>
-            <span>Công Việc Sắp Đến Hạn (Trong Vòng 24 Giờ Tới)</span>
-          </h3>
-          <div class="alert-cards-grid" id="alertsDueSoonGrid"></div>
+          <!-- Overdue Grid Section -->
+          <div id="alertsOverdueSection">
+            <h3 style="font-size:15px; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+              <span>🔴</span>
+              <span>Công Việc Đã Quá Hạn (Trễ Deadline)</span>
+            </h3>
+            <div class="alert-cards-grid" id="alertsOverdueGrid" style="margin-bottom:28px;"></div>
+          </div>
+
+          <!-- Due Soon Grid Section -->
+          <div id="alertsDueSoonSection">
+            <h3 style="font-size:15px; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+              <span>🟠</span>
+              <span id="alertsDueSoonTitle">Công Việc Sắp Đến Hạn</span>
+            </h3>
+            <div class="alert-cards-grid" id="alertsDueSoonGrid" style="margin-bottom:28px;"></div>
+          </div>
+
+          <!-- Snoozed Grid Section -->
+          <div id="alertsSnoozedSection" style="display:none;">
+            <h3 style="font-size:15px; margin-bottom:12px; display:flex; align-items:center; gap:8px; color:var(--text-secondary);">
+              <span>💤</span>
+              <span>Công Việc Đang Tạm Hoãn Cảnh Báo (Đã Ghi Nhận)</span>
+            </h3>
+            <div class="alert-cards-grid" id="alertsSnoozedGrid" style="margin-bottom:28px;"></div>
+          </div>
         </section>
 
         <!-- VIEW 5: REPORTS & ANALYTICS (ROLE-BASED INTELLIGENCE) -->
@@ -3387,6 +3428,152 @@
           Đóng
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CẤU HÌNH QUY TẮC CẢNH BÁO (ADMIN ONLY) -->
+  <div class="modal-overlay" id="alertSettingsModal">
+    <div class="modal-content" style="max-width: 580px;">
+      <div class="modal-header" style="background:var(--brand-gradient); color:#fff; border:none;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:20px;">⚙️</span>
+          <div>
+            <h3 class="modal-title" style="color:#fff; margin:0; font-size:16px;">Cấu Hình Quy Tắc Cảnh Báo Hệ Thống</h3>
+            <div style="font-size:11.5px; opacity:0.9;">Dành riêng cho Quản Trị Viên (Admin) • Chống làm phiền nhân sự</div>
+          </div>
+        </div>
+        <button type="button" class="modal-close-btn" style="color:#fff;" onclick="App.closeAlertSettingsModal()">×</button>
+      </div>
+      <form id="alertSettingsForm" onsubmit="App.handleAlertSettingsSubmit(event)">
+        <div class="modal-body" style="padding: 20px;">
+          <!-- Security Notice -->
+          <div style="background:rgba(14, 165, 233, 0.08); border-left:4px solid var(--primary); padding:10px 14px; border-radius:6px; margin-bottom:18px; font-size:12.5px;">
+            🔒 <strong>Phân quyền quản trị:</strong> Các thiết lập này áp dụng trên toàn bộ hệ thống doanh nghiệp. Chỉ tài khoản Quản trị viên (Admin) mới có quyền lưu cấu hình.
+          </div>
+
+          <!-- Ngưỡng giờ báo sắp đến hạn -->
+          <div class="form-group" style="margin-bottom:16px;">
+            <label class="form-label" style="font-weight:700;">⏰ Ngưỡng cảnh báo trước khi đến hạn:</label>
+            <select class="form-control" id="alertSettingWarningHours" required>
+              <option value="6">Trước 6 giờ</option>
+              <option value="12">Trước 12 giờ</option>
+              <option value="24" selected>Trước 24 giờ (Khuyến nghị 1 ngày)</option>
+              <option value="48">Trước 48 giờ (2 ngày)</option>
+              <option value="72">Trước 72 giờ (3 ngày)</option>
+            </select>
+            <small style="color:var(--text-muted); font-size:11.5px;">Thời gian hệ thống bắt đầu gửi thông báo màu cam nhắc việc sắp đến deadline.</small>
+          </div>
+
+          <!-- Tần suất nhắc lại -->
+          <div class="form-group" style="margin-bottom:16px;">
+            <label class="form-label" style="font-weight:700;">🔁 Tần suất gửi lại thông báo quá hạn (Repeat Interval):</label>
+            <select class="form-control" id="alertSettingRepeatInterval" required>
+              <option value="0">Chỉ thông báo 1 lần duy nhất (Không nhắc lại)</option>
+              <option value="6">Nhắc lại mỗi 6 giờ</option>
+              <option value="12" selected>Nhắc lại mỗi 12 giờ (Khuyến nghị)</option>
+              <option value="24">Nhắc lại 1 lần mỗi ngày (24 giờ)</option>
+            </select>
+            <small style="color:var(--text-muted); font-size:11.5px;">Tránh tình trạng nhân sự bị bắn thông báo liên tục khi đang tập trung xử lý.</small>
+          </div>
+
+          <!-- Khung giờ yên tĩnh (Quiet Hours / Do Not Disturb) -->
+          <div style="border:1px solid var(--border-color); border-radius:12px; padding:14px; margin-bottom:16px; background:var(--bg-main);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <div>
+                <strong style="font-size:13.5px;">🌙 Khung Giờ Yên Tĩnh (Quiet Hours / Do Not Disturb)</strong>
+                <div style="font-size:11.5px; color:var(--text-secondary); margin-top:2px;">Tắt âm thanh chuông và chặn spam thông báo ngoài giờ làm việc.</div>
+              </div>
+              <input type="checkbox" id="alertSettingQuietEnabled" style="width:18px; height:18px; accent-color:var(--primary); cursor:pointer;">
+            </div>
+            
+            <div id="quietHoursConfigWrap" style="display:flex; gap:12px; margin-top:10px;">
+              <div style="flex:1;">
+                <label style="font-size:11.5px; color:var(--text-muted); display:block; margin-bottom:4px;">Bắt đầu từ (Tối):</label>
+                <input type="time" class="form-control form-control-sm" id="alertSettingQuietStart" value="22:00">
+              </div>
+              <div style="flex:1;">
+                <label style="font-size:11.5px; color:var(--text-muted); display:block; margin-bottom:4px;">Kết thúc lúc (Sáng):</label>
+                <input type="time" class="form-control form-control-sm" id="alertSettingQuietEnd" value="07:30">
+              </div>
+            </div>
+
+            <div style="margin-top:10px; display:flex; align-items:center; gap:8px;">
+              <input type="checkbox" id="alertSettingWeekendQuiet" style="width:16px; height:16px; accent-color:var(--primary); cursor:pointer;">
+              <label for="alertSettingWeekendQuiet" style="font-size:12px; cursor:pointer;">Áp dụng chế độ yên tĩnh cả ngày Thứ Bảy & Chủ Nhật</label>
+            </div>
+          </div>
+
+          <!-- Chống Spam Thông Báo Cho Admin -->
+          <div style="border:1px solid var(--border-color); border-radius:12px; padding:14px; margin-bottom:16px; background:var(--bg-main);">
+            <div style="display:flex; align-items:flex-start; gap:10px;">
+              <input type="checkbox" id="alertSettingNotifyAdminAll" style="width:18px; height:18px; accent-color:var(--primary); cursor:pointer; margin-top:3px;">
+              <div>
+                <strong style="font-size:13px;">Gửi thông báo trễ hạn của TẤT CẢ nhân viên cho Quản trị viên</strong>
+                <div style="font-size:11.5px; color:var(--text-secondary); margin-top:3px;">
+                  <em>Khuyến nghị tắt tùy chọn này:</em> Khi tắt, Admin chỉ nhận cảnh báo đối với các đầu việc có độ ưu tiên <strong>Khẩn Cấp (P1) hoặc Cao</strong>, giúp hòm thư thông báo của Admin luôn tinh gọn.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Âm thanh cảnh báo -->
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <input type="checkbox" id="alertSettingSoundEnabled" style="width:18px; height:18px; accent-color:var(--primary); cursor:pointer;">
+              <label for="alertSettingSoundEnabled" style="font-size:13px; font-weight:600; cursor:pointer;">🔔 Bật âm thanh chuông cảnh báo</label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; padding:14px 20px;">
+          <button type="button" class="btn btn-outline" onclick="App.closeAlertSettingsModal()">Hủy</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveAlertSettings" style="font-weight:700;">
+            💾 Lưu Cấu Hình Quy Tắc
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: TẠM HOÃN CẢNH BÁO (SNOOZE ALERT MODAL) -->
+  <div class="modal-overlay" id="snoozeAlertModal">
+    <div class="modal-content" style="max-width: 460px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="margin:0; font-size:16px;">💤 Tạm Hoãn Cảnh Báo Công Việc</h3>
+        <button type="button" class="modal-close-btn" onclick="App.closeSnoozeAlertModal()">×</button>
+      </div>
+      <form id="snoozeAlertForm" onsubmit="App.handleSnoozeAlertSubmit(event)">
+        <input type="hidden" id="snoozeTaskId">
+        <div class="modal-body" style="padding: 20px;">
+          <div style="margin-bottom:14px; background:var(--bg-main); padding:12px; border-radius:10px; border:1px solid var(--border-color);">
+            <div id="snoozeTaskBadge" class="badge-priority" style="display:inline-block; margin-bottom:4px;"></div>
+            <div id="snoozeTaskTitle" style="font-size:13.5px; font-weight:700; color:var(--text-primary);"></div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:16px;">
+            <label class="form-label" style="font-weight:700;">Thời gian tạm hoãn:</label>
+            <select class="form-control" id="snoozeDurationHours" required>
+              <option value="4">Hoãn 4 giờ (Đang xử lý gấp)</option>
+              <option value="12">Hoãn 12 giờ</option>
+              <option value="24" selected>Hoãn 24 giờ (Đến ngày mai)</option>
+              <option value="48">Hoãn 48 giờ (2 ngày tới)</option>
+              <option value="72">Hoãn 72 giờ (3 ngày)</option>
+              <option value="168">Hoãn 1 tuần (7 ngày)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Lý do tạm hoãn (tùy chọn):</label>
+            <input type="text" class="form-control" id="snoozeReason" placeholder="VD: Đang chờ đối tác duyệt, Sếp đã đồng ý dời lịch..." maxlength="120">
+            <small style="color:var(--text-muted); font-size:11px; margin-top:4px; display:block;">Trong thời gian tạm hoãn, hệ thống sẽ ngừng phát chuông và không gửi thông báo nhắc lại cho đầu việc này.</small>
+          </div>
+        </div>
+        <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; padding:14px 20px;">
+          <button type="button" class="btn btn-outline" onclick="App.closeSnoozeAlertModal()">Đóng</button>
+          <button type="submit" class="btn btn-primary" id="btnConfirmSnooze" style="font-weight:700; background:#d97706; border-color:#d97706;">
+            💤 Xác Nhận Tạm Hoãn
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 

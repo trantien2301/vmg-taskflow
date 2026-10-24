@@ -974,7 +974,7 @@ class Database {
     return this.data.notifications.filter(n => n.userId === userId || n.userId === 'all');
   }
 
-  addNotification(notification) {
+  addNotification(notification, skipSave = false) {
     const newNotif = {
       id: `ntf-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       userId: notification.userId,
@@ -986,12 +986,15 @@ class Database {
       read: false,
       createdAt: new Date().toISOString()
     };
+    if (!this.data.notifications) this.data.notifications = [];
     this.data.notifications.unshift(newNotif);
     // keep latest 200 notifications
     if (this.data.notifications.length > 200) {
       this.data.notifications.pop();
     }
-    this.save();
+    if (!skipSave) {
+      this.save();
+    }
     return newNotif;
   }
 
@@ -1064,6 +1067,53 @@ class Database {
     this.data.settings = { ...this.data.settings, ...newSettings };
     this.save();
     return this.data.settings;
+  }
+
+  // --- Alert Rules & Smart Anti-Fatigue Settings ---
+  getAlertSettings() {
+    if (!this.data.alertSettings) {
+      this.data.alertSettings = {
+        warningThresholdHours: 24,       // Báo trước 24h
+        repeatIntervalHours: 12,          // Nhắc lại mỗi 12h (hoặc 0 = chỉ 1 lần)
+        quietHoursEnabled: true,          // Khung giờ yên tĩnh
+        quietHoursStart: "22:00",
+        quietHoursEnd: "07:30",
+        weekendQuietEnabled: true,        // Chế độ cuối tuần T7 & CN
+        notifyAdminOnAllOverdue: false,   // false = chỉ báo Admin việc Khẩn cấp (High/Urgent) tránh spam admin
+        soundAlertEnabled: true           // Bật âm thanh cảnh báo
+      };
+      this.save();
+    }
+    return this.data.alertSettings;
+  }
+
+  updateAlertSettings(newSettings) {
+    this.data.alertSettings = { ...this.getAlertSettings(), ...newSettings };
+    this.save();
+    return this.data.alertSettings;
+  }
+
+  snoozeTaskAlert(taskId, hours = 24, reason = '', userId = null) {
+    const task = this.getTaskById(taskId);
+    if (!task) return null;
+    const now = new Date();
+    task.alertSnoozedUntil = new Date(now.getTime() + hours * 3600 * 1000).toISOString();
+    task.alertSnoozeReason = reason;
+    task.alertSnoozedBy = userId;
+    task.alertSnoozedAt = now.toISOString();
+    this.save();
+    return task;
+  }
+
+  unsnoozeTaskAlert(taskId) {
+    const task = this.getTaskById(taskId);
+    if (!task) return null;
+    delete task.alertSnoozedUntil;
+    delete task.alertSnoozeReason;
+    delete task.alertSnoozedBy;
+    delete task.alertSnoozedAt;
+    this.save();
+    return task;
   }
 
   // --- Google Calendar & Live ICS Feed Integration ---

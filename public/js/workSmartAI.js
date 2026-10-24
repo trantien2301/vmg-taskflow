@@ -75,16 +75,14 @@ const WorkSmartAI = {
     },
 
     alerts: {
-      title: 'Trung Tâm Cảnh Báo & Rủi Ro',
-      keywords: ['canh bao', 'tre han', 'qua han', 'alerts', 'rui ro', 'khan cap', 'overdue', 'chuông'],
+      title: 'Trung Tâm Cảnh Báo & Chống Làm Phiền (Anti-Fatigue)',
+      keywords: ['canh bao', 'tre han', 'qua han', 'alerts', 'rui ro', 'khan cap', 'overdue', 'chuông', 'snooze', 'hoan', 'tam hoan', 'lam phien', 'quy tac canh bao', 'quiet hours'],
       answer: `
-        <strong>🚨 Trung Tâm Cảnh Báo Hoạt Động Như Thế Nào:</strong><br>
-        • <strong>Tự động quét Realtime:</strong> Hệ thống liên tục kiểm tra thời hạn mọi công việc 24/7.<br>
-        • <strong>Phân cấp mức độ cảnh báo:</strong><br>
-          - 🔴 <em>Báo động Đỏ:</em> Đã quá hạn chót (Overdue).<br>
-          - 🟠 <em>Báo động Cam:</em> Sắp hết hạn trong vòng 4 giờ tới.<br>
-          - 🟡 <em>Báo động Vàng:</em> Đến hạn trong ngày hôm nay.<br>
-        • <strong>Âm thanh cảnh báo:</strong> Kèm chuông âm thanh trực quan và thông báo trên thanh Header.
+        <strong>🚨 Trung Tâm Cảnh Báo & Chế Độ Chống Làm Phiền (Anti-Alert Fatigue):</strong><br>
+        • <strong>Tự động quét Realtime:</strong> Hệ thống kiểm tra thời hạn mọi công việc liên tục.<br>
+        • <strong>💤 Tạm hoãn cảnh báo (Snooze 24h):</strong> Bạn có thể bấm nút <em>"Hoãn"</em> trên thẻ việc để tạm ngừng chuông và ngừng nhắc lại khi đang xử lý hoặc đã xin gia hạn.<br>
+        • <strong>Phân loại thông minh:</strong> Bộ lọc 5 nhóm: <em>Tất cả</em>, <em>🔴 Quá hạn</em>, <em>🟠 Sắp đến hạn</em>, <em>💤 Đang tạm hoãn</em>, và <em>👤 Việc của tôi</em>.<br>
+        • <strong>⚙️ Cấu hình quy tắc (Chỉ Admin):</strong> Quản trị viên có toàn quyền thiết lập ngưỡng giờ báo trước, tần suất nhắc lại, khung giờ yên tĩnh (Quiet Hours: 22h-07h30) và chống spam thông báo cho Admin.
       `,
       actions: [
         { label: '🚨 Xem Trung Tâm Cảnh Báo', callback: () => App.switchView('alerts') }

@@ -145,13 +145,42 @@ const lastAlertSentTime = new Map(); // taskId -> timestamp
 function scanDeadlinesAndGenerateAlerts() {
   const tasks = db.getTasks();
   const now = new Date();
-  const settings = db.getSettings();
-  const warningHours = settings.warningThresholdHours || 24;
+  const alertSettings = db.getAlertSettings ? db.getAlertSettings() : {};
+  const warningHours = alertSettings.warningThresholdHours || 24;
+  const repeatIntervalMs = alertSettings.repeatIntervalHours === 0
+    ? Infinity
+    : (alertSettings.repeatIntervalHours || 12) * 3600 * 1000;
+
+  // Check Quiet Hours (Khung giờ yên tĩnh)
+  let isQuietTime = false;
+  if (alertSettings.quietHoursEnabled) {
+    const dayOfWeek = now.getDay(); // 0: CN, 6: T7
+    if (alertSettings.weekendQuietEnabled && (dayOfWeek === 0 || dayOfWeek === 6)) {
+      isQuietTime = true;
+    } else {
+      const [sH, sM] = (alertSettings.quietHoursStart || '22:00').split(':').map(Number);
+      const [eH, eM] = (alertSettings.quietHoursEnd || '07:30').split(':').map(Number);
+      const currentMin = now.getHours() * 60 + now.getMinutes();
+      const startMin = sH * 60 + sM;
+      const endMin = eH * 60 + eM;
+      if (startMin > endMin) {
+        if (currentMin >= startMin || currentMin < endMin) isQuietTime = true;
+      } else {
+        if (currentMin >= startMin && currentMin < endMin) isQuietTime = true;
+      }
+    }
+  }
+
   let newAlertCount = 0;
 
   tasks.forEach(task => {
     if (task.status === 'completed') return;
     if (!task.dueDate) return;
+
+    // Nếu công việc đang được TẠM HOÃN CẢNH BÁO (Snoozed) thì bỏ qua
+    if (task.alertSnoozedUntil && new Date(task.alertSnoozedUntil) > now) {
+      return;
+    }
 
     const due = new Date(task.dueDate);
     const diffMs = due.getTime() - now.getTime();
@@ -163,8 +192,11 @@ function scanDeadlinesAndGenerateAlerts() {
     // 1. Quá hạn (Overdue)
     if (diffHours < 0) {
       const lastSent = lastAlertSentTime.get(alertKeyOverdue) || 0;
-      // Alert once every 6 hours if still overdue
-      if (now.getTime() - lastSent > 6 * 3600 * 1000) {
+      const canSend = (repeatIntervalMs === Infinity)
+        ? (lastSent === 0)
+        : (now.getTime() - lastSent > repeatIntervalMs);
+
+      if (canSend) {
         lastAlertSentTime.set(alertKeyOverdue, now.getTime());
         const overdueDays = Math.ceil(Math.abs(diffHours) / 24);
         const assignedUser = db.getUserById(task.assignedTo);
@@ -175,20 +207,25 @@ function scanDeadlinesAndGenerateAlerts() {
           level: 'danger',
           title: '🚨 CÔNG VIỆC ĐÃ QUÁ HẠN!',
           message: `Công việc "${task.title}" đã quá hạn ${overdueDays} ngày (Hạn: ${new Date(task.dueDate).toLocaleDateString('vi-VN')})! Vui lòng hoàn tất ngay.`,
-          taskId: task.id
-        });
+          taskId: task.id,
+          silent: isQuietTime
+        }, true);
 
-        // Also notify admins
-        db.getUsers().filter(u => u.role === 'admin' && u.id !== task.assignedTo).forEach(admin => {
-          db.addNotification({
-            userId: admin.id,
-            type: 'alert',
-            level: 'danger',
-            title: `🚨 Nhân viên trễ hạn: ${assignedUser?.name || 'Chưa gán'}`,
-            message: `Công việc "${task.title}" phụ trách bởi ${assignedUser?.name || 'N/A'} đã trễ hạn!`,
-            taskId: task.id
+        // Chỉ thông báo cho Admin nếu bật notifyAdminOnAllOverdue hoặc task là Khẩn cấp / Cao
+        const shouldNotifyAdmin = alertSettings.notifyAdminOnAllOverdue || (task.priority === 'urgent' || task.priority === 'high');
+        if (shouldNotifyAdmin) {
+          db.getUsers().filter(u => u.role === 'admin' && u.id !== task.assignedTo).forEach(admin => {
+            db.addNotification({
+              userId: admin.id,
+              type: 'alert',
+              level: 'danger',
+              title: `🚨 Nhân viên trễ hạn: ${assignedUser?.name || 'Chưa gán'}`,
+              message: `Công việc "${task.title}" phụ trách bởi ${assignedUser?.name || 'N/A'} đã trễ hạn!`,
+              taskId: task.id,
+              silent: isQuietTime
+            }, true);
           });
-        });
+        }
 
         broadcast('alert:new', notif);
         newAlertCount++;
@@ -200,7 +237,11 @@ function scanDeadlinesAndGenerateAlerts() {
     // 2. Sắp đến hạn (Due soon, e.g. within warningHours)
     else if (diffHours <= warningHours && diffHours >= 0) {
       const lastSent = lastAlertSentTime.get(alertKeyWarning) || 0;
-      if (now.getTime() - lastSent > 6 * 3600 * 1000) {
+      const canSend = (repeatIntervalMs === Infinity)
+        ? (lastSent === 0)
+        : (now.getTime() - lastSent > repeatIntervalMs);
+
+      if (canSend) {
         lastAlertSentTime.set(alertKeyWarning, now.getTime());
         const hoursLeft = Math.round(diffHours);
 
@@ -210,14 +251,19 @@ function scanDeadlinesAndGenerateAlerts() {
           level: 'warning',
           title: '⏰ CẢNH BÁO SẮP ĐẾN HẠN',
           message: `Công việc "${task.title}" chỉ còn ${hoursLeft} giờ nữa là đến hạn chót!`,
-          taskId: task.id
-        });
+          taskId: task.id,
+          silent: isQuietTime
+        }, true);
 
         broadcast('alert:new', notif);
         newAlertCount++;
       }
     }
   });
+
+  if (newAlertCount > 0) {
+    db.save();
+  }
 
   return newAlertCount;
 }
@@ -2621,6 +2667,128 @@ app.post('/api/feedbacks', (req, res) => {
   });
 });
 
+// -------------------------------------------------------------
+// ALERT RULES & ANTI-FATIGUE CONFIGURATION (ADMIN ONLY)
+// -------------------------------------------------------------
+app.get('/api/settings/alerts', authenticate, (req, res) => {
+  res.json({
+    settings: db.getAlertSettings(),
+    isAdmin: req.user.role === 'admin'
+  });
+});
+
+app.put('/api/settings/alerts', authenticate, (req, res) => {
+  // STRICT ADMIN PERMISSION GUARD
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({
+      error: 'Bảo mật: Chỉ Quản Trị Viên (Admin) mới có quyền chỉnh sửa cấu hình quy tắc cảnh báo!'
+    });
+  }
+
+  const {
+    warningThresholdHours,
+    repeatIntervalHours,
+    quietHoursEnabled,
+    quietHoursStart,
+    quietHoursEnd,
+    weekendQuietEnabled,
+    notifyAdminOnAllOverdue,
+    soundAlertEnabled
+  } = req.body;
+
+  const current = db.getAlertSettings();
+  const updated = db.updateAlertSettings({
+    warningThresholdHours: warningThresholdHours !== undefined ? Number(warningThresholdHours) : current.warningThresholdHours,
+    repeatIntervalHours: repeatIntervalHours !== undefined ? Number(repeatIntervalHours) : current.repeatIntervalHours,
+    quietHoursEnabled: quietHoursEnabled !== undefined ? Boolean(quietHoursEnabled) : current.quietHoursEnabled,
+    quietHoursStart: quietHoursStart || current.quietHoursStart,
+    quietHoursEnd: quietHoursEnd || current.quietHoursEnd,
+    weekendQuietEnabled: weekendQuietEnabled !== undefined ? Boolean(weekendQuietEnabled) : current.weekendQuietEnabled,
+    notifyAdminOnAllOverdue: notifyAdminOnAllOverdue !== undefined ? Boolean(notifyAdminOnAllOverdue) : current.notifyAdminOnAllOverdue,
+    soundAlertEnabled: soundAlertEnabled !== undefined ? Boolean(soundAlertEnabled) : current.soundAlertEnabled
+  });
+
+  db.logActivity({
+    userId: req.user.id,
+    userName: req.user.name,
+    userRole: req.user.role,
+    userAvatar: req.user.avatar || '⚙️',
+    action: 'update_alert_rules',
+    category: 'system',
+    details: `Admin cập nhật quy tắc cảnh báo: Ngưỡng sắp trễ ${updated.warningThresholdHours}h, Nhắc lại mỗi ${updated.repeatIntervalHours}h, Giờ yên tĩnh: ${updated.quietHoursEnabled ? updated.quietHoursStart + '-' + updated.quietHoursEnd : 'Tắt'}`
+  });
+
+  broadcast('settings:alerts:updated', { settings: updated });
+
+  res.json({
+    success: true,
+    message: 'Đã lưu cấu hình quy tắc cảnh báo thành công!',
+    settings: updated
+  });
+});
+
+// -------------------------------------------------------------
+// SNOOZE / TEMPORARY PAUSE ALERT ON TASK (Anti-Fatigue)
+// -------------------------------------------------------------
+app.post('/api/tasks/:id/snooze-alert', authenticate, (req, res) => {
+  const task = db.getTaskById(req.params.id);
+  if (!task) {
+    return res.status(404).json({ error: 'Không tìm thấy công việc' });
+  }
+
+  const isOwner = task.assignedTo === req.user.id;
+  const isPrivileged = req.user.role === 'admin' || req.user.role === 'manager';
+  if (!isOwner && !isPrivileged) {
+    return res.status(403).json({
+      error: 'Bạn chỉ có quyền tạm hoãn cảnh báo cho các công việc được phân công cho mình!'
+    });
+  }
+
+  const hours = Number(req.body.hours) || 24;
+  const reason = (req.body.reason || 'Đang xử lý / Đã xin gia hạn').trim();
+  const updatedTask = db.snoozeTaskAlert(req.params.id, hours, reason, req.user.id);
+
+  db.logActivity({
+    userId: req.user.id,
+    userName: req.user.name,
+    userRole: req.user.role,
+    userAvatar: req.user.avatar || '💤',
+    action: 'snooze_alert',
+    category: 'task',
+    details: `Tạm hoãn cảnh báo #${task.id} (${task.title}) trong ${hours}h. Lý do: "${reason}"`
+  });
+
+  broadcast('task:alert:snoozed', { task: updatedTask, user: req.user, hours, reason });
+
+  res.json({
+    success: true,
+    message: `Đã tạm hoãn cảnh báo cho công việc #${task.id} trong ${hours} giờ`,
+    task: updatedTask
+  });
+});
+
+app.post('/api/tasks/:id/unsnooze-alert', authenticate, (req, res) => {
+  const task = db.getTaskById(req.params.id);
+  if (!task) {
+    return res.status(404).json({ error: 'Không tìm thấy công việc' });
+  }
+
+  const isOwner = task.assignedTo === req.user.id;
+  const isPrivileged = req.user.role === 'admin' || req.user.role === 'manager';
+  if (!isOwner && !isPrivileged) {
+    return res.status(403).json({ error: 'Không có quyền thao tác' });
+  }
+
+  const updatedTask = db.unsnoozeTaskAlert(req.params.id);
+  broadcast('task:alert:unsnoozed', { task: updatedTask, user: req.user });
+
+  res.json({
+    success: true,
+    message: `Đã khôi phục cảnh báo thời hạn cho công việc #${task.id}`,
+    task: updatedTask
+  });
+});
+
 // SPA catch-all
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -2629,7 +2797,7 @@ app.use((req, res) => {
 // -------------------------------------------------------------
 // START SERVER
 // -------------------------------------------------------------
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`=======================================================`);
   console.log(`🚀 TaskFlow Pro Webapp đang chạy tại: http://localhost:${PORT}`);
   console.log(`📡 WebSocket Realtime Server sẵn sàng phục vụ!`);

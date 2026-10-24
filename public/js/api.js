@@ -431,5 +431,30 @@ const API = {
       method: 'POST',
       body: JSON.stringify(data)
     });
+  },
+
+  // Alert Rules & Anti-Fatigue Settings
+  async getAlertSettings() {
+    return this.request('/api/settings/alerts');
+  },
+
+  async updateAlertSettings(settings) {
+    return this.request('/api/settings/alerts', {
+      method: 'PUT',
+      body: JSON.stringify(settings)
+    });
+  },
+
+  async snoozeTaskAlert(taskId, hours = 24, reason = '') {
+    return this.request(`/api/tasks/${encodeURIComponent(taskId)}/snooze-alert`, {
+      method: 'POST',
+      body: JSON.stringify({ hours, reason })
+    });
+  },
+
+  async unsnoozeTaskAlert(taskId) {
+    return this.request(`/api/tasks/${encodeURIComponent(taskId)}/unsnooze-alert`, {
+      method: 'POST'
+    });
   }
 };

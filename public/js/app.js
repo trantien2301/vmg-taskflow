@@ -29,6 +29,8 @@ const App = {
       assignedTo: 'all',
       search: ''
     },
+    alertsFilter: 'all',
+    alertSettings: null,
     executiveDeskData: null,
     executiveRiskFilter: 'all',
     executiveSubTab: 'personnel',
@@ -480,8 +482,48 @@ const App = {
       case 'alert:new':
         this.state.notifications.unshift(data);
         this.updateNotificationBadge();
-        this.showToast(`${data.title}: ${data.message}`, data.level || 'danger');
-        this.playSound('alert');
+        if (!data.silent) {
+          this.showToast(`${data.title}: ${data.message}`, data.level || 'danger');
+          const soundOn = !this.state.alertSettings || this.state.alertSettings.soundAlertEnabled !== false;
+          if (soundOn) this.playSound('alert');
+        }
+        if (this.state.activeView === 'alerts') {
+          this.renderAlertsView();
+        }
+        break;
+
+      case 'settings:alerts:updated':
+        this.state.alertSettings = data.settings;
+        if (this.state.user && this.state.user.role === 'admin') {
+          this.showToast('⚙️ Cấu hình quy tắc cảnh báo đã được cập nhật', 'info');
+        }
+        if (this.state.activeView === 'alerts') {
+          this.renderAlertsView();
+        }
+        break;
+
+      case 'task:alert:snoozed':
+        if (data && data.task) {
+          const idx = this.state.tasks.findIndex(t => t.id === data.task.id);
+          if (idx !== -1) {
+            this.state.tasks[idx] = data.task;
+          }
+          if (data.user && data.user.id !== this.state.user?.id) {
+            this.showToast(`💤 ${data.user.name} đã tạm hoãn cảnh báo #${data.task.id}`, 'info');
+          }
+        }
+        if (this.state.activeView === 'alerts') {
+          this.renderAlertsView();
+        }
+        break;
+
+      case 'task:alert:unsnoozed':
+        if (data && data.task) {
+          const idx = this.state.tasks.findIndex(t => t.id === data.task.id);
+          if (idx !== -1) {
+            this.state.tasks[idx] = data.task;
+          }
+        }
         if (this.state.activeView === 'alerts') {
           this.renderAlertsView();
         }
@@ -2796,41 +2838,146 @@ const App = {
   // -------------------------------------------------------------
   // ALERTS CENTER VIEW (ROLE-SCOPED)
   // -------------------------------------------------------------
-  renderAlertsView() {
+  // -------------------------------------------------------------
+  // ALERTS CENTER VIEW (ANTI-FATIGUE & ADMIN CONTROL)
+  // -------------------------------------------------------------
+  setAlertsFilter(filter) {
+    this.state.alertsFilter = filter;
+    this.renderAlertsView();
+  },
+
+  async renderAlertsView() {
     const tasks = this.getRoleScopedTasks();
     const now = new Date();
+    const currentUser = this.state.user;
+    const isAdmin = currentUser && currentUser.role === 'admin';
 
-    const overdueTasks = tasks.filter(t => t.status !== 'completed' && t.dueDate && new Date(t.dueDate) < now);
-    const dueSoonTasks = tasks.filter(t => {
-      if (t.status === 'completed' || !t.dueDate) return false;
-      const due = new Date(t.dueDate);
-      const hoursLeft = (due.getTime() - now.getTime()) / (1000 * 3600);
-      return hoursLeft >= 0 && hoursLeft <= 24;
+    // 1. Show / Hide Admin Settings Button
+    const btnAdmin = document.getElementById('btnAdminAlertSettings');
+    if (btnAdmin) {
+      btnAdmin.style.display = isAdmin ? 'inline-flex' : 'none';
+    }
+
+    // 2. Fetch alert settings if not yet loaded
+    if (!this.state.alertSettings) {
+      try {
+        const res = await API.getAlertSettings();
+        if (res && res.settings) {
+          this.state.alertSettings = res.settings;
+        }
+      } catch (_) {}
+    }
+
+    const alertSettings = this.state.alertSettings || {};
+    const warningHours = alertSettings.warningThresholdHours || 24;
+
+    const dueSoonTitleEl = document.getElementById('alertsDueSoonTitle');
+    if (dueSoonTitleEl) {
+      dueSoonTitleEl.innerText = `Công Việc Sắp Đến Hạn (Trong Vòng ${warningHours} Giờ Tới)`;
+    }
+
+    // 3. Partition tasks into Overdue, Due Soon, and Snoozed
+    const activeTasks = tasks.filter(t => t.status !== 'completed');
+
+    const snoozedTasks = activeTasks.filter(t => {
+      return t.alertSnoozedUntil && new Date(t.alertSnoozedUntil) > now;
     });
 
+    const overdueTasks = activeTasks.filter(t => {
+      const isSnoozed = t.alertSnoozedUntil && new Date(t.alertSnoozedUntil) > now;
+      return !isSnoozed && t.dueDate && new Date(t.dueDate) < now;
+    });
+
+    const dueSoonTasks = activeTasks.filter(t => {
+      const isSnoozed = t.alertSnoozedUntil && new Date(t.alertSnoozedUntil) > now;
+      if (isSnoozed || !t.dueDate) return false;
+      const due = new Date(t.dueDate);
+      const hoursLeft = (due.getTime() - now.getTime()) / (1000 * 3600);
+      return hoursLeft >= 0 && hoursLeft <= warningHours;
+    });
+
+    const myTasksCount = [...overdueTasks, ...dueSoonTasks, ...snoozedTasks].filter(t => currentUser && t.assignedTo === currentUser.id).length;
+
+    // 4. Update Header Badge & Pill Counts
     const bannerCountEl = document.getElementById('alertTotalCount');
     if (bannerCountEl) bannerCountEl.innerText = overdueTasks.length + dueSoonTasks.length;
 
+    const pillAll = document.getElementById('pillCountAll');
+    if (pillAll) pillAll.innerText = overdueTasks.length + dueSoonTasks.length + snoozedTasks.length;
+
+    const pillOverdue = document.getElementById('pillCountOverdue');
+    if (pillOverdue) pillOverdue.innerText = overdueTasks.length;
+
+    const pillDueSoon = document.getElementById('pillCountDueSoon');
+    if (pillDueSoon) pillDueSoon.innerText = dueSoonTasks.length;
+
+    const pillSnoozed = document.getElementById('pillCountSnoozed');
+    if (pillSnoozed) pillSnoozed.innerText = snoozedTasks.length;
+
+    const pillMy = document.getElementById('pillCountMy');
+    if (pillMy) pillMy.innerText = myTasksCount;
+
+    // Update active class on filter pills
+    const activeFilter = this.state.alertsFilter || 'all';
+    document.querySelectorAll('.alert-filter-pill').forEach(pill => {
+      if (pill.getAttribute('data-filter') === activeFilter) {
+        pill.classList.add('active');
+      } else {
+        pill.classList.remove('active');
+      }
+    });
+
+    // 5. Apply Active Filter to Task Lists
+    let displayOverdue = overdueTasks;
+    let displayDueSoon = dueSoonTasks;
+    let displaySnoozed = snoozedTasks;
+
+    if (activeFilter === 'my') {
+      displayOverdue = overdueTasks.filter(t => currentUser && t.assignedTo === currentUser.id);
+      displayDueSoon = dueSoonTasks.filter(t => currentUser && t.assignedTo === currentUser.id);
+      displaySnoozed = snoozedTasks.filter(t => currentUser && t.assignedTo === currentUser.id);
+    }
+
+    const overdueSection = document.getElementById('alertsOverdueSection');
+    const dueSoonSection = document.getElementById('alertsDueSoonSection');
+    const snoozedSection = document.getElementById('alertsSnoozedSection');
+
+    if (overdueSection) {
+      overdueSection.style.display = (activeFilter === 'duesoon' || activeFilter === 'snoozed') ? 'none' : 'block';
+    }
+    if (dueSoonSection) {
+      dueSoonSection.style.display = (activeFilter === 'overdue' || activeFilter === 'snoozed') ? 'none' : 'block';
+    }
+    if (snoozedSection) {
+      snoozedSection.style.display = (activeFilter === 'snoozed' || (activeFilter === 'all' && displaySnoozed.length > 0)) ? 'block' : 'none';
+    }
+
+    // 6. Render Overdue Container
     const overdueContainer = document.getElementById('alertsOverdueGrid');
     if (overdueContainer) {
-      if (overdueTasks.length === 0) {
-        overdueContainer.innerHTML = '<div style="color:var(--text-muted); font-size:13px;">🎉 Tuyệt vời! Không có công việc nào bị quá hạn.</div>';
+      if (displayOverdue.length === 0) {
+        overdueContainer.innerHTML = '<div style="color:var(--text-muted); font-size:13px; padding:12px 0;">🎉 Tuyệt vời! Không có công việc nào bị quá hạn.</div>';
       } else {
-        overdueContainer.innerHTML = overdueTasks.map(t => {
+        overdueContainer.innerHTML = displayOverdue.map(t => {
           const assignee = this.state.users.find(u => u.id === t.assignedTo);
           const daysOver = Math.ceil(Math.abs((new Date(t.dueDate).getTime() - now.getTime()) / (1000 * 3600 * 24)));
           return `
             <div class="alert-card-item">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <span class="badge-priority ${t.priority}">#${t.id} - ${t.priority.toUpperCase()}</span>
+                <span class="badge-priority ${t.priority}">#${t.id} - ${(t.priority || 'medium').toUpperCase()}</span>
                 <span style="color:var(--danger); font-size:12px; font-weight:700;">Trễ ${daysOver} ngày</span>
               </div>
               <div style="font-size:14px; font-weight:700; margin-bottom:6px;">${this.escapeHtml(t.title)}</div>
               <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">
                 Phụ trách: <strong>${assignee ? assignee.name : 'N/A'}</strong> (${t.department})
               </div>
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <button class="btn btn-outline btn-sm" onclick="App.openTaskDetail('${t.id}')">Xem chi tiết</button>
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; flex-wrap:wrap;">
+                <div style="display:flex; gap:6px;">
+                  <button class="btn btn-outline btn-sm" onclick="App.openTaskDetail('${t.id}')">Xem chi tiết</button>
+                  <button class="btn btn-outline btn-sm" onclick="App.openSnoozeModal('${t.id}')" title="Tạm hoãn cảnh báo cho công việc này để tránh chuông báo làm phiền" style="color:#d97706; border-color:rgba(217,119,6,0.35);">
+                    💤 Hoãn
+                  </button>
+                </div>
                 <button class="btn btn-primary btn-sm" onclick="App.quickCompleteTask('${t.id}')">Đánh dấu xong</button>
               </div>
             </div>
@@ -2839,32 +2986,227 @@ const App = {
       }
     }
 
+    // 7. Render Due Soon Container
     const dueSoonContainer = document.getElementById('alertsDueSoonGrid');
     if (dueSoonContainer) {
-      if (dueSoonTasks.length === 0) {
-        dueSoonContainer.innerHTML = '<div style="color:var(--text-muted); font-size:13px;">Không có công việc nào sắp hết hạn trong 24 giờ tới.</div>';
+      if (displayDueSoon.length === 0) {
+        dueSoonContainer.innerHTML = '<div style="color:var(--text-muted); font-size:13px; padding:12px 0;">Không có công việc nào sắp hết hạn trong thời gian này.</div>';
       } else {
-        dueSoonContainer.innerHTML = dueSoonTasks.map(t => {
+        dueSoonContainer.innerHTML = displayDueSoon.map(t => {
           const assignee = this.state.users.find(u => u.id === t.assignedTo);
           const hoursLeft = Math.round((new Date(t.dueDate).getTime() - now.getTime()) / (1000 * 3600));
           return `
             <div class="alert-card-item warning">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <span class="badge-priority ${t.priority}">#${t.id}</span>
+                <span class="badge-priority ${t.priority}">#${t.id} - ${(t.priority || 'medium').toUpperCase()}</span>
                 <span style="color:#d97706; font-size:12px; font-weight:700;">Còn ${hoursLeft} giờ</span>
               </div>
               <div style="font-size:14px; font-weight:700; margin-bottom:6px;">${this.escapeHtml(t.title)}</div>
               <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">
-                Phụ trách: <strong>${assignee ? assignee.name : 'N/A'}</strong>
+                Phụ trách: <strong>${assignee ? assignee.name : 'N/A'}</strong> (${t.department})
               </div>
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <button class="btn btn-outline btn-sm" onclick="App.openTaskDetail('${t.id}')">Xem chi tiết</button>
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; flex-wrap:wrap;">
+                <div style="display:flex; gap:6px;">
+                  <button class="btn btn-outline btn-sm" onclick="App.openTaskDetail('${t.id}')">Xem chi tiết</button>
+                  <button class="btn btn-outline btn-sm" onclick="App.openSnoozeModal('${t.id}')" title="Tạm hoãn cảnh báo cho công việc này" style="color:#d97706; border-color:rgba(217,119,6,0.35);">
+                    💤 Hoãn
+                  </button>
+                </div>
                 <button class="btn btn-success btn-sm" onclick="App.quickCompleteTask('${t.id}')">Hoàn tất ngay</button>
               </div>
             </div>
           `;
         }).join('');
       }
+    }
+
+    // 8. Render Snoozed Container
+    const snoozedContainer = document.getElementById('alertsSnoozedGrid');
+    if (snoozedContainer) {
+      if (displaySnoozed.length === 0) {
+        snoozedContainer.innerHTML = '<div style="color:var(--text-muted); font-size:13px; padding:12px 0;">Không có công việc nào đang tạm hoãn cảnh báo.</div>';
+      } else {
+        snoozedContainer.innerHTML = displaySnoozed.map(t => {
+          const assignee = this.state.users.find(u => u.id === t.assignedTo);
+          const snoozedDate = new Date(t.alertSnoozedUntil);
+          const hoursRem = Math.round((snoozedDate.getTime() - now.getTime()) / (1000 * 3600));
+          return `
+            <div class="alert-card-item snoozed">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span class="badge-priority ${t.priority}">#${t.id} - ${(t.priority || 'medium').toUpperCase()}</span>
+                <span style="color:#8b5cf6; font-size:12px; font-weight:700;">💤 Hoãn còn ${hoursRem}h</span>
+              </div>
+              <div style="font-size:14px; font-weight:700; margin-bottom:6px;">${this.escapeHtml(t.title)}</div>
+              <div style="font-size:12px; color:var(--text-secondary); margin-bottom:6px;">
+                Phụ trách: <strong>${assignee ? assignee.name : 'N/A'}</strong> (${t.department})
+              </div>
+              <div style="font-size:11.5px; background:rgba(139,92,246,0.08); border-radius:6px; padding:5px 8px; color:#7c3aed; margin-bottom:12px;">
+                📌 <em>Lý do hoãn:</em> ${this.escapeHtml(t.alertSnoozeReason || 'Đang xử lý / Đã xin gia hạn')}
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+                <button class="btn btn-outline btn-sm" onclick="App.openTaskDetail('${t.id}')">Xem chi tiết</button>
+                <div style="display:flex; gap:6px;">
+                  <button class="btn btn-outline btn-sm" onclick="App.unsnoozeTask('${t.id}')" title="Hủy tạm hoãn và khôi phục cảnh báo ngay">
+                    ▶️ Khôi phục báo
+                  </button>
+                  <button class="btn btn-primary btn-sm" onclick="App.quickCompleteTask('${t.id}')">Đã xong</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+  },
+
+  // -------------------------------------------------------------
+  // ADMIN ALERT RULES SETTINGS MODAL
+  // -------------------------------------------------------------
+  async openAlertSettingsModal() {
+    const user = this.state.user;
+    if (!user || user.role !== 'admin') {
+      this.showToast('Bảo mật: Chỉ Quản Trị Viên (Admin) mới có quyền truy cập cấu hình quy tắc!', 'danger');
+      return;
+    }
+
+    try {
+      const res = await API.getAlertSettings();
+      const s = res.settings || {};
+      this.state.alertSettings = s;
+
+      const selWarning = document.getElementById('alertSettingWarningHours');
+      if (selWarning) selWarning.value = s.warningThresholdHours !== undefined ? s.warningThresholdHours : 24;
+
+      const selRepeat = document.getElementById('alertSettingRepeatInterval');
+      if (selRepeat) selRepeat.value = s.repeatIntervalHours !== undefined ? s.repeatIntervalHours : 12;
+
+      const chkQuiet = document.getElementById('alertSettingQuietEnabled');
+      if (chkQuiet) chkQuiet.checked = s.quietHoursEnabled !== false;
+
+      const inpStart = document.getElementById('alertSettingQuietStart');
+      if (inpStart) inpStart.value = s.quietHoursStart || '22:00';
+
+      const inpEnd = document.getElementById('alertSettingQuietEnd');
+      if (inpEnd) inpEnd.value = s.quietHoursEnd || '07:30';
+
+      const chkWeekend = document.getElementById('alertSettingWeekendQuiet');
+      if (chkWeekend) chkWeekend.checked = s.weekendQuietEnabled !== false;
+
+      const chkAdminAll = document.getElementById('alertSettingNotifyAdminAll');
+      if (chkAdminAll) chkAdminAll.checked = !!s.notifyAdminOnAllOverdue;
+
+      const chkSound = document.getElementById('alertSettingSoundEnabled');
+      if (chkSound) chkSound.checked = s.soundAlertEnabled !== false;
+
+      const modal = document.getElementById('alertSettingsModal');
+      if (modal) modal.classList.add('show');
+    } catch (err) {
+      this.showToast(`Lỗi tải cấu hình: ${err.message}`, 'danger');
+    }
+  },
+
+  closeAlertSettingsModal() {
+    const modal = document.getElementById('alertSettingsModal');
+    if (modal) modal.classList.remove('show');
+  },
+
+  async handleAlertSettingsSubmit(event) {
+    if (event) event.preventDefault();
+    const user = this.state.user;
+    if (!user || user.role !== 'admin') {
+      this.showToast('Chỉ Quản Trị Viên (Admin) mới có quyền lưu cấu hình!', 'danger');
+      return;
+    }
+
+    const payload = {
+      warningThresholdHours: Number(document.getElementById('alertSettingWarningHours')?.value || 24),
+      repeatIntervalHours: Number(document.getElementById('alertSettingRepeatInterval')?.value || 12),
+      quietHoursEnabled: !!document.getElementById('alertSettingQuietEnabled')?.checked,
+      quietHoursStart: document.getElementById('alertSettingQuietStart')?.value || '22:00',
+      quietHoursEnd: document.getElementById('alertSettingQuietEnd')?.value || '07:30',
+      weekendQuietEnabled: !!document.getElementById('alertSettingWeekendQuiet')?.checked,
+      notifyAdminOnAllOverdue: !!document.getElementById('alertSettingNotifyAdminAll')?.checked,
+      soundAlertEnabled: !!document.getElementById('alertSettingSoundEnabled')?.checked
+    };
+
+    try {
+      const res = await API.updateAlertSettings(payload);
+      this.state.alertSettings = res.settings;
+      this.showToast('✅ Đã lưu cấu hình quy tắc cảnh báo thành công!', 'success');
+      this.closeAlertSettingsModal();
+      this.renderAlertsView();
+    } catch (err) {
+      this.showToast(`Lỗi lưu cấu hình: ${err.message}`, 'danger');
+    }
+  },
+
+  // -------------------------------------------------------------
+  // SNOOZE / TEMPORARY PAUSE ALERT MODAL
+  // -------------------------------------------------------------
+  openSnoozeModal(taskId) {
+    const task = this.state.tasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    const inpId = document.getElementById('snoozeTaskId');
+    if (inpId) inpId.value = task.id;
+
+    const titleEl = document.getElementById('snoozeTaskTitle');
+    if (titleEl) titleEl.innerText = task.title;
+
+    const badgeEl = document.getElementById('snoozeTaskBadge');
+    if (badgeEl) {
+      badgeEl.className = `badge-priority ${task.priority}`;
+      badgeEl.innerText = `#${task.id} - ${(task.priority || 'medium').toUpperCase()}`;
+    }
+
+    const selDuration = document.getElementById('snoozeDurationHours');
+    if (selDuration) selDuration.value = '24';
+
+    const inpReason = document.getElementById('snoozeReason');
+    if (inpReason) inpReason.value = '';
+
+    const modal = document.getElementById('snoozeAlertModal');
+    if (modal) modal.classList.add('show');
+  },
+
+  closeSnoozeAlertModal() {
+    const modal = document.getElementById('snoozeAlertModal');
+    if (modal) modal.classList.remove('show');
+  },
+
+  async handleSnoozeAlertSubmit(event) {
+    if (event) event.preventDefault();
+    const taskId = document.getElementById('snoozeTaskId')?.value;
+    const hours = Number(document.getElementById('snoozeDurationHours')?.value || 24);
+    const reason = document.getElementById('snoozeReason')?.value || '';
+
+    if (!taskId) return;
+
+    try {
+      const res = await API.snoozeTaskAlert(taskId, hours, reason);
+      const idx = this.state.tasks.findIndex(t => t.id === taskId);
+      if (idx !== -1 && res.task) {
+        this.state.tasks[idx] = res.task;
+      }
+      this.showToast(`💤 Đã tạm hoãn cảnh báo cho việc #${taskId} trong ${hours}h!`, 'success');
+      this.closeSnoozeAlertModal();
+      this.renderAlertsView();
+    } catch (err) {
+      this.showToast(`Lỗi: ${err.message}`, 'danger');
+    }
+  },
+
+  async unsnoozeTask(taskId) {
+    try {
+      const res = await API.unsnoozeTaskAlert(taskId);
+      const idx = this.state.tasks.findIndex(t => t.id === taskId);
+      if (idx !== -1 && res.task) {
+        this.state.tasks[idx] = res.task;
+      }
+      this.showToast(`▶️ Đã khôi phục cảnh báo cho việc #${taskId}`, 'info');
+      this.renderAlertsView();
+    } catch (err) {
+      this.showToast(`Lỗi: ${err.message}`, 'danger');
     }
   },
 
