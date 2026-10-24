@@ -19864,6 +19864,19 @@
   ],
   "activities": [
     {
+      "id": "act-1792811083693-s91f2",
+      "userId": "usr-1",
+      "userName": "Trần Tiến",
+      "userRole": "admin",
+      "userAvatar": "/uploads/avatars/avatar-usr-1-1792747940607.png?t=1792747940608",
+      "action": "auth_login",
+      "category": "auth",
+      "details": "Quản trị viên (Admin) đã đăng nhập vào hệ thống (admin@company.com)",
+      "taskId": null,
+      "taskTitle": null,
+      "timestamp": "2026-10-24T03:04:43.693Z"
+    },
+    {
       "id": "act-1792809149829-syv7v",
       "userId": "bot-auto",
       "userName": "🤖 Gắn nhãn cảnh báo việc Trễ hạn",
@@ -26349,19 +26362,6 @@
       "taskId": null,
       "taskTitle": null,
       "timestamp": "2026-10-22T11:59:20.784Z"
-    },
-    {
-      "id": "act-1792670360761-7qvti",
-      "userId": "bot-auto",
-      "userName": "⚡ Bot Tự Động",
-      "userRole": "admin",
-      "userAvatar": "👑",
-      "action": "update_task",
-      "category": "task",
-      "details": "Đã cập nhật công việc: \"Kế hoạch vận hành PVT\"",
-      "taskId": "TSK-680",
-      "taskTitle": "Kế hoạch vận hành PVT",
-      "timestamp": "2026-10-22T11:59:20.761Z"
     }
   ],
   "settings": {
