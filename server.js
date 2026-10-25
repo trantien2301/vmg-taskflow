@@ -2298,9 +2298,21 @@ app.delete('/api/users/:id', authenticate, requireAdmin, (req, res) => {
 // -------------------------------------------------------------
 // SYSTEM / ACTIVITY / VERSION ROUTES
 // -------------------------------------------------------------
-const APP_VERSION = '3.4.0';
-const APP_BUILD_DATE = '25/10/2026';
+const APP_VERSION = '3.5.0';
+const APP_BUILD_DATE = '26/10/2026';
 const APP_CHANGELOG = [
+  {
+    version: 'v3.5.0',
+    date: '26/10/2026',
+    title: 'Tối Ưu Bản Tin VMG Realtime Trên Điện Thoại Di Động (Mobile News Ticker Polish)',
+    highlights: [
+      'Hiển thị huy hiệu nhận diện "TIN VMG" sắc nét trên di động, đảm bảo nhận diện thương hiệu rõ ràng ngay đầu thanh tin tức',
+      'Khắc phục triệt để lỗi đứng hình (sticky hover pause) trên màn hình cảm ứng điện thoại, cho phép chạm vuốt mượt mà mà không làm gián đoạn dòng chữ chạy',
+      'Loại bỏ lỗi mất nét / trong suốt do bộ giải mã GPU WebKit trên thiết bị di động, bổ sung đầy đủ vendor prefix -webkit-animation',
+      'Bố trí thanh điều hướng siêu gọn gàng: Nút quản trị ✏️ dành cho Admin, nút tạm dừng ⏸/▶ và nút đóng ✕ cân đối với thanh cuộn',
+      'Cập nhật Cache Busters v3.5.0 tự động đồng bộ mã nguồn và style mới nhất tới toàn bộ trình duyệt điện thoại di động'
+    ]
+  },
   {
     version: 'v3.4.0',
     date: '25/10/2026',

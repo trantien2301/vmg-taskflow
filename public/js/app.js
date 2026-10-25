@@ -242,7 +242,7 @@ const App = {
     }
   ],
 
-  renderNewsTicker() {
+  renderNewsTicker(forceShow = false) {
     const trackEl = document.getElementById('tickerTrack');
     const tickerBar = document.getElementById('newsTickerBar');
     if (!trackEl || !tickerBar) return;
@@ -250,8 +250,12 @@ const App = {
     // Show/hide admin button
     const adminBtn = document.getElementById('btnAdminManageNews');
     if (adminBtn) {
-      const isAdmin = this.state.user && this.state.user.role === 'admin';
+      const isAdmin = this.state.user && (this.state.user.role === 'admin' || this.state.user.permissions?.canManageUsers);
       adminBtn.style.display = isAdmin ? 'inline-flex' : 'none';
+    }
+
+    if (forceShow) {
+      sessionStorage.removeItem('taskflow_ticker_dismissed');
     }
 
     if (sessionStorage.getItem('taskflow_ticker_dismissed') === 'true') {
@@ -294,7 +298,7 @@ const App = {
     if (tickerBar) {
       tickerBar.style.display = 'none';
       sessionStorage.setItem('taskflow_ticker_dismissed', 'true');
-      this.showToast('Đã đóng thanh tin tức cho phiên làm việc này.', 'info');
+      this.showToast('Đã đóng thanh tin tức. Vào Hướng Dẫn hoặc tải lại trang để mở lại.', 'info');
     }
   },
 

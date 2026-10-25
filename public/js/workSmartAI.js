@@ -174,18 +174,20 @@ const WorkSmartAI = {
     },
 
     newsTicker: {
-      title: 'Bản Tin Chạy Chữ Nội Bộ & Quản Trị Realtime (News Ticker Marquee)',
-      keywords: ['tin noi bo', 'bang tin', 'chay chu', 'marquee', 'tin tuc', 'ticker', 'thong bao chay', 'trai sang phai', 'quan ly tin', 'dang tin'],
+      title: 'Bản Tin Chạy Chữ Nội Bộ VMG Realtime (News Ticker Marquee)',
+      keywords: ['tin noi bo', 'bang tin', 'chay chu', 'marquee', 'tin tuc', 'ticker', 'thong bao chay', 'trai sang phai', 'quan ly tin', 'dang tin', 'tin vmg', 'dien thoai', 'mobile', 'khong thay tin', 'tin tren dien thoai'],
       answer: `
-        <strong>📢 Bản Tin Chạy Chữ Nội Bộ & Quản Trị Realtime:</strong><br>
-        • <strong>Vị trí:</strong> Dải tin tức kính mờ ngay dưới thanh Header, chuyển động mượt mà từ trái sang phải.<br>
-        • <strong>Tương tác dừng đọc:</strong> Rê chuột hoặc chạm tay vào dòng tin để tạm dừng chạy chữ tức thì.<br>
+        <strong>📢 Bản Tin Chạy Chữ Nội Bộ VMG Realtime:</strong><br>
+        • <strong>Vị trí:</strong> Dải tin tức kính mờ ngay dưới thanh Header, trên điện thoại có huy hiệu <strong>[TIN VMG]</strong> chạy chữ mượt mà từ trái sang phải.<br>
+        • <strong>Trên điện thoại di động:</strong> Bản tin tự động thu gọn huy hiệu thành <code>TIN VMG</code>, tối ưu vùng chạm và không bao giờ đứng hình khi lướt chạm.<br>
         • <strong>Xem chi tiết:</strong> Nhấp vào bất kỳ mẩu tin nào để mở cửa sổ xem toàn văn nội dung, phòng ban phát tin và mốc thời gian.<br>
-        • <strong>Quản trị dành cho Admin (Phương án 2):</strong> Bấm vào biểu tượng cây bút <strong>✏️</strong> trên thanh Ticker để Đăng tin mới, Đặt ngày hết hạn, Ghim đầu dòng và Bật/Tắt phát sóng Realtime qua WebSocket.
+        • <strong>Tạm dừng / Chạy tiếp:</strong> Bấm nút <code>⏸ / ▶</code> để dừng hoặc tiếp tục dòng chữ chạy.<br>
+        • <strong>Quản trị dành cho Admin:</strong> Bấm vào biểu tượng cây bút <strong>✏️</strong> trên thanh Ticker hoặc thanh menu bên trái để Đăng tin mới, Đặt ngày hết hạn, Ghim đầu dòng và Bật/Tắt phát sóng Realtime qua WebSocket.<br>
+        <em>💡 Mẹo: Nếu không thấy thanh tin tức trên điện thoại, hãy vuốt xuống để tải lại trang (F5) để nạp phiên bản mới nhất v3.5.0.</em>
       `,
       actions: [
-        { label: '📢 Xem Bảng Công Việc & Bản Tin', callback: () => { App.switchView('kanban'); App.renderNewsTicker(); } },
-        { label: '⚙️ Mở Quản Trị Bản Tin (Admin)', callback: () => App.openAdminNewsModal() }
+        { label: '📢 Xem Bảng Công Việc & Khởi Động Lại Ticker', callback: () => { App.switchView('kanban'); App.renderNewsTicker(true); } },
+        { label: '✏️ Mở Quản Trị Bản Tin (Admin)', callback: () => App.openAdminNewsModal() }
       ]
     }
   },

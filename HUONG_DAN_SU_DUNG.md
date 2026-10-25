@@ -395,9 +395,10 @@ Mục **Nhật Ký Hoạt Động (Activity Log)** ghi nhận chi tiết mọi h
 
 ### Q6: Bản tin chạy chữ nội bộ (News Ticker) hoạt động ra sao và ai được đăng tin?
 > **Giải đáp**:
-> 1. **Chuyển động & Xem tin**: Dải tin chạy mượt mà từ trái sang phải ngay dưới thanh Header. Người dùng rê chuột hoặc chạm tay để dừng đọc, nhấp vào tin để mở cửa sổ xem toàn văn.
-> 2. **Quyền Quản trị (Admin)**: Chỉ Quản trị viên mới thấy nút cây bút (✏️) trên thanh Ticker để mở Bảng Quản Trị: Đăng tin mới, Đặt ngày hết hạn, Ghim ưu tiên đầu dòng hoặc Bật/Tắt phát sóng.
-> 3. **Phát sóng Realtime**: Mọi tin tức mới hoặc chỉnh sửa được máy chủ đẩy tức thời qua WebSocket tới toàn bộ nhân sự đang online mà không cần tải lại trang.
+> 1. **Chuyển động & Xem tin**: Dải tin chạy mượt mà từ trái sang phải ngay dưới thanh Header. Người dùng rê chuột (trên máy tính) hoặc chạm để xem chi tiết mẩu tin toàn văn.
+> 2. **Hiển thị trên điện thoại**: Trên màn hình di động, huy hiệu tự động hiển thị nhận diện `[TIN VMG]`, dải chữ chạy liên tục không bị đứng hình khi lướt chạm, hỗ trợ đầy đủ các thao tác xem chi tiết và tạm dừng mượt mà.
+> 3. **Quyền Quản trị (Admin)**: Chỉ Quản trị viên mới thấy nút cây bút (✏️) trên thanh Ticker hoặc thanh menu bên trái để mở Bảng Quản Trị: Đăng tin mới, Đặt ngày hết hạn, Ghim ưu tiên đầu dòng hoặc Bật/Tắt phát sóng.
+> 4. **Phát sóng Realtime**: Mọi tin tức mới hoặc chỉnh sửa được máy chủ đẩy tức thời qua WebSocket tới toàn bộ nhân sự đang online mà không cần tải lại trang.
 
 ---
 *Tài liệu được biên soạn phục vụ công tác đào tạo và chuẩn hóa vận hành nội bộ TaskFlow Pro.*
