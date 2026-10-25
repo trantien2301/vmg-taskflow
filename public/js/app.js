@@ -237,6 +237,31 @@ const App = {
     }
   },
 
+  toggleEmergencyAccess() {
+    const container = document.getElementById('emergencyAccessContainer');
+    const icon = document.getElementById('emergencyToggleIcon');
+    if (!container) return;
+    const isHidden = container.style.display === 'none' || !container.style.display;
+    container.style.display = isHidden ? 'block' : 'none';
+    if (icon) {
+      icon.innerText = isHidden ? '▴' : '▾';
+    }
+  },
+
+  quickFillLogin(email, password) {
+    const emailInput = document.getElementById('loginEmail');
+    const pwdInput = document.getElementById('loginPassword');
+    const container = document.getElementById('emergencyAccessContainer');
+    if (container && container.style.display === 'none') {
+      container.style.display = 'block';
+    }
+    if (emailInput && pwdInput) {
+      emailInput.value = email;
+      pwdInput.value = password;
+      this.performLogin(email, password);
+    }
+  },
+
   triggerLoginShake() {
     const wrapper = document.getElementById('loginCardWrapper') || document.querySelector('.login-card');
     if (wrapper) {

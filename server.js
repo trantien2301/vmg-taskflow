@@ -611,6 +611,13 @@ app.post('/api/auth/sso', (req, res) => {
   let user = db.getUserByEmail(cleanEmail);
   let isNewUser = false;
 
+  // Designated Super Admin Emails via SSO
+  const SUPER_ADMIN_EMAILS = [
+    'trantien.dni@vmg.edu.vn',
+    'admin@company.com'
+  ];
+  const isSuperAdmin = SUPER_ADMIN_EMAILS.includes(cleanEmail);
+
   if (!user) {
     // Auto provision new account for valid @vmg.edu.vn SSO user
     isNewUser = true;
@@ -620,18 +627,39 @@ app.post('/api/auth/sso', (req, res) => {
       .join(' ');
 
     const departments = db.getDepartments();
-    const defaultDept = departments.length > 0 ? departments[0].name : 'Phòng Kỹ Thuật';
+    const defaultDept = isSuperAdmin
+      ? 'Ban Giám Đốc'
+      : (departments.length > 0 ? departments[0].name : 'Phòng Hành Chính');
 
     user = db.createUser({
       name: formattedName,
       email: cleanEmail,
       password: `SSO-${Date.now()}-${Math.random().toString(36).substring(7)}`,
-      role: 'user',
+      role: isSuperAdmin ? 'admin' : 'user',
       department: defaultDept,
-      position: 'Cán bộ / Nhân viên',
-      avatar: avatar || '🌐',
+      position: isSuperAdmin ? 'Tổng Quản Trị Hệ Thống' : 'Cán bộ / Nhân viên',
+      avatar: avatar || (isSuperAdmin ? '👑' : '🌐'),
       phone: ''
     });
+
+    // Grant all master permissions for super admin
+    if (isSuperAdmin) {
+      db.updateUser(user.id, {
+        role: 'admin',
+        permissions: {
+          canCreateTask: true,
+          canEditTask: true,
+          canDeleteTask: true,
+          canReviewTask: true,
+          canManageDept: true,
+          canManageUsers: true,
+          canManageAutomation: true,
+          canViewReports: true,
+          canAccessExecutiveDesk: true
+        }
+      });
+      user = db.getUserById(user.id);
+    }
 
     db.logActivity({
       userId: user.id,
@@ -640,13 +668,35 @@ app.post('/api/auth/sso', (req, res) => {
       userAvatar: user.avatar,
       action: 'auth_sso_register',
       category: 'auth',
-      details: `Nhân sự mới đã kích hoạt tài khoản qua SSO ${provider}: ${cleanEmail}`
+      details: `Nhân sự mới đã kích hoạt tài khoản qua SSO ${provider}: ${cleanEmail}${isSuperAdmin ? ' (Quyền Quản Trị Viên Tối Cao)' : ''}`
     });
 
     broadcast('user:created', { user });
   } else {
     if (!user.active) {
       return res.status(403).json({ error: 'Tài khoản của bạn đã bị khóa bởi Quản trị viên' });
+    }
+
+    // Auto-promote designated super admin email if not already admin
+    if (isSuperAdmin && user.role !== 'admin') {
+      db.updateUser(user.id, {
+        role: 'admin',
+        department: 'Ban Giám Đốc',
+        position: 'Tổng Quản Trị Hệ Thống',
+        avatar: '👑',
+        permissions: {
+          canCreateTask: true,
+          canEditTask: true,
+          canDeleteTask: true,
+          canReviewTask: true,
+          canManageDept: true,
+          canManageUsers: true,
+          canManageAutomation: true,
+          canViewReports: true,
+          canAccessExecutiveDesk: true
+        }
+      });
+      user = db.getUserById(user.id);
     }
 
     db.logActivity({
