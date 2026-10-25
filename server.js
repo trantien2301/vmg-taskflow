@@ -2298,9 +2298,21 @@ app.delete('/api/users/:id', authenticate, requireAdmin, (req, res) => {
 // -------------------------------------------------------------
 // SYSTEM / ACTIVITY / VERSION ROUTES
 // -------------------------------------------------------------
-const APP_VERSION = '3.3.0';
+const APP_VERSION = '3.3.1';
 const APP_BUILD_DATE = '25/10/2026';
 const APP_CHANGELOG = [
+  {
+    version: 'v3.3.1',
+    date: '25/10/2026',
+    title: 'Bản Tin Chạy Chữ Nội Bộ (Internal News Ticker Marquee)',
+    highlights: [
+      'Bản tin nội bộ kính mờ (Glassmorphism) chạy chữ từ trái sang phải mượt mà ngay dưới thanh Header',
+      'Hỗ trợ tính năng Tạm dừng khi rê chuột hoặc chạm tay (Hover/Touch to Pause) và nút chuyển đổi trạng thái Play/Pause',
+      'Nhấp vào từng mẩu tin để mở Modal xem chi tiết nội dung, mốc thời gian và phòng ban phát tin',
+      'Phân loại mức độ nổi bật đa màu sắc: Khẩn cấp (Đỏ), Vinh danh (Xanh Mint), Tin vui (Cyan), Lịch họp (Vàng), Công nghệ (Tím)',
+      'Tương thích hoàn hảo Dual Theme (Sáng/Tối) và tối ưu co giãn di động không che khuất màn hình'
+    ]
+  },
   {
     version: 'v3.3.0',
     date: '25/10/2026',

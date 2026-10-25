@@ -186,6 +186,131 @@ const App = {
       const aiWidget = document.getElementById('workSmartAiWidget');
       if (aiWidget) aiWidget.style.display = '';
     }
+
+    // Render Internal News Ticker (Chạy từ trái sang phải)
+    this.renderNewsTicker();
+  },
+
+  // ========================================================
+  // INTERNAL NEWS TICKER MARQUEE (Chạy Từ Trái Sang Phải)
+  // ========================================================
+  internalNewsData: [
+    {
+      id: 1,
+      tag: 'urgent',
+      tagText: 'KHẨN CẤP',
+      title: 'Nhắc nhở cập nhật 100% tiến độ nhiệm vụ trước 17h30 thứ Sáu hàng tuần',
+      content: 'Toàn bộ Trưởng phòng và Nhân sự các bộ phận nghiêm túc rà soát, cập nhật tỷ lệ hoàn thành công việc và gửi duyệt các đầu việc đã xong trước 17h30 thứ Sáu nhằm phục vụ công tác xuất báo cáo KPI định kỳ.',
+      department: 'Ban Giám Đốc',
+      time: 'Hôm nay 08:30'
+    },
+    {
+      id: 2,
+      tag: 'success',
+      tagText: 'VINH DANH',
+      title: 'Chúc mừng Khối R&D nghiệm thu xuất sắc phiên bản TaskFlow Pro v3.3 Mobile-First',
+      content: 'Hệ thống TaskFlow Pro phiên bản v3.3 đã chính thức ra mắt với giao diện di động chuẩn Native App không góc chết, tối ưu trải nghiệm và bảo vệ vùng an toàn cho toàn thể người dùng di động.',
+      department: 'Khối R&D',
+      time: '25/10/2026'
+    },
+    {
+      id: 3,
+      tag: 'info',
+      tagText: 'TIN VUI',
+      title: 'Chào đón các thành viên mới gia nhập đại gia đình VMG trong tháng 10/2026',
+      content: 'Nhiệt liệt chào đón các đồng nghiệp mới gia nhập phòng Marketing, Kỹ thuật và Kinh doanh. Chúc các bạn nhanh chóng hòa nhập và cùng kiến tạo nhiều thành tựu rực rỡ!',
+      department: 'Phòng Phát Triển Nhân Sự',
+      time: '24/10/2026'
+    },
+    {
+      id: 4,
+      tag: 'warning',
+      tagText: 'LỊCH HỌP',
+      title: 'Họp giao ban định kỳ Ban Giám Đốc & Khối Vận Hành lúc 09h00 sáng Thứ Hai',
+      content: 'Cuộc họp diễn ra tại Phòng Hội thảo Tầng 3 kết hợp phòng họp trực tuyến Google Meet đã được ghim trên lịch hệ thống TaskFlow Pro.',
+      department: 'Văn Phòng BGD',
+      time: '23/10/2026'
+    },
+    {
+      id: 5,
+      tag: 'purple',
+      tagText: 'AI TRỢ LÝ',
+      title: 'Trợ lý thông minh Work Smart AI đã cập nhật kiến thức hỗ trợ vận hành 24/7',
+      content: 'Nhấp ngay vào biểu tượng Robot nổi góc dưới màn hình để hỏi đáp mọi quy trình vận hành, phím tắt và giải đáp thắc mắc tự động tức thì.',
+      department: 'Ban Công Nghệ',
+      time: '22/10/2026'
+    }
+  ],
+
+  renderNewsTicker() {
+    const trackEl = document.getElementById('tickerTrack');
+    const tickerBar = document.getElementById('newsTickerBar');
+    if (!trackEl || !tickerBar) return;
+
+    if (sessionStorage.getItem('taskflow_ticker_dismissed') === 'true') {
+      tickerBar.style.display = 'none';
+      return;
+    }
+    tickerBar.style.display = 'flex';
+
+    const items = this.internalNewsData || [];
+    if (items.length === 0) {
+      tickerBar.style.display = 'none';
+      return;
+    }
+
+    const buildItemHtml = (item) => `
+      <div class="ticker-item" onclick="App.openNewsDetail(${item.id})" title="Bấm để xem chi tiết mẩu tin">
+        <span class="ticker-tag ${item.tag}">${item.tagText}</span>
+        <span class="ticker-text">${item.title}</span>
+        <span class="ticker-separator">✦</span>
+      </div>
+    `;
+
+    // Duplicate list to guarantee seamless infinite loop from left to right (-50% to 0%)
+    const singleSet = items.map(buildItemHtml).join('');
+    trackEl.innerHTML = singleSet + singleSet;
+  },
+
+  toggleTickerPause() {
+    const tickerBar = document.getElementById('newsTickerBar');
+    if (!tickerBar) return;
+    const isPaused = tickerBar.classList.toggle('paused');
+    this.showToast(isPaused ? '⏸ Đã tạm dừng dòng tin nội bộ' : '▶ Đang tiếp tục chạy tin tức', 'info');
+  },
+
+  dismissNewsTicker() {
+    const tickerBar = document.getElementById('newsTickerBar');
+    if (tickerBar) {
+      tickerBar.style.display = 'none';
+      sessionStorage.setItem('taskflow_ticker_dismissed', 'true');
+      this.showToast('Đã đóng thanh tin tức cho phiên làm việc này.', 'info');
+    }
+  },
+
+  openNewsDetail(id) {
+    const item = (this.internalNewsData || []).find(n => n.id === id);
+    if (!item) return;
+
+    const modal = document.getElementById('newsDetailModal');
+    const badge = document.getElementById('newsModalBadge');
+    const title = document.getElementById('newsModalTitle');
+    const dept = document.getElementById('newsModalDept');
+    const time = document.getElementById('newsModalTime');
+    const content = document.getElementById('newsModalContent');
+
+    if (badge) {
+      badge.className = `ticker-tag ${item.tag}`;
+      badge.innerText = item.tagText;
+    }
+    if (title) title.innerText = item.title;
+    if (dept) dept.innerText = item.department;
+    if (time) time.innerText = item.time;
+    if (content) content.innerText = item.content;
+
+    if (modal) {
+      modal.classList.add('show');
+    }
   },
 
   switchAuthTab(tab) {

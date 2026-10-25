@@ -171,6 +171,21 @@ const WorkSmartAI = {
       actions: [
         { label: '📋 Xem Bảng Công Việc', callback: () => App.switchView('kanban') }
       ]
+    },
+
+    newsTicker: {
+      title: 'Bản Tin Chạy Chữ Nội Bộ (News Ticker Marquee)',
+      keywords: ['tin noi bo', 'bang tin', 'chay chu', 'marquee', 'tin tuc', 'ticker', 'thong bao chay', 'trai sang phai'],
+      answer: `
+        <strong>📢 Bản Tin Chạy Chữ Nội Bộ (News Ticker):</strong><br>
+        • <strong>Vị trí:</strong> Dải tin tức kính mờ ngay dưới thanh Header, chuyển động mượt mà từ trái sang phải.<br>
+        • <strong>Tương tác dừng đọc:</strong> Rê chuột hoặc chạm tay vào dòng tin để tạm dừng chạy chữ tức thì.<br>
+        • <strong>Xem chi tiết:</strong> Nhấp vào bất kỳ mẩu tin nào để mở cửa sổ xem toàn văn nội dung, phòng ban phát tin và mốc thời gian.<br>
+        • <strong>Điều khiển:</strong> Dùng nút Tạm dừng (⏸/▶) hoặc nút (✕) để ẩn thanh tin cho phiên làm việc.
+      `,
+      actions: [
+        { label: '📢 Xem Bảng Công Việc & Bản Tin', callback: () => { App.switchView('kanban'); App.renderNewsTicker(); } }
+      ]
     }
   },
 

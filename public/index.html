@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TaskFlow Pro - Quản Lý Công Việc & Báo Cáo Realtime</title>
   <link rel="icon" type="image/png" href="images/taskflow-icon.png">
-  <link rel="stylesheet" href="css/style.css?v=3.1">
+  <link rel="stylesheet" href="css/style.css?v=3.2">
   <!-- Chart.js for interactive analytics -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
@@ -601,6 +601,33 @@
           </button>
         </div>
       </header>
+
+      <!-- INTERNAL NEWS TICKER MARQUEE (Chạy Từ Trái Sang Phải) -->
+      <div class="news-ticker-bar" id="newsTickerBar">
+        <div class="ticker-badge" title="Bản tin nội bộ thời gian thực TaskFlow Pro">
+          <svg class="tf-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span class="badge-text">TIN NỘI BỘ VMG</span>
+        </div>
+
+        <div class="ticker-marquee-wrapper" id="tickerMarqueeWrapper">
+          <div class="ticker-track" id="tickerTrack">
+            <!-- Dynamic news items loaded by App.renderNewsTicker() -->
+          </div>
+        </div>
+
+        <div class="ticker-actions">
+          <button type="button" class="ticker-action-btn" id="btnToggleTickerPause" title="Tạm dừng / Tiếp tục chạy tin" onclick="App.toggleTickerPause()">
+            <svg class="tf-icon ticker-pause-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+            <svg class="tf-icon ticker-play-icon" style="display:none;" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </button>
+          <button type="button" class="ticker-action-btn" title="Đóng thanh tin tức này" onclick="App.dismissNewsTicker()">
+            ✕
+          </button>
+        </div>
+      </div>
 
       <!-- SCROLLABLE CONTENT AREA -->
       <main class="content-area">
@@ -2373,6 +2400,39 @@
     <div class="work-smart-ai-widget" id="workSmartAiWidget"></div>
   </div>
 
+  <!-- MODAL: XEM CHI TIẾT TIN TỨC NỘI BỘ -->
+  <div class="modal-overlay" id="newsDetailModal">
+    <div class="modal-content" style="max-width: 520px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span id="newsModalBadge" class="ticker-tag info">TIN NỘI BỘ</span>
+          <h3 class="modal-title" style="font-size: 16px;">Chi Tiết Bản Tin</h3>
+        </div>
+        <button class="modal-close-btn" data-close-modal="newsDetailModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4 id="newsModalTitle" style="font-size: 16px; font-weight: 700; line-height: 1.4; margin-bottom: 12px; color: var(--text-primary);"></h4>
+        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 14px; font-size: 12px; color: var(--text-muted);">
+          <span style="display: inline-flex; align-items: center; gap: 5px;">
+            <svg class="tf-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.85"><rect x="4" y="2" width="16" height="20" rx="2"/></svg>
+            <strong id="newsModalDept" style="color: var(--text-secondary);"></strong>
+          </span>
+          <span style="display: inline-flex; align-items: center; gap: 5px;">
+            <svg class="tf-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.85"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span id="newsModalTime"></span>
+          </span>
+        </div>
+        <div id="newsModalContent" style="font-size: 13.5px; line-height: 1.6; color: var(--text-secondary); background: var(--bg-main); padding: 14px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content: flex-end;">
+        <button type="button" class="btn btn-primary btn-sm" data-close-modal="newsDetailModal">
+          <span>Đã Hiểu & Đóng</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: ADD / EDIT TASK -->
   <div class="modal-overlay" id="taskModal">
     <div class="modal-content">
@@ -3721,7 +3781,7 @@
   <script src="js/icons.js?v=3.2.1"></script>
   <script src="js/api.js?v=3.2.0"></script>
   <script src="js/charts.js?v=3.2.0"></script>
-  <script src="js/app.js?v=3.2.2"></script>
-  <script src="js/workSmartAI.js?v=3.2.1"></script>
+  <script src="js/app.js?v=3.3.0"></script>
+  <script src="js/workSmartAI.js?v=3.3.0"></script>
 </body>
 </html>

@@ -3033,6 +3033,182 @@ body, .sidebar, .top-header, .kpi-card, .kanban-col, .task-card, .table-card, .m
 }
 
 /* ========================================================
+   INTERNAL NEWS TICKER MARQUEE (Chạy Từ Trái Sang Phải)
+   ======================================================== */
+.news-ticker-bar {
+  height: 38px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 12px;
+  position: relative;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  flex-shrink: 0;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .news-ticker-bar {
+  background: rgba(15, 23, 42, 0.92);
+  border-bottom-color: rgba(255, 255, 255, 0.07);
+}
+
+.ticker-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--brand-gradient);
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.35);
+  user-select: none;
+}
+
+.ticker-marquee-wrapper {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent);
+}
+
+.ticker-track {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  white-space: nowrap;
+  width: max-content;
+  animation: marqueeLeftToRight 38s linear infinite;
+  will-change: transform;
+}
+
+.ticker-marquee-wrapper:hover .ticker-track,
+.news-ticker-bar.paused .ticker-track {
+  animation-play-state: paused;
+}
+
+@keyframes marqueeLeftToRight {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 3px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.ticker-item:hover {
+  background: rgba(14, 165, 233, 0.12);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.ticker-tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+}
+
+.ticker-tag.urgent { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+.ticker-tag.success { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+.ticker-tag.info { background: rgba(14, 165, 233, 0.15); color: #0ea5e9; border: 1px solid rgba(14, 165, 233, 0.3); }
+.ticker-tag.warning { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+.ticker-tag.purple { background: rgba(168, 85, 247, 0.15); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.3); }
+
+.ticker-separator {
+  color: var(--border-color);
+  font-size: 12px;
+  user-select: none;
+}
+
+.ticker-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.ticker-action-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.ticker-action-btn:hover {
+  background: var(--bg-main);
+  color: var(--text-primary);
+}
+
+.news-ticker-bar.paused .ticker-pause-icon {
+  display: none !important;
+}
+
+.news-ticker-bar.paused .ticker-play-icon {
+  display: block !important;
+  color: var(--primary);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .news-ticker-bar {
+    height: 32px;
+    padding: 0 8px;
+    gap: 8px;
+  }
+  .ticker-badge {
+    padding: 2.5px 6px;
+    font-size: 10px;
+  }
+  .ticker-badge .badge-text {
+    display: none;
+  }
+  .ticker-item {
+    font-size: 11px;
+    gap: 6px;
+    padding: 2px 4px;
+  }
+  .ticker-track {
+    gap: 20px;
+    animation-duration: 45s;
+  }
+}
+
+/* ========================================================
    APP UPDATE BANNER & VERSION SYSTEM
    ======================================================== */
 .app-update-banner {
