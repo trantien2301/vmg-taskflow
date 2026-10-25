@@ -386,5 +386,12 @@ Mục **Nhật Ký Hoạt Động (Activity Log)** ghi nhận chi tiết mọi h
 ### Q4: Phòng họp Google Meet có bị giới hạn thời gian không?
 > **Giải đáp**: Hệ thống khởi tạo phòng họp chuẩn theo nền tảng Google Meet. Thời lượng và số lượng người tham gia phụ thuộc vào gói tài khoản Google (tài khoản cá nhân tối đa 100 người, gói Google Workspace doanh nghiệp lên đến 250 - 500 người không giới hạn).
 
+### Q5: Trải nghiệm sử dụng TaskFlow Pro trên điện thoại di động (smartphone) như thế nào?
+> **Giải đáp**: Hệ thống hỗ trợ hoàn hảo chuẩn Mobile-First Responsive:
+> 1. **Thanh điều hướng 4 Tab Kanban**: Bố cục 4 tab phân bổ đối xứng 25% chiều rộng vừa vặn mọi màn hình từ 320px đến 480px, không bị tràn hay khuất chữ.
+> 2. **Cơ chế Vuốt Trượt (Swipe Carousel)**: Hỗ trợ cử chỉ vuốt ngang chuyển đổi cột Kanban mượt mà.
+> 3. **Vùng an toàn (Safe Area)**: Các thẻ công việc được thiết lập khoảng đệm cuộn đáy 84px an toàn, đảm bảo nút Trợ lý AI không bao giờ che khuất nội dung hay các nút hành động.
+> 4. **Bảng thống kê KPI 2 cột cân bằng**: 5 chỉ số KPI tự động co giãn đối xứng, thẻ thứ 5 trải đều 100% hai cột thẩm mỹ.
+
 ---
 *Tài liệu được biên soạn phục vụ công tác đào tạo và chuẩn hóa vận hành nội bộ TaskFlow Pro.*

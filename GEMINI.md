@@ -45,3 +45,13 @@ Mọi tính năng, màn hình giao diện (View), thành phần (Component), Mod
   3. **Cập nhật Tài liệu toàn diện offline (`HUONG_DAN_SU_DUNG_TOAN_DIEN_TASKFLOW_PRO.md`)**: Bổ sung chương/mục vào tài liệu markdown nội bộ.
   4. **Cập nhật Changelog (`server.js`)**: Thêm tóm tắt vào API `/api/system/version`.
 
+### 7. Bảo Vệ Giao Diện Di Động (Mobile-First & Responsive Protection)
+* **Nguyên tắc "Zero Text Clipping & Balanced Mobile UI":** Mọi tính năng, màn hình giao diện (View), thành phần (Component) khi được thêm mới hoặc chỉnh sửa **BẮT BUỘC** phải tuân thủ:
+  1. **Không khuất chữ tiêu đề (`.current-view-title`):** Luôn dùng `min-width: 0; flex: 1; overflow: hidden;` kết hợp thẻ `span` bên trong `text-overflow: ellipsis; white-space: nowrap;`. Ẩn SVG thừa cạnh tiêu đề trên màn hình nhỏ ($\le 600\text{px}$) để dành 100% không gian hiển thị cho tiêu đề. Tuyệt đối không dùng `max-width` cố định nhỏ.
+  2. **Lưới chỉ số KPI cân đối (`.kpi-grid`):** Trên di động ($\le 768\text{px}$), dùng lưới 2 cột. Khi có số lượng thẻ lẻ (5 thẻ), thẻ thứ 5 bắt buộc có `grid-column: 1 / -1 !important;` để trải đều cả 2 cột, không để khuyết cột.
+  3. **Thanh điều hướng Tab đối xứng (`.mobile-kanban-nav`):** 4 tab chia đều 25% chiều rộng (`flex: 1 1 0; min-width: 0;`), không để tab thứ 4 bị tràn hay cắt chữ.
+  4. **Vùng an toàn cuộn đáy (Safe Area Scroll Padding):** `.content-area` luôn có `padding: 10px 10px 84px !important;` và `.kanban-cards` có `padding-bottom: 72px !important;` để đảm bảo thẻ công việc cuối cùng không bao giờ bị nút nổi Trợ lý AI che lấp. Toast thông báo đặt tại `bottom: 76px !important;`.
+  5. **Quy chuẩn vùng chạm (Touch Targets):** Mọi nút bấm di động đạt tối thiểu $44\text{px} \times 44\text{px}$. Nút nổi Trợ lý AI trên di động ($\le 480\text{px}$) chuẩn hóa ở kích thước `48px x 48px`.
+  6. **Kiểm thử tự động trước khi commit:** Chạy script `node scratch/verify_mobile_ui.js` trên viewport `360x780` để nghiệm thu giao diện đạt chuẩn không khuất chữ (`isClipped === false`).
+
+

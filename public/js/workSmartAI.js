@@ -156,6 +156,21 @@ const WorkSmartAI = {
         • Hệ thống sẽ tự động lưu tùy chọn của bạn vào trình duyệt cho những lần đăng nhập sau.<br>
         • Giao diện được tối ưu chuẩn tương phản cao, dịu mắt và tôn vinh phong cách thương hiệu Cyan-Emerald.
       `
+    },
+
+    mobileApp: {
+      title: 'Giao Diện Di Động & Trải Nghiệm Trên Điện Thoại',
+      keywords: ['dien thoai', 'mobile', 'smartphone', 'app', 'giao dien dien thoai', 'man hinh nho', 'tablet'],
+      answer: `
+        <strong>📱 Trải Nghiệm TaskFlow Pro Trên Điện Thoại:</strong><br>
+        • <strong>Đồng bộ 4 cột Kanban:</strong> Thanh điều hướng 4 tab <em>Cần Làm</em>, <em>Đang Làm</em>, <em>Duyệt</em>, <em>Xong</em> co giãn thông minh 100% chiều rộng, chạm là chuyển tức thì.<br>
+        • <strong>Vuốt mượt mà (Swipe Carousel):</strong> Bảng Kanban hỗ trợ thao tác vuốt ngang chuyển cột dạng trượt mượt mà theo chuẩn Native App.<br>
+        • <strong>Vùng an toàn (Safe Area):</strong> Toàn bộ thẻ công việc có khoảng trống đệm đáy an toàn, không lo bị nút Trợ lý AI che khuất.<br>
+        • <strong>Chỉ số KPI cân đối:</strong> Lưới thống kê 5 chỉ số tự động căn chỉnh đối xứng 2 cột hoàn hảo.
+      `,
+      actions: [
+        { label: '📋 Xem Bảng Công Việc', callback: () => App.switchView('kanban') }
+      ]
     }
   },
 

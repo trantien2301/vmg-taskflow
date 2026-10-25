@@ -2298,9 +2298,21 @@ app.delete('/api/users/:id', authenticate, requireAdmin, (req, res) => {
 // -------------------------------------------------------------
 // SYSTEM / ACTIVITY / VERSION ROUTES
 // -------------------------------------------------------------
-const APP_VERSION = '3.2.0';
-const APP_BUILD_DATE = '22/10/2026';
+const APP_VERSION = '3.3.0';
+const APP_BUILD_DATE = '25/10/2026';
 const APP_CHANGELOG = [
+  {
+    version: 'v3.3.0',
+    date: '25/10/2026',
+    title: 'Tối Ưu Giao Diện Di Động Toàn Diện (Mobile-First Polish & Safe Area)',
+    highlights: [
+      'Khắc phục triệt để lỗi khuất chữ tiêu đề trên điện thoại di động (Title truncation fixed): giải phóng 100% không gian hiển thị, ẩn vector thừa trên màn hình nhỏ, bảo đảm hiển thị trọn vẹn tên bảng công việc',
+      'Cân đối thẻ chỉ số KPI di động: Thẻ thứ 5 (Ưu tiên khẩn cấp) tự động trải rộng cân bằng 100% 2 cột (span 2), loại bỏ khoảng trống bất đối xứng',
+      'Đồng bộ 4 tab điều hướng Kanban: Phân bổ đối xứng 25% vừa vặn mọi màn hình điện thoại (320px - 480px), không còn bị tràn chữ hay che khuất tab Đã hoàn thành',
+      'Vùng an toàn (Safe Area Scroll Padding): Tăng khoảng cách cuộn đáy 84px - 72px và tinh chỉnh nút Trợ lý Work Smart AI 48px, đảm bảo không bao giờ che khuất nội dung thẻ công việc',
+      'Bộ kỹ năng (Skill) & Quy tắc (Rule) chuẩn hóa giao diện di động: Tự động bảo vệ giao diện di động khi phát triển tính năng mới'
+    ]
+  },
   {
     version: 'v3.2.0',
     date: '22/10/2026',
