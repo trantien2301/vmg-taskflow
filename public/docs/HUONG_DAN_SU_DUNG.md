@@ -393,5 +393,11 @@ Mục **Nhật Ký Hoạt Động (Activity Log)** ghi nhận chi tiết mọi h
 > 3. **Vùng an toàn (Safe Area)**: Các thẻ công việc được thiết lập khoảng đệm cuộn đáy 84px an toàn, đảm bảo nút Trợ lý AI không bao giờ che khuất nội dung hay các nút hành động.
 > 4. **Bảng thống kê KPI 2 cột cân bằng**: 5 chỉ số KPI tự động co giãn đối xứng, thẻ thứ 5 trải đều 100% hai cột thẩm mỹ.
 
+### Q6: Bản tin chạy chữ nội bộ (News Ticker) hoạt động ra sao và ai được đăng tin?
+> **Giải đáp**:
+> 1. **Chuyển động & Xem tin**: Dải tin chạy mượt mà từ trái sang phải ngay dưới thanh Header. Người dùng rê chuột hoặc chạm tay để dừng đọc, nhấp vào tin để mở cửa sổ xem toàn văn.
+> 2. **Quyền Quản trị (Admin)**: Chỉ Quản trị viên mới thấy nút cây bút (✏️) trên thanh Ticker để mở Bảng Quản Trị: Đăng tin mới, Đặt ngày hết hạn, Ghim ưu tiên đầu dòng hoặc Bật/Tắt phát sóng.
+> 3. **Phát sóng Realtime**: Mọi tin tức mới hoặc chỉnh sửa được máy chủ đẩy tức thời qua WebSocket tới toàn bộ nhân sự đang online mà không cần tải lại trang.
+
 ---
 *Tài liệu được biên soạn phục vụ công tác đào tạo và chuẩn hóa vận hành nội bộ TaskFlow Pro.*

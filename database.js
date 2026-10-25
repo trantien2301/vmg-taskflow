@@ -1555,6 +1555,163 @@ class Database {
     this.save();
     return true;
   }
+
+  // ========================================================
+  // INTERNAL NEWS TICKER SYSTEM (Phương Án 2)
+  // ========================================================
+  getDefaultNews() {
+    return [
+      {
+        id: 'news-1',
+        tag: 'urgent',
+        tagText: 'KHẨN CẤP',
+        title: 'Nhắc nhở cập nhật 100% tiến độ nhiệm vụ trước 17h30 thứ Sáu hàng tuần',
+        content: 'Toàn bộ Trưởng phòng và Nhân sự các bộ phận nghiêm túc rà soát, cập nhật tỷ lệ hoàn thành công việc và gửi duyệt các đầu việc đã xong trước 17h30 thứ Sáu nhằm phục vụ công tác xuất báo cáo KPI định kỳ.',
+        department: 'Ban Giám Đốc',
+        author: 'Admin',
+        pinned: true,
+        active: true,
+        expireAt: null,
+        createdAt: '2026-10-25T08:30:00.000Z'
+      },
+      {
+        id: 'news-2',
+        tag: 'success',
+        tagText: 'VINH DANH',
+        title: 'Chúc mừng Khối R&D nghiệm thu xuất sắc phiên bản TaskFlow Pro v3.3 Mobile-First',
+        content: 'Hệ thống TaskFlow Pro phiên bản v3.3 đã chính thức ra mắt với giao diện di động chuẩn Native App không góc chết, tối ưu trải nghiệm và bảo vệ vùng an toàn cho toàn thể người dùng di động.',
+        department: 'Khối R&D',
+        author: 'Ban Giám Đốc',
+        pinned: true,
+        active: true,
+        expireAt: null,
+        createdAt: '2026-10-25T09:00:00.000Z'
+      },
+      {
+        id: 'news-3',
+        tag: 'info',
+        tagText: 'TIN VUI',
+        title: 'Chào đón các thành viên mới gia nhập đại gia đình VMG trong tháng 10/2026',
+        content: 'Nhiệt liệt chào đón các đồng nghiệp mới gia nhập phòng Marketing, Kỹ thuật và Kinh doanh. Chúc các bạn nhanh chóng hòa nhập và cùng kiến tạo nhiều thành tựu rực rỡ!',
+        department: 'Phòng Phát Triển Nhân Sự',
+        author: 'HR Dept',
+        pinned: false,
+        active: true,
+        expireAt: null,
+        createdAt: '2026-10-24T10:00:00.000Z'
+      },
+      {
+        id: 'news-4',
+        tag: 'warning',
+        tagText: 'LỊCH HỌP',
+        title: 'Họp giao ban định kỳ Ban Giám Đốc & Khối Vận Hành lúc 09h00 sáng Thứ Hai',
+        content: 'Cuộc họp diễn ra tại Phòng Hội thảo Tầng 3 kết hợp phòng họp trực tuyến Google Meet đã được ghim trên lịch hệ thống TaskFlow Pro.',
+        department: 'Văn Phòng BGD',
+        author: 'Trợ lý BGD',
+        pinned: false,
+        active: true,
+        expireAt: null,
+        createdAt: '2026-10-23T14:00:00.000Z'
+      },
+      {
+        id: 'news-5',
+        tag: 'purple',
+        tagText: 'AI TRỢ LÝ',
+        title: 'Trợ lý thông minh Work Smart AI đã cập nhật kiến thức hỗ trợ vận hành 24/7',
+        content: 'Nhấp ngay vào biểu tượng Robot nổi góc dưới màn hình để hỏi đáp mọi quy trình vận hành, phím tắt và giải đáp thắc mắc tự động tức thì.',
+        department: 'Ban Công Nghệ',
+        author: 'Tech Lead',
+        pinned: false,
+        active: true,
+        expireAt: null,
+        createdAt: '2026-10-22T16:00:00.000Z'
+      }
+    ];
+  }
+
+  getNews() {
+    if (!this.data.news || !Array.isArray(this.data.news)) {
+      this.data.news = this.getDefaultNews();
+      this.save();
+    }
+    return this.data.news;
+  }
+
+  getActiveNews() {
+    const all = this.getNews();
+    const now = new Date();
+    return all.filter(n => {
+      if (!n.active) return false;
+      if (n.expireAt && new Date(n.expireAt) < now) return false;
+      return true;
+    }).sort((a, b) => {
+      if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+  }
+
+  getNewsById(id) {
+    return this.getNews().find(n => n.id === id) || null;
+  }
+
+  createNews(newsData, authorName = 'Admin') {
+    const list = this.getNews();
+    const newId = `news-${Date.now()}`;
+    const tagMap = {
+      urgent: 'KHẨN CẤP',
+      success: 'VINH DANH',
+      info: 'TIN VUI',
+      warning: 'LỊCH HỌP',
+      purple: 'AI TRỢ LÝ',
+      general: 'THÔNG BÁO'
+    };
+    const tag = newsData.tag || 'info';
+    const item = {
+      id: newId,
+      tag: tag,
+      tagText: newsData.tagText || tagMap[tag] || 'THÔNG BÁO',
+      title: (newsData.title || '').trim(),
+      content: (newsData.content || '').trim(),
+      department: newsData.department || 'Ban Giám Đốc',
+      author: authorName,
+      pinned: !!newsData.pinned,
+      active: newsData.active !== undefined ? !!newsData.active : true,
+      expireAt: newsData.expireAt || null,
+      createdAt: new Date().toISOString()
+    };
+    list.unshift(item);
+    this.save();
+    return item;
+  }
+
+  updateNews(id, updates) {
+    const list = this.getNews();
+    const idx = list.findIndex(n => n.id === id);
+    if (idx === -1) return null;
+    const tagMap = {
+      urgent: 'KHẨN CẤP',
+      success: 'VINH DANH',
+      info: 'TIN VUI',
+      warning: 'LỊCH HỌP',
+      purple: 'AI TRỢ LÝ',
+      general: 'THÔNG BÁO'
+    };
+    if (updates.tag && !updates.tagText) {
+      updates.tagText = tagMap[updates.tag] || 'THÔNG BÁO';
+    }
+    list[idx] = { ...list[idx], ...updates, updatedAt: new Date().toISOString() };
+    this.save();
+    return list[idx];
+  }
+
+  deleteNews(id) {
+    const list = this.getNews();
+    const idx = list.findIndex(n => n.id === id);
+    if (idx === -1) return false;
+    list.splice(idx, 1);
+    this.save();
+    return true;
+  }
 }
 
 module.exports = new Database();

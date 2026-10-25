@@ -2298,19 +2298,19 @@ app.delete('/api/users/:id', authenticate, requireAdmin, (req, res) => {
 // -------------------------------------------------------------
 // SYSTEM / ACTIVITY / VERSION ROUTES
 // -------------------------------------------------------------
-const APP_VERSION = '3.3.1';
+const APP_VERSION = '3.4.0';
 const APP_BUILD_DATE = '25/10/2026';
 const APP_CHANGELOG = [
   {
-    version: 'v3.3.1',
+    version: 'v3.4.0',
     date: '25/10/2026',
-    title: 'Bản Tin Chạy Chữ Nội Bộ (Internal News Ticker Marquee)',
+    title: 'Bản Tin Chạy Chữ Nội Bộ Realtime & Quản Trị Phát Sóng (News Ticker Pro)',
     highlights: [
       'Bản tin nội bộ kính mờ (Glassmorphism) chạy chữ từ trái sang phải mượt mà ngay dưới thanh Header',
-      'Hỗ trợ tính năng Tạm dừng khi rê chuột hoặc chạm tay (Hover/Touch to Pause) và nút chuyển đổi trạng thái Play/Pause',
-      'Nhấp vào từng mẩu tin để mở Modal xem chi tiết nội dung, mốc thời gian và phòng ban phát tin',
-      'Phân loại mức độ nổi bật đa màu sắc: Khẩn cấp (Đỏ), Vinh danh (Xanh Mint), Tin vui (Cyan), Lịch họp (Vàng), Công nghệ (Tím)',
-      'Tương thích hoàn hảo Dual Theme (Sáng/Tối) và tối ưu co giãn di động không che khuất màn hình'
+      'Bảng Quản trị Đăng tin dành riêng cho Admin: Tạo tin mới, Đặt ngày hết hạn, Ghim ưu tiên đầu dòng, Bật/Tắt phát sóng tức thì',
+      'Đồng bộ phát sóng Realtime qua WebSocket: Mọi nhân sự nhận ngay tin mới mà không cần tải lại trang',
+      'Modal xem toàn văn chi tiết từng mẩu tin với phân loại mức độ phong phú (Khẩn cấp, Vinh danh, Tin vui, Lịch họp, AI)',
+      'Lưu trữ dữ liệu tin tức vĩnh viễn trên cơ sở dữ liệu hệ thống, tự động ẩn khi đến hạn'
     ]
   },
   {
@@ -2490,6 +2490,113 @@ app.post('/api/system/reset-demo', authenticate, requireAdmin, (req, res) => {
   });
   broadcast('system:reset', { message: 'Dữ liệu đã được đặt lại về mặc định!' });
   res.json({ success: true, message: 'Đã hoàn tất đặt lại dữ liệu mẫu' });
+});
+
+// -------------------------------------------------------------
+// INTERNAL NEWS TICKER SYSTEM (Phương Án 2)
+// -------------------------------------------------------------
+// 1. Get active news for news ticker
+app.get('/api/news', (req, res) => {
+  const activeNews = db.getActiveNews();
+  res.json({ news: activeNews });
+});
+
+// 2. Get all news for Admin management
+app.get('/api/admin/news', authenticate, requireAdmin, (req, res) => {
+  const allNews = db.getNews();
+  res.json({ news: allNews });
+});
+
+// 3. Create news item (Admin only)
+app.post('/api/admin/news', authenticate, requireAdmin, (req, res) => {
+  const { title, content, tag, tagText, department, expireAt, pinned } = req.body;
+  if (!title || !title.trim()) {
+    return res.status(400).json({ error: 'Tiêu đề bản tin không được để trống' });
+  }
+
+  const news = db.createNews({
+    title,
+    content,
+    tag,
+    tagText,
+    department,
+    expireAt,
+    pinned
+  }, req.user.name);
+
+  db.logActivity({
+    userId: req.user.id,
+    userName: req.user.name,
+    userRole: req.user.role,
+    userAvatar: req.user.avatar || '👑',
+    action: 'create_news',
+    category: 'system',
+    details: `Admin đã đăng bản tin nội bộ mới: "${news.title}" [${news.tagText}]`
+  });
+
+  // Broadcast realtime via WebSocket to all clients
+  const activeNews = db.getActiveNews();
+  broadcast('news:created', { news, activeNews });
+
+  res.status(201).json({
+    success: true,
+    news,
+    message: 'Đã đăng bản tin nội bộ thành công!'
+  });
+});
+
+// 4. Update news item (Admin only)
+app.put('/api/admin/news/:id', authenticate, requireAdmin, (req, res) => {
+  const news = db.updateNews(req.params.id, req.body);
+  if (!news) {
+    return res.status(404).json({ error: 'Không tìm thấy bản tin cần cập nhật' });
+  }
+
+  db.logActivity({
+    userId: req.user.id,
+    userName: req.user.name,
+    userRole: req.user.role,
+    userAvatar: req.user.avatar || '👑',
+    action: 'update_news',
+    category: 'system',
+    details: `Admin đã chỉnh sửa bản tin nội bộ: "${news.title}"`
+  });
+
+  const activeNews = db.getActiveNews();
+  broadcast('news:updated', { news, activeNews });
+
+  res.json({
+    success: true,
+    news,
+    message: 'Cập nhật bản tin thành công!'
+  });
+});
+
+// 5. Delete news item (Admin only)
+app.delete('/api/admin/news/:id', authenticate, requireAdmin, (req, res) => {
+  const item = db.getNewsById(req.params.id);
+  const success = db.deleteNews(req.params.id);
+  if (!success) {
+    return res.status(404).json({ error: 'Không tìm thấy bản tin cần xóa' });
+  }
+
+  db.logActivity({
+    userId: req.user.id,
+    userName: req.user.name,
+    userRole: req.user.role,
+    userAvatar: req.user.avatar || '👑',
+    action: 'delete_news',
+    category: 'system',
+    details: `Admin đã xóa bản tin nội bộ: "${item ? item.title : req.params.id}"`
+  });
+
+  const activeNews = db.getActiveNews();
+  broadcast('news:deleted', { id: req.params.id, activeNews });
+
+  res.json({
+    success: true,
+    message: 'Đã xóa bản tin nội bộ thành công!'
+  });
 });
 
 // -------------------------------------------------------------

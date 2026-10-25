@@ -619,6 +619,11 @@
         </div>
 
         <div class="ticker-actions">
+          <button type="button" class="ticker-action-btn" id="btnAdminManageNews" title="Quản trị bản tin nội bộ (Admin)" onclick="App.openAdminNewsModal()" style="display:none; color: var(--primary);">
+            <svg class="tf-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+          </button>
           <button type="button" class="ticker-action-btn" id="btnToggleTickerPause" title="Tạm dừng / Tiếp tục chạy tin" onclick="App.toggleTickerPause()">
             <svg class="tf-icon ticker-pause-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
             <svg class="tf-icon ticker-play-icon" style="display:none;" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -2429,6 +2434,124 @@
         <button type="button" class="btn btn-primary btn-sm" data-close-modal="newsDetailModal">
           <span>Đã Hiểu & Đóng</span>
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: QUẢN TRỊ BẢN TIN NỘI BỘ (ADMIN REALTIME NEWS MANAGER - PHƯƠNG ÁN 2) -->
+  <div class="modal-overlay" id="adminNewsModal">
+    <div class="modal-content" style="max-width: 760px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div class="ticker-badge" style="box-shadow: none;">ADMIN</div>
+          <h3 class="modal-title" style="font-size: 16px;">Quản Trị Bản Tin Chạy Chữ Nội Bộ</h3>
+        </div>
+        <button class="modal-close-btn" data-close-modal="adminNewsModal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Sub-header bar with New Post Button -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+          <div style="font-size: 13px; color: var(--text-secondary);">
+            Quản trị nội dung mẩu tin chạy ngang trên thanh Ticker của toàn bộ nhân sự hệ thống.
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" id="btnToggleAddNewsForm" onclick="App.toggleAddNewsForm()" style="display: inline-flex; align-items: center; gap: 6px;">
+            <svg class="tf-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span id="btnToggleAddNewsText">Đăng Tin Mới</span>
+          </button>
+        </div>
+
+        <!-- COLLAPSIBLE FORM: ADD / EDIT NEWS -->
+        <div id="adminNewsFormContainer" style="display: none; background: var(--bg-main); border: 1.5px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; margin-bottom: 18px;">
+          <form id="adminNewsForm" onsubmit="App.handleSaveNews(event)">
+            <input type="hidden" id="adminNewsId">
+            <h4 id="adminNewsFormTitle" style="font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+              <span>➕ Đăng Bản Tin Nội Bộ Mới</span>
+            </h4>
+
+            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Phân Loại / Mức Độ *</label>
+                <select id="adminNewsTag" class="form-control" required>
+                  <option value="urgent">🔴 KHẨN CẤP (Viền đỏ nổi bật)</option>
+                  <option value="success">🟢 VINH DANH (Xanh mint thành tích)</option>
+                  <option value="info" selected>🔵 TIN VUI (Cyan phong trào)</option>
+                  <option value="warning">🟡 LỊCH HỌP (Vàng cảnh báo)</option>
+                  <option value="purple">🟣 AI TRỢ LÝ (Tím công nghệ)</option>
+                  <option value="general">⚪ THÔNG BÁO (Chuẩn chung)</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Phòng Ban Phát Tin *</label>
+                <select id="adminNewsDept" class="form-control" required>
+                  <!-- Populated dynamically via App.populateAdminNewsDeptDropdown() -->
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Tiêu Đề Bản Tin (Hiển thị chạy chữ) *</label>
+              <input type="text" id="adminNewsTitle" class="form-control" required placeholder="Ví dụ: Nhắc nhở cập nhật báo cáo tuần trước 17h30..." maxlength="150">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Nội Dung Chi Tiết (Hiển thị khi nhấp vào tin)</label>
+              <textarea id="adminNewsContent" class="form-control" rows="3" placeholder="Mô tả cụ thể nội dung, địa điểm hoặc hướng dẫn..."></textarea>
+            </div>
+
+            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Ngày Hết Hạn (Tùy chọn)</label>
+                <input type="datetime-local" id="adminNewsExpire" class="form-control">
+                <small style="color: var(--text-muted); font-size: 11px;">Để trống nếu tin phát sóng liên tục</small>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center; gap: 8px; padding-top: 14px;">
+                <label style="display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; cursor: pointer;">
+                  <input type="checkbox" id="adminNewsPinned" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  <strong>📌 Ghim ưu tiên đầu dòng</strong>
+                </label>
+                <label style="display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; cursor: pointer;">
+                  <input type="checkbox" id="adminNewsActive" checked style="width: 16px; height: 16px; accent-color: var(--success);">
+                  <span>🟢 Kích hoạt phát sóng ngay</span>
+                </label>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+              <button type="button" class="btn btn-outline btn-sm" onclick="App.cancelNewsForm()">Hủy Bỏ</button>
+              <button type="submit" class="btn btn-primary btn-sm" id="btnSubmitNews">
+                <span>🚀 Phát Sóng Bản Tin Realtime</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- NEWS LIST TABLE -->
+        <div style="overflow-x: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+          <table class="data-table" style="width: 100%; margin-bottom: 0;">
+            <thead>
+              <tr>
+                <th style="width: 90px;">Mức Độ</th>
+                <th>Tiêu Đề Bản Tin</th>
+                <th style="width: 130px;">Đơn Vị</th>
+                <th style="width: 105px;">Trạng Thái</th>
+                <th style="width: 100px; text-align: center;">Hành Động</th>
+              </tr>
+            </thead>
+            <tbody id="adminNewsTableBody">
+              <!-- Dynamically populated via App.renderAdminNewsTable() -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 12px; color: var(--text-muted);">
+          📡 Mọi thay đổi sẽ phát sóng Realtime tức thì qua WebSocket tới toàn bộ nhân sự.
+        </span>
+        <button type="button" class="btn btn-outline btn-sm" data-close-modal="adminNewsModal">Đóng</button>
       </div>
     </div>
   </div>

@@ -460,5 +460,34 @@ const API = {
     return this.request(`/api/tasks/${encodeURIComponent(taskId)}/unsnooze-alert`, {
       method: 'POST'
     });
+  },
+
+  // Internal News Ticker System (Phương Án 2)
+  async getNews() {
+    return this.request('/api/news');
+  },
+
+  async getAdminNews() {
+    return this.request('/api/admin/news');
+  },
+
+  async createNews(newsData) {
+    return this.request('/api/admin/news', {
+      method: 'POST',
+      body: JSON.stringify(newsData)
+    });
+  },
+
+  async updateNews(id, newsData) {
+    return this.request(`/api/admin/news/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify(newsData)
+    });
+  },
+
+  async deleteNews(id) {
+    return this.request(`/api/admin/news/${encodeURIComponent(id)}`, {
+      method: 'DELETE'
+    });
   }
 };

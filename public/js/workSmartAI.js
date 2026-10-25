@@ -174,17 +174,18 @@ const WorkSmartAI = {
     },
 
     newsTicker: {
-      title: 'Bản Tin Chạy Chữ Nội Bộ (News Ticker Marquee)',
-      keywords: ['tin noi bo', 'bang tin', 'chay chu', 'marquee', 'tin tuc', 'ticker', 'thong bao chay', 'trai sang phai'],
+      title: 'Bản Tin Chạy Chữ Nội Bộ & Quản Trị Realtime (News Ticker Marquee)',
+      keywords: ['tin noi bo', 'bang tin', 'chay chu', 'marquee', 'tin tuc', 'ticker', 'thong bao chay', 'trai sang phai', 'quan ly tin', 'dang tin'],
       answer: `
-        <strong>📢 Bản Tin Chạy Chữ Nội Bộ (News Ticker):</strong><br>
+        <strong>📢 Bản Tin Chạy Chữ Nội Bộ & Quản Trị Realtime:</strong><br>
         • <strong>Vị trí:</strong> Dải tin tức kính mờ ngay dưới thanh Header, chuyển động mượt mà từ trái sang phải.<br>
         • <strong>Tương tác dừng đọc:</strong> Rê chuột hoặc chạm tay vào dòng tin để tạm dừng chạy chữ tức thì.<br>
         • <strong>Xem chi tiết:</strong> Nhấp vào bất kỳ mẩu tin nào để mở cửa sổ xem toàn văn nội dung, phòng ban phát tin và mốc thời gian.<br>
-        • <strong>Điều khiển:</strong> Dùng nút Tạm dừng (⏸/▶) hoặc nút (✕) để ẩn thanh tin cho phiên làm việc.
+        • <strong>Quản trị dành cho Admin (Phương án 2):</strong> Bấm vào biểu tượng cây bút <strong>✏️</strong> trên thanh Ticker để Đăng tin mới, Đặt ngày hết hạn, Ghim đầu dòng và Bật/Tắt phát sóng Realtime qua WebSocket.
       `,
       actions: [
-        { label: '📢 Xem Bảng Công Việc & Bản Tin', callback: () => { App.switchView('kanban'); App.renderNewsTicker(); } }
+        { label: '📢 Xem Bảng Công Việc & Bản Tin', callback: () => { App.switchView('kanban'); App.renderNewsTicker(); } },
+        { label: '⚙️ Mở Quản Trị Bản Tin (Admin)', callback: () => App.openAdminNewsModal() }
       ]
     }
   },

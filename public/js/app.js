@@ -247,21 +247,31 @@ const App = {
     const tickerBar = document.getElementById('newsTickerBar');
     if (!trackEl || !tickerBar) return;
 
+    // Show/hide admin button
+    const adminBtn = document.getElementById('btnAdminManageNews');
+    if (adminBtn) {
+      const isAdmin = this.state.user && this.state.user.role === 'admin';
+      adminBtn.style.display = isAdmin ? 'inline-flex' : 'none';
+    }
+
     if (sessionStorage.getItem('taskflow_ticker_dismissed') === 'true') {
       tickerBar.style.display = 'none';
       return;
     }
     tickerBar.style.display = 'flex';
 
-    const items = this.internalNewsData || [];
+    const items = (this.state.internalNews && this.state.internalNews.length > 0)
+      ? this.state.internalNews
+      : (this.internalNewsData || []);
+
     if (items.length === 0) {
       tickerBar.style.display = 'none';
       return;
     }
 
     const buildItemHtml = (item) => `
-      <div class="ticker-item" onclick="App.openNewsDetail(${item.id})" title="Bấm để xem chi tiết mẩu tin">
-        <span class="ticker-tag ${item.tag}">${item.tagText}</span>
+      <div class="ticker-item" onclick="App.openNewsDetail('${item.id}')" title="Bấm để xem chi tiết mẩu tin">
+        <span class="ticker-tag ${item.tag}">${item.tagText || 'THÔNG BÁO'}</span>
         <span class="ticker-text">${item.title}</span>
         <span class="ticker-separator">✦</span>
       </div>
@@ -289,7 +299,10 @@ const App = {
   },
 
   openNewsDetail(id) {
-    const item = (this.internalNewsData || []).find(n => n.id === id);
+    const items = (this.state.internalNews && this.state.internalNews.length > 0)
+      ? this.state.internalNews
+      : (this.internalNewsData || []);
+    const item = items.find(n => String(n.id) === String(id));
     if (!item) return;
 
     const modal = document.getElementById('newsDetailModal');
@@ -301,15 +314,282 @@ const App = {
 
     if (badge) {
       badge.className = `ticker-tag ${item.tag}`;
-      badge.innerText = item.tagText;
+      badge.innerText = item.tagText || 'THÔNG BÁO';
     }
     if (title) title.innerText = item.title;
-    if (dept) dept.innerText = item.department;
-    if (time) time.innerText = item.time;
-    if (content) content.innerText = item.content;
+    if (dept) dept.innerText = item.department || 'Ban Giám Đốc';
+    if (time) {
+      const d = item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : (item.time || 'Hôm nay');
+      time.innerText = d;
+    }
+    if (content) content.innerText = item.content || item.title;
 
     if (modal) {
       modal.classList.add('show');
+    }
+  },
+
+  // ========================================================
+  // ADMIN NEWS MANAGEMENT (Phương Án 2)
+  // ========================================================
+  async openAdminNewsModal() {
+    if (!this.state.user || this.state.user.role !== 'admin') {
+      this.showToast('Chỉ Quản trị viên (Admin) mới có quyền truy cập bảng quản trị bản tin!', 'danger');
+      return;
+    }
+
+    this.populateAdminNewsDeptDropdown();
+    this.cancelNewsForm();
+
+    const modal = document.getElementById('adminNewsModal');
+    if (modal) {
+      modal.classList.add('show');
+      await this.refreshAdminNewsList();
+    }
+  },
+
+  populateAdminNewsDeptDropdown() {
+    const select = document.getElementById('adminNewsDept');
+    if (!select) return;
+    const depts = (this.state.departments && this.state.departments.length > 0)
+      ? this.state.departments.map(d => d.name)
+      : ['Ban Giám Đốc', 'Khối R&D', 'Phòng Marketing', 'Phòng Kỹ Thuật', 'Phòng Kinh Doanh', 'Phòng Nhân Sự', 'Khối Vận Hành'];
+
+    select.innerHTML = depts.map(d => `<option value="${d}">${d}</option>`).join('');
+  },
+
+  async refreshAdminNewsList() {
+    try {
+      const res = await API.getAdminNews();
+      this.state.adminAllNews = res.news || [];
+      this.renderAdminNewsTable();
+    } catch (err) {
+      console.error('Failed to load admin news', err);
+      this.showToast('Không thể tải danh sách bản tin quản trị', 'danger');
+    }
+  },
+
+  renderAdminNewsTable() {
+    const tbody = document.getElementById('adminNewsTableBody');
+    if (!tbody) return;
+
+    const list = this.state.adminAllNews || [];
+    if (list.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align: center; padding: 24px; color: var(--text-muted);">
+            Chưa có bản tin nào. Hãy bấm <strong>"Đăng Tin Mới"</strong> để phát sóng bản tin đầu tiên!
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    const now = new Date();
+    tbody.innerHTML = list.map(item => {
+      const isExpired = item.expireAt && new Date(item.expireAt) < now;
+      let statusBadge = '';
+      if (!item.active) {
+        statusBadge = '<span class="badge" style="background: rgba(148, 163, 184, 0.2); color: #64748b; font-size: 11px;">⏸ Đã ẩn</span>';
+      } else if (isExpired) {
+        statusBadge = '<span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #d97706; font-size: 11px;">⌛ Hết hạn</span>';
+      } else {
+        statusBadge = '<span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #059669; font-size: 11px;">🟢 Đang phát</span>';
+      }
+
+      const pinnedIcon = item.pinned ? '<span title="Ghim ưu tiên đầu dòng" style="margin-left: 4px; color: #f59e0b;">📌</span>' : '';
+
+      return `
+        <tr>
+          <td>
+            <span class="ticker-tag ${item.tag}" style="font-size: 10px;">${item.tagText || 'THÔNG BÁO'}</span>
+          </td>
+          <td>
+            <div style="font-weight: 600; font-size: 12.5px; color: var(--text-primary);">
+              ${item.title} ${pinnedIcon}
+            </div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+              Tác giả: <strong>${item.author || 'Admin'}</strong> • ${item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : ''}
+              ${item.expireAt ? ` • Hết hạn: ${new Date(item.expireAt).toLocaleDateString('vi-VN')}` : ''}
+            </div>
+          </td>
+          <td>
+            <span style="font-size: 11.5px; color: var(--text-secondary); font-weight: 500;">
+              ${item.department || 'Ban Giám Đốc'}
+            </span>
+          </td>
+          <td>${statusBadge}</td>
+          <td style="text-align: center;">
+            <div style="display: inline-flex; align-items: center; gap: 4px;">
+              <button type="button" class="btn btn-outline btn-sm" onclick="App.editNewsItem('${item.id}')" title="Chỉnh sửa bản tin" style="padding: 3px 6px; font-size: 11px;">
+                ✏️
+              </button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="App.toggleNewsActive('${item.id}')" title="${item.active ? 'Tạm ẩn bản tin' : 'Bật phát sóng'}" style="padding: 3px 6px; font-size: 11px;">
+                ${item.active ? '👁️' : '🚫'}
+              </button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="App.deleteNewsItem('${item.id}')" title="Xóa bản tin" style="padding: 3px 6px; font-size: 11px; color: var(--danger); border-color: rgba(239, 68, 68, 0.4);">
+                🗑️
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  },
+
+  toggleAddNewsForm() {
+    const container = document.getElementById('adminNewsFormContainer');
+    if (!container) return;
+    const isHidden = container.style.display === 'none' || !container.style.display;
+    if (isHidden) {
+      this.resetNewsForm();
+      container.style.display = 'block';
+      document.getElementById('btnToggleAddNewsText').innerText = 'Đóng Form';
+      document.getElementById('adminNewsTitle')?.focus();
+    } else {
+      container.style.display = 'none';
+      document.getElementById('btnToggleAddNewsText').innerText = 'Đăng Tin Mới';
+    }
+  },
+
+  resetNewsForm() {
+    const idEl = document.getElementById('adminNewsId');
+    if (idEl) idEl.value = '';
+    const titleEl = document.getElementById('adminNewsTitle');
+    if (titleEl) titleEl.value = '';
+    const contentEl = document.getElementById('adminNewsContent');
+    if (contentEl) contentEl.value = '';
+    const tagEl = document.getElementById('adminNewsTag');
+    if (tagEl) tagEl.value = 'info';
+    const expireEl = document.getElementById('adminNewsExpire');
+    if (expireEl) expireEl.value = '';
+    const pinnedEl = document.getElementById('adminNewsPinned');
+    if (pinnedEl) pinnedEl.checked = false;
+    const activeEl = document.getElementById('adminNewsActive');
+    if (activeEl) activeEl.checked = true;
+
+    const formTitle = document.getElementById('adminNewsFormTitle');
+    if (formTitle) formTitle.innerHTML = '<span>➕ Đăng Bản Tin Nội Bộ Mới</span>';
+    const submitBtn = document.getElementById('btnSubmitNews');
+    if (submitBtn) submitBtn.innerHTML = '<span>🚀 Phát Sóng Bản Tin Realtime</span>';
+  },
+
+  cancelNewsForm() {
+    const container = document.getElementById('adminNewsFormContainer');
+    if (container) {
+      container.style.display = 'none';
+      const btnText = document.getElementById('btnToggleAddNewsText');
+      if (btnText) btnText.innerText = 'Đăng Tin Mới';
+    }
+    this.resetNewsForm();
+  },
+
+  editNewsItem(id) {
+    const list = this.state.adminAllNews || [];
+    const item = list.find(n => String(n.id) === String(id));
+    if (!item) return;
+
+    const container = document.getElementById('adminNewsFormContainer');
+    if (container) {
+      container.style.display = 'block';
+      const btnText = document.getElementById('btnToggleAddNewsText');
+      if (btnText) btnText.innerText = 'Đóng Form';
+    }
+
+    document.getElementById('adminNewsId').value = item.id;
+    document.getElementById('adminNewsTitle').value = item.title;
+    document.getElementById('adminNewsContent').value = item.content || '';
+    document.getElementById('adminNewsTag').value = item.tag || 'info';
+    document.getElementById('adminNewsDept').value = item.department || '';
+    document.getElementById('adminNewsPinned').checked = !!item.pinned;
+    document.getElementById('adminNewsActive').checked = item.active !== false;
+
+    if (item.expireAt) {
+      const dt = new Date(item.expireAt);
+      const isoLocal = new Date(dt.getTime() - dt.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+      document.getElementById('adminNewsExpire').value = isoLocal;
+    } else {
+      document.getElementById('adminNewsExpire').value = '';
+    }
+
+    document.getElementById('adminNewsFormTitle').innerHTML = '<span>✏️ Chỉnh Sửa Bản Tin Nội Bộ</span>';
+    document.getElementById('btnSubmitNews').innerHTML = '<span>💾 Lưu Thay Đổi & Phát Sóng</span>';
+
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('adminNewsTitle')?.focus();
+  },
+
+  async handleSaveNews(e) {
+    e.preventDefault();
+    const id = document.getElementById('adminNewsId').value;
+    const title = document.getElementById('adminNewsTitle').value.trim();
+    const content = document.getElementById('adminNewsContent').value.trim();
+    const tag = document.getElementById('adminNewsTag').value;
+    const department = document.getElementById('adminNewsDept').value;
+    const expireVal = document.getElementById('adminNewsExpire').value;
+    const pinned = document.getElementById('adminNewsPinned').checked;
+    const active = document.getElementById('adminNewsActive').checked;
+
+    if (!title) {
+      this.showToast('Vui lòng nhập tiêu đề bản tin', 'warning');
+      return;
+    }
+
+    const submitBtn = document.getElementById('btnSubmitNews');
+    if (submitBtn) submitBtn.disabled = true;
+
+    const payload = {
+      title,
+      content,
+      tag,
+      department,
+      pinned,
+      active,
+      expireAt: expireVal ? new Date(expireVal).toISOString() : null
+    };
+
+    try {
+      if (id) {
+        await API.updateNews(id, payload);
+        this.showToast('✅ Đã cập nhật và phát sóng bản tin thành công!', 'success');
+      } else {
+        await API.createNews(payload);
+        this.showToast('🚀 Đã đăng và phát sóng bản tin tới toàn bộ hệ thống!', 'success');
+      }
+      this.cancelNewsForm();
+      await this.refreshAdminNewsList();
+    } catch (err) {
+      console.error('Save news error:', err);
+      this.showToast(err.message || 'Lỗi khi lưu bản tin', 'danger');
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  },
+
+  async toggleNewsActive(id) {
+    const list = this.state.adminAllNews || [];
+    const item = list.find(n => String(n.id) === String(id));
+    if (!item) return;
+
+    try {
+      const newStatus = !item.active;
+      await API.updateNews(id, { active: newStatus });
+      this.showToast(newStatus ? '🟢 Đã kích hoạt phát sóng bản tin' : '⏸ Đã tạm ẩn bản tin', 'info');
+      await this.refreshAdminNewsList();
+    } catch (err) {
+      this.showToast('Lỗi khi đổi trạng thái bản tin', 'danger');
+    }
+  },
+
+  async deleteNewsItem(id) {
+    if (!confirm('Bạn có chắc chắn muốn xóa vĩnh viễn bản tin này không?')) return;
+
+    try {
+      await API.deleteNews(id);
+      this.showToast('🗑️ Đã xóa bản tin thành công!', 'success');
+      await this.refreshAdminNewsList();
+    } catch (err) {
+      this.showToast('Lỗi khi xóa bản tin', 'danger');
     }
   },
 
@@ -837,27 +1117,60 @@ const App = {
           }
         });
         break;
+
+      case 'news:created':
+        this.state.internalNews = data.activeNews || [];
+        this.renderNewsTicker();
+        if (data.news) {
+          this.showToast(`📢 Bản tin mới từ ${data.news.department}: "${data.news.title}"`, 'info');
+          this.playSound('info');
+        }
+        if (document.getElementById('adminNewsModal')?.classList.contains('show')) {
+          this.refreshAdminNewsList();
+        }
+        break;
+
+      case 'news:updated':
+        this.state.internalNews = data.activeNews || [];
+        this.renderNewsTicker();
+        if (document.getElementById('adminNewsModal')?.classList.contains('show')) {
+          this.refreshAdminNewsList();
+        }
+        break;
+
+      case 'news:deleted':
+        this.state.internalNews = data.activeNews || [];
+        this.renderNewsTicker();
+        if (document.getElementById('adminNewsModal')?.classList.contains('show')) {
+          this.refreshAdminNewsList();
+        }
+        break;
     }
   },
 
   async loadInitialData() {
     try {
-      const [tasksRes, usersRes, notifsRes, deptsRes, autoRes] = await Promise.all([
+      const [tasksRes, usersRes, notifsRes, deptsRes, autoRes, newsRes] = await Promise.all([
         API.getTasks(),
         API.getUsers(),
         API.getNotifications(),
         API.getDepartments(),
-        API.getAutomations().catch(() => ({ automations: [] }))
+        API.getAutomations().catch(() => ({ automations: [] })),
+        API.getNews().catch(() => ({ news: [] }))
       ]);
       this.state.tasks = tasksRes.tasks || [];
       this.state.users = usersRes.users || [];
       this.state.notifications = notifsRes.notifications || [];
       this.state.departments = (deptsRes && deptsRes.departments) ? deptsRes.departments : [];
       this.state.automations = (autoRes && autoRes.automations) ? autoRes.automations : [];
+      if (newsRes && newsRes.news) {
+        this.state.internalNews = newsRes.news;
+      }
       this.populateFilterDropdowns();
       this.populateDepartmentDropdowns();
       this.populateDemoUserDropdown();
       this.updateNotificationBadge();
+      this.renderNewsTicker();
     } catch (err) {
       console.error('Failed to load initial data', err);
     }
