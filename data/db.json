@@ -18134,7 +18134,7 @@
       "title": "🚨 Nhân viên trễ hạn: Lê Văn Hùng",
       "message": "Công việc \"Tính KPI Khảo Thí\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-885",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-25T16:39:18.444Z"
     },
     {
@@ -18255,7 +18255,7 @@
       "title": "🚨 Nhân viên trễ hạn: Lê Văn Hùng",
       "message": "Công việc \"KH KPI Khảo thí 2027. Phân bổ KPI khu vực, hệ thống\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-877",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-25T16:39:18.443Z"
     },
     {
@@ -18376,7 +18376,7 @@
       "title": "🚨 Nhân viên trễ hạn: Lê Văn Hùng",
       "message": "Công việc \"Tổng hợp số liệu Cambridge  - Nhập báo cáo tiến độ KPI 1600\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-869",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-25T16:39:18.442Z"
     },
     {
@@ -18530,7 +18530,7 @@
       "title": "🚨 Nhân viên trễ hạn: Lê Văn Hùng",
       "message": "Công việc \"Kiểm tra tiến độ TESOL Batch 06,07 - Tổng hợp form HV kết khóa TESOL Batch 06,07 - Báo cáo kết khóa TESOL Batch 07\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-858",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-25T16:39:18.442Z"
     },
     {
@@ -18574,7 +18574,7 @@
       "title": "🚨 Nhân viên trễ hạn: Lê Văn Hùng",
       "message": "Công việc \"Tổng hợp số liệu Cambridge  - Nhập báo cáo tiến độ KPI 1600 - Liên hệ các trung tâm điều chỉnh danh sách đki\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-857",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-25T16:39:18.442Z"
     },
     {
@@ -18761,7 +18761,7 @@
       "title": "🚨 Nhân viên trễ hạn: Lê Văn Hùng",
       "message": "Công việc \"Chuẩn bị báo cáo số liệu Khảo thí\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-843",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-25T16:39:18.440Z"
     },
     {
@@ -18860,7 +18860,7 @@
       "title": "🚨 Nhân viên trễ hạn: Lê Văn Hùng",
       "message": "Công việc \"Làm báo cáo số liệu tháng 9/2026\" phụ trách bởi Lê Văn Hùng đã trễ hạn!",
       "taskId": "TSK-835",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-25T16:39:18.440Z"
     },
     {
@@ -19256,7 +19256,7 @@
       "title": "🚨 Nhân viên trễ hạn: Trần Văn Dũng",
       "message": "Công việc \"Tờ trình kế hoạch &amp; ngân sách Bảo vệ - Tạp vụ\" phụ trách bởi Trần Văn Dũng đã trễ hạn!",
       "taskId": "TSK-775",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-25T16:39:18.436Z"
     },
     {
@@ -19432,7 +19432,7 @@
       "title": "🚨 Nhân viên trễ hạn: Trần Văn Dũng",
       "message": "Công việc \"Báo cáo tiến độ khắc phục và CLDV.\" phụ trách bởi Trần Văn Dũng đã trễ hạn!",
       "taskId": "TSK-762",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-25T16:39:18.434Z"
     },
     {
@@ -19509,7 +19509,7 @@
       "title": "🚨 Nhân viên trễ hạn: Trần Văn Dũng",
       "message": "Công việc \"Gửi báo cáo chi tiết cho TT/GĐKV.\" phụ trách bởi Trần Văn Dũng đã trễ hạn!",
       "taskId": "TSK-758",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-25T16:39:18.433Z"
     },
     {
@@ -19553,7 +19553,7 @@
       "title": "🚨 Nhân viên trễ hạn: Trần Văn Dũng",
       "message": "Công việc \"Báo cáo tuần, lập lịch tuần tới.\" phụ trách bởi Trần Văn Dũng đã trễ hạn!",
       "taskId": "TSK-757",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-25T16:39:18.433Z"
     },
     {
@@ -19707,7 +19707,7 @@
       "title": "🚨 Nhân viên trễ hạn: Trần Văn Dũng",
       "message": "Công việc \"Hoàn thiện báo cáo rà soát từng TT.\" phụ trách bởi Trần Văn Dũng đã trễ hạn!",
       "taskId": "TSK-746",
-      "read": false,
+      "read": true,
       "createdAt": "2026-10-25T16:39:18.431Z"
     },
     {
@@ -19844,6 +19844,71 @@
     }
   ],
   "activities": [
+    {
+      "id": "act-1792947271700-0ccpx",
+      "userId": "usr-1792209027761",
+      "userName": "Trần Tiến",
+      "userRole": "admin",
+      "userAvatar": "👑",
+      "action": "auth_sso_login",
+      "category": "auth",
+      "details": "Đã xác thực và đăng nhập 1-click qua SSO Google Workspace: trantien.dni@vmg.edu.vn",
+      "taskId": null,
+      "taskTitle": null,
+      "timestamp": "2026-10-25T16:54:31.700Z"
+    },
+    {
+      "id": "act-1792946757219-j576a",
+      "userId": "usr-1",
+      "userName": "Trần Tiến",
+      "userRole": "admin",
+      "userAvatar": "/uploads/avatars/avatar-usr-1-1792747940607.png?t=1792747940608",
+      "action": "auth_login",
+      "category": "auth",
+      "details": "Quản trị viên (Admin) đã đăng nhập vào hệ thống (admin@company.com)",
+      "taskId": null,
+      "taskTitle": null,
+      "timestamp": "2026-10-25T16:45:57.219Z"
+    },
+    {
+      "id": "act-1792946750605-xp92v",
+      "userId": "usr-1792209027761",
+      "userName": "Trần Tiến",
+      "userRole": "admin",
+      "userAvatar": "👑",
+      "action": "auth_logout",
+      "category": "auth",
+      "details": "Quản trị viên (Admin) đã đăng xuất khỏi phiên làm việc",
+      "taskId": null,
+      "taskTitle": null,
+      "timestamp": "2026-10-25T16:45:50.605Z"
+    },
+    {
+      "id": "act-1792946659128-6x99i",
+      "userId": "usr-1792209027761",
+      "userName": "Trần Tiến",
+      "userRole": "admin",
+      "userAvatar": "👑",
+      "action": "auth_sso_login",
+      "category": "auth",
+      "details": "Đã xác thực và đăng nhập 1-click qua SSO Google Workspace: trantien.dni@vmg.edu.vn",
+      "taskId": null,
+      "taskTitle": null,
+      "timestamp": "2026-10-25T16:44:19.128Z"
+    },
+    {
+      "id": "act-1792946653774-zzyhu",
+      "userId": "usr-1792209027761",
+      "userName": "Trần Tiến",
+      "userRole": "admin",
+      "userAvatar": "👑",
+      "action": "auth_logout",
+      "category": "auth",
+      "details": "Quản trị viên (Admin) đã đăng xuất khỏi phiên làm việc",
+      "taskId": null,
+      "taskTitle": null,
+      "timestamp": "2026-10-25T16:44:13.774Z"
+    },
     {
       "id": "act-1792946382941-2gvy2",
       "userId": "usr-1792209027761",
@@ -26278,71 +26343,6 @@
       "taskId": "TSK-764",
       "taskTitle": "Phân công kiểm tra CLDV tháng 10.",
       "timestamp": "2026-10-22T11:59:22.801Z"
-    },
-    {
-      "id": "act-1792670362778-opmc5",
-      "userId": "bot-auto",
-      "userName": "🤖 Gắn nhãn cảnh báo việc Trễ hạn",
-      "userRole": "admin",
-      "userAvatar": "⏰",
-      "action": "automation_executed",
-      "category": "system",
-      "details": "Tự động gắn thẻ \"Quá hạn\" cho công việc trễ hạn #TSK-763",
-      "taskId": null,
-      "taskTitle": null,
-      "timestamp": "2026-10-22T11:59:22.778Z"
-    },
-    {
-      "id": "act-1792670362758-czjvc",
-      "userId": "bot-auto",
-      "userName": "⚡ Bot Tự Động",
-      "userRole": "admin",
-      "userAvatar": "👑",
-      "action": "update_task",
-      "category": "task",
-      "details": "Đã cập nhật công việc: \"Kiểm tra chữ ký email trước 14:00.\"",
-      "taskId": "TSK-763",
-      "taskTitle": "Kiểm tra chữ ký email trước 14:00.",
-      "timestamp": "2026-10-22T11:59:22.758Z"
-    },
-    {
-      "id": "act-1792670362675-rbca2",
-      "userId": "bot-auto",
-      "userName": "🤖 Gắn nhãn cảnh báo việc Trễ hạn",
-      "userRole": "admin",
-      "userAvatar": "⏰",
-      "action": "automation_executed",
-      "category": "system",
-      "details": "Tự động gắn thẻ \"Quá hạn\" cho công việc trễ hạn #TSK-762",
-      "taskId": null,
-      "taskTitle": null,
-      "timestamp": "2026-10-22T11:59:22.675Z"
-    },
-    {
-      "id": "act-1792670362652-gndsu",
-      "userId": "bot-auto",
-      "userName": "⚡ Bot Tự Động",
-      "userRole": "admin",
-      "userAvatar": "👑",
-      "action": "update_task",
-      "category": "task",
-      "details": "Đã cập nhật công việc: \"Báo cáo tiến độ khắc phục và CLDV.\"",
-      "taskId": "TSK-762",
-      "taskTitle": "Báo cáo tiến độ khắc phục và CLDV.",
-      "timestamp": "2026-10-22T11:59:22.652Z"
-    },
-    {
-      "id": "act-1792670362627-yk2qd",
-      "userId": "bot-auto",
-      "userName": "🤖 Gắn nhãn cảnh báo việc Trễ hạn",
-      "userRole": "admin",
-      "userAvatar": "⏰",
-      "action": "automation_executed",
-      "category": "system",
-      "details": "Tự động gắn thẻ \"Quá hạn\" cho công việc trễ hạn #TSK-761",
-      "taskId": null,
-      "taskTitle": null,
-      "timestamp": "2026-10-22T11:59:22.627Z"
     }
   ],
   "settings": {

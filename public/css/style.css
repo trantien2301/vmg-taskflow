@@ -3151,8 +3151,39 @@ body, .sidebar, .top-header, .kpi-card, .kanban-col, .task-card, .table-card, .m
 .ticker-actions {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   flex-shrink: 0;
+}
+
+.btn-ticker-admin {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(14, 165, 233, 0.15);
+  border: 1px solid rgba(14, 165, 233, 0.4);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+[data-theme="dark"] .btn-ticker-admin {
+  background: rgba(14, 165, 233, 0.22);
+  border-color: rgba(14, 165, 233, 0.5);
+  color: #38bdf8;
+}
+
+.btn-ticker-admin:hover {
+  background: var(--brand-gradient);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.4);
+  transform: translateY(-1px);
 }
 
 .ticker-action-btn {
@@ -3201,6 +3232,13 @@ body, .sidebar, .top-header, .kpi-card, .kanban-col, .task-card, .table-card, .m
     font-size: 11px;
     gap: 6px;
     padding: 2px 4px;
+  }
+  .btn-ticker-admin {
+    padding: 2px 6px;
+    font-size: 10px;
+  }
+  .btn-ticker-admin .btn-ticker-label {
+    display: none;
   }
   .ticker-track {
     gap: 20px;

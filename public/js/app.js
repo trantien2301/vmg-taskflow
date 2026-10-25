@@ -348,6 +348,14 @@ const App = {
     }
   },
 
+  handleBadgeClick() {
+    if (this.state.user && (this.state.user.role === 'admin' || this.state.user.permissions?.canManageUsers)) {
+      this.openAdminNewsModal();
+    } else {
+      this.showToast('📢 Bản tin nội bộ trực tuyến TaskFlow Pro (Chạy từ trái sang phải)', 'info');
+    }
+  },
+
   populateAdminNewsDeptDropdown() {
     const select = document.getElementById('adminNewsDept');
     if (!select) return;
@@ -2135,10 +2143,14 @@ const App = {
     const adminTitleEl = document.getElementById('navSectionAdminTitle');
     const adminUsersNav = document.getElementById('adminUsersNavItem');
     const adminActivitiesNav = document.getElementById('adminActivitiesNavItem');
+    const adminNewsNav = document.getElementById('adminNewsNavItem');
+    const adminNewsBtn = document.getElementById('btnAdminManageNews');
 
     if (adminTitleEl) adminTitleEl.style.display = isAdminOrHr ? 'block' : 'none';
     if (adminUsersNav) adminUsersNav.style.display = isAdminOrHr ? 'flex' : 'none';
     if (adminActivitiesNav) adminActivitiesNav.style.display = isAdminOrHr ? 'flex' : 'none';
+    if (adminNewsNav) adminNewsNav.style.display = isAdminOrHr ? 'flex' : 'none';
+    if (adminNewsBtn) adminNewsBtn.style.display = isAdminOrHr ? 'inline-flex' : 'none';
 
     // Automation Navigation visibility
     const autoNav = document.getElementById('navItemAutomation');
