@@ -156,6 +156,14 @@ const App = {
     if (loginScreen) loginScreen.style.display = 'flex';
     if (appContainer) appContainer.style.display = 'none';
 
+    // Hide Work Smart AI widget on Login Screen
+    if (window.WorkSmartAI && typeof WorkSmartAI.hide === 'function') {
+      WorkSmartAI.hide();
+    } else {
+      const aiWidget = document.getElementById('workSmartAiWidget');
+      if (aiWidget) aiWidget.style.display = 'none';
+    }
+
     // Reset login form fields
     const emailInput = document.getElementById('loginEmail');
     const pwdInput = document.getElementById('loginPassword');
@@ -170,6 +178,14 @@ const App = {
     const appContainer = document.getElementById('appContainer');
     if (loginScreen) loginScreen.style.display = 'none';
     if (appContainer) appContainer.style.display = 'flex';
+
+    // Show Work Smart AI widget inside App View
+    if (window.WorkSmartAI && typeof WorkSmartAI.show === 'function') {
+      WorkSmartAI.show();
+    } else {
+      const aiWidget = document.getElementById('workSmartAiWidget');
+      if (aiWidget) aiWidget.style.display = '';
+    }
   },
 
   switchAuthTab(tab) {

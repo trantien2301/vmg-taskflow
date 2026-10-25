@@ -165,7 +165,40 @@ const WorkSmartAI = {
   init() {
     this.renderWidget();
     this.loadHistory();
+    this.updateVisibility();
     console.log('Work Smart AI initialized successfully.');
+  },
+
+  show() {
+    const widget = document.getElementById('workSmartAiWidget');
+    if (widget) {
+      widget.style.display = '';
+    }
+  },
+
+  hide() {
+    const widget = document.getElementById('workSmartAiWidget');
+    if (widget) {
+      widget.style.display = 'none';
+    }
+    this.isOpen = false;
+    const win = document.getElementById('aiChatWindow');
+    const btn = document.getElementById('aiLauncherBtn');
+    if (win) win.style.display = 'none';
+    if (btn) btn.classList.remove('active');
+  },
+
+  updateVisibility() {
+    const loginScreen = document.getElementById('loginScreen');
+    const appContainer = document.getElementById('appContainer');
+    const isLoginActive = loginScreen && loginScreen.style.display !== 'none';
+    const isAppVisible = appContainer && appContainer.style.display !== 'none';
+
+    if (isLoginActive || !isAppVisible) {
+      this.hide();
+    } else {
+      this.show();
+    }
   },
 
   renderWidget() {
@@ -174,7 +207,8 @@ const WorkSmartAI = {
       container = document.createElement('div');
       container.id = 'workSmartAiWidget';
       container.className = 'work-smart-ai-widget';
-      document.body.appendChild(container);
+      const targetParent = document.getElementById('appContainer') || document.body;
+      targetParent.appendChild(container);
     }
 
     container.innerHTML = `

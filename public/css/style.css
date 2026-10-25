@@ -7176,6 +7176,13 @@ body, .sidebar, .top-header, .kpi-card, .kanban-col, .task-card, .table-card, .m
    Brand: Cyan-Emerald Gradient Flow, Glassmorphism, Dual Theme
    ======================================================== */
 
+/* Hide Work Smart AI widget on Login Screen */
+.login-screen:not([style*="display: none"]) ~ .app-container #workSmartAiWidget,
+.login-screen:not([style*="display: none"]) ~ #workSmartAiWidget,
+body:has(#loginScreen:not([style*="display: none"])) #workSmartAiWidget {
+  display: none !important;
+}
+
 .work-smart-ai-widget {
   position: fixed;
   bottom: 24px;
