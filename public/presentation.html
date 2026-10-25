@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskFlow Pro - Báo Cáo Giới Thiệu & Chiến Lược Quản Trị Vận Hành</title>
+  <link rel="icon" type="image/png" href="images/taskflow-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ========================================================
+       DESIGN TOKENS & DUAL THEMES (TASKFLOW PRO COMPLIANT)
+       ======================================================== */
+    :root {
+      --brand-cyan: #0ea5e9;
+      --brand-emerald: #10b981;
+      --brand-gradient: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+      --brand-gradient-hover: linear-gradient(135deg, #0284c7 0%, #059669 100%);
+      --brand-glow-cyan: 0 0 24px rgba(14, 165, 233, 0.45);
+      --brand-glow-emerald: 0 0 24px rgba(16, 185, 129, 0.4);
+      --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      /* Dark Theme (Default) */
+      --bg-main: #090d16;
+      --bg-surface: #0f172a;
+      --bg-card: rgba(17, 24, 39, 0.85);
+      --bg-card-hover: rgba(30, 41, 59, 0.95);
+      --bg-glass: rgba(15, 23, 42, 0.72);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(14, 165, 233, 0.35);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
+      --shadow-soft: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    [data-theme="light"] {
+      --bg-main: #f1f5f9;
+      --bg-surface: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.92);
+      --bg-card-hover: #ffffff;
+      --bg-glass: rgba(255, 255, 255, 0.82);
+      --border-color: rgba(0, 0, 0, 0.08);
+      --border-highlight: rgba(14, 165, 233, 0.4);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --shadow-soft: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+      --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      font-family: var(--font-main);
+      line-height: 1.65;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Ambient Background Glow */
+    .ambient-glow {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      filter: blur(140px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.15;
+    }
+    .glow-cyan { top: -100px; left: -100px; background: #0ea5e9; }
+    .glow-emerald { bottom: 10%; right: -100px; background: #10b981; }
+
+    /* Container */
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ========================================================
+       TOP NAVBAR
+       ======================================================== */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: var(--bg-glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .logo-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--brand-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(14, 165, 233, 0.4);
+    }
+    .brand-title {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .brand-title span {
+      background: var(--brand-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(14, 165, 233, 0.15);
+      color: var(--brand-cyan);
+      border: 1px solid rgba(14, 165, 233, 0.3);
+      text-transform: uppercase;
+      margin-left: 4px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14.5px;
+      font-weight: 600;
+      transition: color 0.2s ease;
+      position: relative;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--text-primary);
+    }
+    .nav-links a.active::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      width: 100%;
+      height: 2.5px;
+      background: var(--brand-gradient);
+      border-radius: 2px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .theme-toggle-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .theme-toggle-btn:hover {
+      border-color: var(--brand-cyan);
+      box-shadow: 0 0 12px rgba(14, 165, 233, 0.25);
+    }
+    .btn-launch-app {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      background: var(--brand-gradient);
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 700;
+      box-shadow: 0 4px 14px rgba(14, 165, 233, 0.35);
+      transition: all 0.2s ease;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-launch-app:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(14, 165, 233, 0.5);
+    }
+
+    /* ========================================================
+       HERO BANNER
+       ======================================================== */
+    .hero-section {
+      padding: 80px 0 60px;
+      text-align: center;
+    }
+    .hero-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(14, 165, 233, 0.1);
+      border: 1px solid rgba(14, 165, 233, 0.3);
+      color: var(--brand-cyan);
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .hero-title {
+      font-size: 48px;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+      margin-bottom: 22px;
+      max-width: 980px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero-title .gradient-text {
+      background: var(--brand-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-desc {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 840px;
+      margin: 0 auto 38px;
+      font-weight: 400;
+      line-height: 1.7;
+    }
+    .hero-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-top: 50px;
+    }
+    .stat-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 24px 18px;
+      backdrop-filter: blur(12px);
+      transition: all 0.3s ease;
+      text-align: left;
+    }
+    .stat-box:hover {
+      border-color: var(--brand-cyan);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-card);
+    }
+    .stat-number {
+      font-size: 32px;
+      font-weight: 800;
+      background: var(--brand-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+      font-family: var(--font-mono);
+    }
+    .stat-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .stat-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* ========================================================
+       SECTION HEADERS
+       ======================================================== */
+    .section-wrap {
+      padding: 70px 0;
+      border-top: 1px solid var(--border-color);
+    }
+    .section-header {
+      margin-bottom: 44px;
+      text-align: center;
+    }
+    .section-tag {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--brand-emerald);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+      display: inline-block;
+    }
+    .section-title {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+    }
+    .section-desc {
+      font-size: 16px;
+      color: var(--text-secondary);
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    /* ========================================================
+       TAB CONTROLS & SWITCHERS
+       ======================================================== */
+    .tab-pills-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 36px;
+    }
+    .tab-pills {
+      display: inline-flex;
+      background: var(--bg-surface);
+      padding: 5px;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+    }
+    .tab-pill-btn {
+      padding: 10px 24px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tab-pill-btn.active {
+      background: var(--brand-gradient);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(14, 165, 233, 0.4);
+    }
+
+    /* ========================================================
+       PILLAR 1: PDCA & POLC MATRIX CARDS
+       ======================================================== */
+    .matrix-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+    .matrix-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      backdrop-filter: blur(12px);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .matrix-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--brand-gradient);
+      opacity: 0.8;
+    }
+    .matrix-card:hover {
+      border-color: var(--border-highlight);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card);
+    }
+    .matrix-badge-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .matrix-step-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      letter-spacing: 0.05em;
+    }
+    .badge-blue { background: rgba(14, 165, 233, 0.15); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.3); }
+    .badge-green { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+
+    .matrix-role-tag {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .matrix-title {
+      font-size: 21px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .matrix-desc {
+      font-size: 14.5px;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13.5px;
+      color: var(--text-primary);
+    }
+    .feature-item svg {
+      flex-shrink: 0;
+      margin-top: 3px;
+      color: var(--brand-emerald);
+    }
+    .feature-item strong {
+      color: var(--brand-cyan);
+    }
+
+    /* Comparison Table */
+    .comparison-card {
+      margin-top: 40px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      overflow-x: auto;
+    }
+    .comp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      text-align: left;
+    }
+    .comp-table th {
+      padding: 14px 18px;
+      border-bottom: 2px solid var(--border-color);
+      color: var(--text-primary);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+    }
+    .comp-table td {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      vertical-align: top;
+    }
+    .comp-table tr:hover td {
+      background: rgba(14, 165, 233, 0.04);
+    }
+    .comp-badge-bad {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      font-weight: 700;
+      font-size: 11.5px;
+    }
+    .comp-badge-good {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      font-weight: 700;
+      font-size: 11.5px;
+    }
+
+    /* ========================================================
+       PILLAR 2: UI/UX & ENGINEERING INNOVATIONS
+       ======================================================== */
+    .ui-showcase-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+    .ui-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 26px;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .ui-card:hover {
+      border-color: var(--brand-cyan);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card);
+    }
+    .ui-icon-wrap {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(14, 165, 233, 0.12);
+      border: 1px solid rgba(14, 165, 233, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--brand-cyan);
+      margin-bottom: 20px;
+    }
+    .ui-card-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+    .ui-card-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 16px;
+      flex: 1;
+    }
+    .ui-tag-pill {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--brand-emerald);
+      background: rgba(16, 185, 129, 0.1);
+      padding: 4px 10px;
+      border-radius: 6px;
+      align-self: flex-start;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    /* Live Interactive Demo Bar */
+    .interactive-demo-card {
+      margin-top: 36px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-highlight);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-card);
+    }
+    .demo-header-label {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--brand-cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mock-ticker-bar {
+      height: 38px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 12px;
+      overflow: hidden;
+    }
+    .mock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--brand-gradient);
+      color: #ffffff;
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .mock-marquee {
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+    }
+    .mock-track {
+      display: inline-block;
+      animation: mockScroll 25s linear infinite;
+      font-size: 12.5px;
+      color: var(--text-primary);
+    }
+    @keyframes mockScroll {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* ========================================================
+       PILLAR 3: STRATEGIC ROADMAP & UNIFIED PLATFORM
+       ======================================================== */
+    .timeline-container {
+      position: relative;
+      margin: 40px 0;
+    }
+    .timeline-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: var(--border-color);
+      transform: translateX(-50%);
+    }
+    .timeline-row {
+      display: flex;
+      justify-content: flex-end;
+      padding-right: 50px;
+      position: relative;
+      margin-bottom: 40px;
+      width: 50%;
+    }
+    .timeline-row.inverted {
+      align-self: flex-end;
+      margin-left: 50%;
+      justify-content: flex-start;
+      padding-right: 0;
+      padding-left: 50px;
+    }
+    .timeline-dot {
+      position: absolute;
+      top: 24px;
+      right: -11px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      border: 3px solid var(--brand-cyan);
+      box-shadow: 0 0 12px var(--brand-cyan);
+      z-index: 2;
+    }
+    .timeline-row.inverted .timeline-dot {
+      right: auto;
+      left: -11px;
+      border-color: var(--brand-emerald);
+      box-shadow: 0 0 12px var(--brand-emerald);
+    }
+    .timeline-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 26px;
+      width: 100%;
+      backdrop-filter: blur(12px);
+      transition: all 0.3s ease;
+    }
+    .timeline-card:hover {
+      border-color: var(--border-highlight);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-card);
+    }
+    .timeline-phase {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--brand-cyan);
+      margin-bottom: 6px;
+    }
+    .timeline-title {
+      font-size: 19px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .timeline-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    /* Architecture Layers */
+    .arch-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 40px;
+    }
+    .arch-layer {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: all 0.25s ease;
+    }
+    .arch-layer:hover {
+      border-color: var(--brand-cyan);
+      background: var(--bg-card-hover);
+    }
+    .layer-level {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--brand-gradient);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-family: var(--font-mono);
+    }
+    .layer-info {
+      flex: 1;
+    }
+    .layer-title {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .layer-desc {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+    }
+    .layer-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .layer-tag {
+      font-size: 11px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      padding: 3px 8px;
+      border-radius: 5px;
+      background: rgba(14, 165, 233, 0.12);
+      color: var(--brand-cyan);
+      border: 1px solid rgba(14, 165, 233, 0.25);
+    }
+
+    /* ========================================================
+       EXECUTIVE SUMMARY & CTA FOOTER
+       ======================================================== */
+    .cta-card {
+      margin-top: 60px;
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, rgba(16, 185, 129, 0.15) 100%);
+      border: 1.5px solid var(--border-highlight);
+      border-radius: var(--radius-xl);
+      padding: 50px 40px;
+      text-align: center;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 40px rgba(14, 165, 233, 0.2);
+    }
+    .cta-title {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+    .cta-desc {
+      font-size: 16px;
+      color: var(--text-secondary);
+      max-width: 740px;
+      margin: 0 auto 30px;
+    }
+    .cta-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+    }
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 10px;
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      border: 1px solid var(--border-color);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-secondary:hover {
+      border-color: var(--brand-cyan);
+      transform: translateY(-2px);
+    }
+
+    footer {
+      padding: 40px 0;
+      text-align: center;
+      border-top: 1px solid var(--border-color);
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ========================================================
+       RESPONSIVE DESIGN (RULE 7 COMPLIANT)
+       ======================================================== */
+    @media (max-width: 992px) {
+      .hero-title { font-size: 36px; }
+      .hero-stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .matrix-grid-4 { grid-template-columns: 1fr; }
+      .ui-showcase-grid { grid-template-columns: 1fr; }
+      .timeline-container::before { left: 20px; }
+      .timeline-row, .timeline-row.inverted {
+        width: 100%;
+        margin-left: 0;
+        padding-left: 50px;
+        padding-right: 0;
+      }
+      .timeline-dot, .timeline-row.inverted .timeline-dot {
+        left: 9px;
+        right: auto;
+      }
+    }
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .hero-title { font-size: 28px; }
+      .hero-desc { font-size: 15px; }
+      .hero-stats-grid { grid-template-columns: 1fr; }
+      .cta-buttons { flex-direction: column; }
+      .arch-layer { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-glow glow-cyan"></div>
+  <div class="ambient-glow glow-emerald"></div>
+
+  <!-- TOP STICKY NAVBAR -->
+  <header class="top-nav">
+    <div class="container nav-inner">
+      <a href="#" class="brand-logo">
+        <div class="logo-badge">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <div class="brand-title">TaskFlow <span>Pro</span></div>
+        <span class="brand-tag">v3.5 Platform</span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#pdca-polc" class="active">Quản Trị PDCA & POLC</a></li>
+          <li><a href="#ui-ux">Thiết Kế UI/UX</a></li>
+          <li><a href="#platform-strategy">Chiến Lược Platform</a></li>
+          <li><a href="#architecture">Kiến Trúc Kỹ Thuật</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <button type="button" class="theme-toggle-btn" id="btnThemeToggle" title="Chuyển chế độ Sáng / Tối">
+          <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+        <a href="/" target="_blank" class="btn-launch-app">
+          <span>Vào Ứng Dụng</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO EXECUTIVE BANNER -->
+  <main class="container">
+    <section class="hero-section">
+      <div class="hero-badge-pill">
+        <span>✦</span> Báo Cáo Chuyên Đề Quản Trị Học & Công Nghệ
+      </div>
+      <h1 class="hero-title">
+        Hiện Thực Hóa <span class="gradient-text">PDCA & POLC</span> Trong Kỷ Nguyên Số Hoá Với <span class="gradient-text">TaskFlow Pro</span>
+      </h1>
+      <p class="hero-desc">
+        Hệ điều hành quản trị luồng công việc thời gian thực (Realtime Work Management Platform) kết hợp triết lý quản trị hiện đại, trải nghiệm người dùng Dual-Theme sang trọng và chiến lược mở rộng thành Nền Tảng Hợp Nhất toàn doanh nghiệp.
+      </p>
+
+      <div class="hero-stats-grid">
+        <div class="stat-box">
+          <div class="stat-number">100%</div>
+          <div class="stat-label">Thời Gian Thực (Realtime)</div>
+          <div class="stat-sub">Đồng bộ WebSocket tức thì 2 chiều</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number">16+</div>
+          <div class="stat-label">Phòng Ban Chuẩn Hóa</div>
+          <div class="stat-sub">SLA, KPI và quy trình khép kín</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number">4 Tầng</div>
+          <div class="stat-label">Phân Quyền Ma Trận (RBAC)</div>
+          <div class="stat-sub">8 quyền hạt nhân bảo mật tuyệt đối</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number">24/7</div>
+          <div class="stat-label">Trợ Lý Work Smart AI</div>
+          <div class="stat-sub">Đồng hành hướng dẫn & giải quyết tắc nghẽn</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         PHẦN 1: PDCA & POLC TRONG QUẢN TRỊ ỨNG VỚI TASKFLOW PRO
+         ======================================================== -->
+    <section class="section-wrap" id="pdca-polc">
+      <div class="section-header">
+        <span class="section-tag">Khung Quản Trị Chuẩn Quốc Tế</span>
+        <h2 class="section-title">1. Tích Hợp Sâu Sắc PDCA & POLC Vào Hệ Thống</h2>
+        <p class="section-desc">
+          Biến các lý thuyết quản trị trừu tượng thành công cụ trực quan, thao tác 1-click giúp Ban Giám Đốc, Trưởng phòng và Nhân viên vận hành chính xác từng giây.
+        </p>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="tab-pills-wrapper">
+        <div class="tab-pills">
+          <button type="button" class="tab-pill-btn active" id="tabBtnPdca" onclick="switchMatrix('pdca')">
+            <span>🔄</span> Vòng Lặp Deming: PDCA (Chất Lượng Vận Hành)
+          </button>
+          <button type="button" class="tab-pill-btn" id="tabBtnPolc" onclick="switchMatrix('polc')">
+            <span>🏛️</span> 4 Trụ Cột Quản Trị: POLC (Điều Hành Chiến Lược)
+          </button>
+        </div>
+      </div>
+
+      <!-- PDCA MATRIX CONTENT -->
+      <div id="contentPdca" class="matrix-grid-4">
+        <!-- PLAN -->
+        <div class="matrix-card">
+          <div class="matrix-badge-row">
+            <span class="matrix-step-badge badge-blue">PHASE 01 • PLAN</span>
+            <span class="matrix-role-tag">Lập Kế Hoạch & Thiết Lập Mục Tiêu</span>
+          </div>
+          <h3 class="matrix-title">P - Plan (Hoạch Định Chi Tiết)</h3>
+          <p class="matrix-desc">
+            Không còn tình trạng giao việc chung chung qua tin nhắn hay email thất lạc. Mọi nhiệm vụ đều được chuẩn hóa ngay từ khâu khởi tạo.
+          </p>
+          <ul class="feature-list">
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Phân rã công việc (WBS):</strong> Xác định tiêu đề, mô tả chi tiết, phòng ban chịu trách nhiệm chính.</span>
+            </li>
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Mốc thời gian nghiêm ngặt:</strong> Thiết lập ngày đến hạn (Due Date) chính xác đến từng phút.</span>
+            </li>
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Đồng bộ Google Calendar:</strong> Tự động đẩy lịch hẹn công việc lên lịch Google cá nhân qua chuẩn iCal/WebCal.</span>
+            </li>
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Phân loại độ ưu tiên:</strong> 4 cấp độ Khẩn cấp, Cao, Trung bình, Thấp với mã màu nhận diện trực quan.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- DO -->
+        <div class="matrix-card">
+          <div class="matrix-badge-row">
+            <span class="matrix-step-badge badge-green">PHASE 02 • DO</span>
+            <span class="matrix-role-tag">Thực Thi & Phối Hợp Luồng Công Việc</span>
+          </div>
+          <h3 class="matrix-title">D - Do (Thực Hiện Chuẩn Hóa)</h3>
+          <p class="matrix-desc">
+            Quy trình thực hiện công việc được minh bạch hóa theo phương pháp luận Agile / Kanban, xóa bỏ hoàn toàn rào cản thông tin.
+          </p>
+          <ul class="feature-list">
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Kanban 4 giai đoạn chuẩn:</strong> Cần làm (To Do) ➔ Đang làm (In Progress) ➔ Chờ duyệt (Pending Review) ➔ Hoàn thành (Completed).</span>
+            </li>
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Kéo thả trực quan (Drag & Drop):</strong> Cập nhật trạng thái tức thời không cần gõ phím hay nhập form phức tạp.</span>
+            </li>
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Thanh trượt tiến độ % động:</strong> Tự động tính toán mức độ hoàn thành nhiệm vụ theo từng giai đoạn thực tế.</span>
+            </li>
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Tương tác hội thoại tại chỗ:</strong> Bình luận, đính kèm tài liệu và trao đổi giải pháp ngay dưới từng thẻ việc.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- CHECK -->
+        <div class="matrix-card">
+          <div class="matrix-badge-row">
+            <span class="matrix-step-badge badge-amber">PHASE 03 • CHECK</span>
+            <span class="matrix-role-tag">Kiểm Tra, Đo Lường & Giám Sát Realtime</span>
+          </div>
+          <h3 class="matrix-title">C - Check (Đo Lường & Cảnh Báo)</h3>
+          <p class="matrix-desc">
+            Dữ liệu trung thực và không thể làm sai lệch. Hệ thống tự động kiểm tra liên tục 24/7 để cảnh báo nguy cơ trước khi sự cố xảy ra.
+          </p>
+          <ul class="feature-list">
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Bảng chỉ số KPI đa chiều:</strong> 5 khối số liệu tổng quan (Tổng việc, Đang chạy, Chờ duyệt, Hoàn thành, Quá hạn cảnh báo).</span>
+            </li>
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Hệ thống quét quá hạn tự động:</strong> Máy chủ quét định kỳ mỗi 60 giây và kích hoạt thông báo chuông đỏ tức thì.</span>
+            </li>
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Biểu đồ hiệu suất Chart.js:</strong> Phân tích cơ cấu công việc, tỷ lệ hoàn thành đúng hạn theo từng nhân sự & phòng ban.</span>
+            </li>
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Audit Trail (Nhật ký truy vết):</strong> Ghi nhận 100% lịch sử ai đã sửa gì, vào thời điểm nào, ngăn ngừa tranh chấp trách nhiệm.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- ACT -->
+        <div class="matrix-card">
+          <div class="matrix-badge-row">
+            <span class="matrix-step-badge badge-purple">PHASE 04 • ACT</span>
+            <span class="matrix-role-tag">Cải Tiến Chuẩn Hóa & Tự Động Hóa</span>
+          </div>
+          <h3 class="matrix-title">A - Act (Chuẩn Hóa & Cải Tiến Liên Tục)</h3>
+          <p class="matrix-desc">
+            Không dừng lại ở việc hoàn thành công việc, hệ thống rút ngắn chu kỳ phản hồi và chuyển hóa kinh nghiệm thành quy tắc tự động.
+          </p>
+          <ul class="feature-list">
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Workflow Automation Pro:</strong> Tự động hóa quy tắc theo cú pháp trực quan <em>KHI (Trigger) ➔ THÌ (Action)</em>.</span>
+            </li>
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Trợ lý ảo Work Smart AI:</strong> Phân tích điểm nghẽn, đề xuất phương án tối ưu hóa tài nguyên và quy trình.</span>
+            </li>
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Cập nhật bài học kinh nghiệm:</strong> Điều chỉnh thời lượng chuẩn (SLA) cho các chu kỳ dự án tiếp theo.</span>
+            </li>
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Bản tin phát thanh nội bộ VMG:</strong> Truyền thông ngay lập tức các chuẩn mực mới tới toàn bộ đội ngũ.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- POLC MATRIX CONTENT (Hidden initially) -->
+      <div id="contentPolc" class="matrix-grid-4" style="display: none;">
+        <!-- PLANNING -->
+        <div class="matrix-card">
+          <div class="matrix-badge-row">
+            <span class="matrix-step-badge badge-blue">POLC • PLANNING</span>
+            <span class="matrix-role-tag">Hoạch Định Chiến Lược & Mục Tiêu</span>
+          </div>
+          <h3 class="matrix-title">Planning (Hoạch Định)</h3>
+          <p class="matrix-desc">
+            Xác định rõ ràng mục tiêu của tổ chức và phương thức tối ưu nhất để đạt được mục tiêu trong giới hạn nguồn lực.
+          </p>
+          <ul class="feature-list">
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Chế độ xem đa góc nhìn:</strong> Linh hoạt chuyển đổi giữa Lịch Ngày (Day), Lịch Tuần (Week) và Toàn cảnh Tháng (Month).</span>
+            </li>
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Đồng bộ mục tiêu cấp cao:</strong> Gắn kết nhiệm vụ cụ thể của nhân viên với mục tiêu KPI trọng tâm của Ban Giám Đốc.</span>
+            </li>
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Phân loại nhãn công việc:</strong> Nhận diện dự án chiến lược, bảo trì vận hành, hoặc yêu cầu phát sinh khẩn cấp.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- ORGANIZING -->
+        <div class="matrix-card">
+          <div class="matrix-badge-row">
+            <span class="matrix-step-badge badge-green">POLC • ORGANIZING</span>
+            <span class="matrix-role-tag">Tổ Chức Nguồn Lực & Phân Công Trách Nhiệm</span>
+          </div>
+          <h3 class="matrix-title">Organizing (Tổ Chức Bộ Máy)</h3>
+          <p class="matrix-desc">
+            Thiết lập cơ cấu phân quyền chuẩn mực, phân bổ công việc đúng người đúng việc dựa trên chuyên môn và phòng ban.
+          </p>
+          <ul class="feature-list">
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Phân quyền 4 cấp bậc (RBAC):</strong> Quản trị viên (Admin) ➔ Trưởng phòng (Manager) ➔ Nhân viên (Member) ➔ Khách xem (Viewer).</span>
+            </li>
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Ma trận 8 đặc quyền hạt nhân:</strong> Kiểm soát chặt chẽ quyền Tạo việc, Sửa, Xóa, Phê duyệt, Quản lý phòng ban và Xem báo cáo.</span>
+            </li>
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Cấu trúc 16 phòng ban thống nhất:</strong> Quản lý danh mục phòng ban linh hoạt với cơ chế tự động đồng bộ (Cascading Update).</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- LEADING -->
+        <div class="matrix-card">
+          <div class="matrix-badge-row">
+            <span class="matrix-step-badge badge-amber">POLC • LEADING</span>
+            <span class="matrix-role-tag">Lãnh Đạo, Động Viên & Truyền Thông Nội Bộ</span>
+          </div>
+          <h3 class="matrix-title">Leading (Lãnh Đạo & Dẫn Dắt)</h3>
+          <p class="matrix-desc">
+            Tạo lập môi trường làm việc cởi mở, minh bạch, kịp thời công nhận đóng góp và dẫn dắt đội ngũ hoàn thành mục tiêu.
+          </p>
+          <ul class="feature-list">
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Bản tin nội bộ VMG Ticker:</strong> Kênh truyền thông phát thanh chính thức của Ban Lãnh Đạo ngay trên thanh công cụ.</span>
+            </li>
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Vinh danh cá nhân xuất sắc:</strong> Công khai ghi nhận những nhân sự và phòng ban đạt tỷ lệ hoàn thành KPI cao nhất.</span>
+            </li>
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Trợ lý Work Smart AI đồng hành:</strong> Giúp nhân sự giải tỏa áp lực, hướng dẫn các bước thao tác nghiệp vụ 24/7.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- CONTROLLING -->
+        <div class="matrix-card">
+          <div class="matrix-badge-row">
+            <span class="matrix-step-badge badge-purple">POLC • CONTROLLING</span>
+            <span class="matrix-role-tag">Kiểm Soát Tiến Độ, Rủi Ro & Đánh Giá</span>
+          </div>
+          <h3 class="matrix-title">Controlling (Kiểm Soát Chặt Chẽ)</h3>
+          <p class="matrix-desc">
+            So sánh liên tục giữa kết quả thực tế và kế hoạch ban đầu, kích hoạt biện pháp ứng phó kịp thời để duy trì sự ổn định.
+          </p>
+          <ul class="feature-list">
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Executive Desk (Bàn Điều Hành):</strong> Dành riêng cho Lãnh Đạo cấp cao với cái nhìn bao quát 360 độ toàn doanh nghiệp.</span>
+            </li>
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Xuất báo cáo đa định dạng:</strong> Trích xuất dữ liệu ra file PDF chuẩn in ấn, bảng tính Excel/CSV để đối soát độc lập.</span>
+            </li>
+            <li class="feature-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Cơ chế duyệt việc 2 lớp (Review Gate):</strong> Chỉ người giao việc hoặc Admin mới có quyền ký duyệt nghiệm thu trạng thái Hoàn thành.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- COMPARISON TABLE -->
+      <div class="comparison-card">
+        <h3 style="font-size: 19px; font-weight: 800; margin-bottom: 16px;">
+          Bảng So Sánh Hiệu Quả: Quản Trị Truyền Thống vs. TaskFlow Pro Realtime
+        </h3>
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th style="width: 20%;">Tiêu Chí Quản Trị</th>
+              <th style="width: 40%;">Phương Pháp Truyền Thống (Excel, Chat, Giấy)</th>
+              <th style="width: 40%;">Nền Tảng TaskFlow Pro</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Cập nhật trạng thái</strong></td>
+              <td><span class="comp-badge-bad">Chậm trễ</span> Chờ họp giao ban cuối tuần hoặc báo cáo tổng hợp cuối tháng.</td>
+              <td><span class="comp-badge-good">Realtime tức thời</span> WebSocket đồng bộ ngay trong 0.1 giây tới mọi màn hình.</td>
+            </tr>
+            <tr>
+              <td><strong>Kiểm soát quá hạn</strong></td>
+              <td><span class="comp-badge-bad">Bị động</span> Thường phát hiện khi khách hàng phàn nàn hoặc hậu quả đã phát sinh.</td>
+              <td><span class="comp-badge-good">Chủ động quét 24/7</span> Máy chủ quét tự động mỗi 60 giây và phát chuông cảnh báo.</td>
+            </tr>
+            <tr>
+              <td><strong>Phối hợp liên bộ phận</strong></td>
+              <td><span class="comp-badge-bad">Rời rạc & Tam sao thất bản</span> Đùn đẩy trách nhiệm qua nhóm chat không có hồ sơ lưu vết.</td>
+              <td><span class="comp-badge-good">Quy trình khép kín</span> Audit Trail lưu lại 100% lịch sử và luồng chuyển giao rõ ràng.</td>
+            </tr>
+            <tr>
+              <td><strong>Bảo mật & Phân quyền</strong></td>
+              <td><span class="comp-badge-bad">Dễ lộ dữ liệu</span> File Excel gửi qua lại có thể bị sao chép hoặc xóa nhầm công thức.</td>
+              <td><span class="comp-badge-good">Bảo mật đa tầng RBAC</span> 4 cấp vai trò, xác thực mật khẩu bcrypt và mã hóa token.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         PHẦN 2: THIẾT KẾ UI/UX & CÔNG NGHỆ TRẢI NGHIỆM
+         ======================================================== -->
+    <section class="section-wrap" id="ui-ux">
+      <div class="section-header">
+        <span class="section-tag">Trải Nghiệm Người Dùng Đột Phá</span>
+        <h2 class="section-title">2. Đỉnh Cao Thiết Kế UI/UX & Công Nghệ Trải Nghiệm</h2>
+        <p class="section-desc">
+          Ứng dụng thiết kế theo chuẩn mực quốc tế: Dual Themes, Hệ sinh thái màu Gradient Cyan-to-Emerald, Kính mờ Glassmorphism và triết lý Zero Text Clipping trên di động.
+        </p>
+      </div>
+
+      <div class="ui-showcase-grid">
+        <!-- 1. DUAL THEMES -->
+        <div class="ui-card">
+          <div class="ui-icon-wrap">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </div>
+          <h3 class="ui-card-title">Dual Themes (Dark & Light)</h3>
+          <p class="ui-card-desc">
+            Hỗ trợ song song Chế độ Tối (Dark Mode) huyền bí công nghệ và Chế độ Sáng (Light Mode) thanh lịch tinh tế. Hệ thống Design Tokens biến số CSS đảm bảo chuyển đổi êm mượt trong 0.3s không chớp nháy.
+          </p>
+          <span class="ui-tag-pill">Design Tokens Chuẩn Hóa</span>
+        </div>
+
+        <!-- 2. BRAND GRADIENT & GLASSMORPHISM -->
+        <div class="ui-card">
+          <div class="ui-icon-wrap">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+          </div>
+          <h3 class="ui-card-title">Cyan-to-Emerald & Kính Mờ</h3>
+          <p class="ui-card-desc">
+            Dải màu gradient chủ đạo Cyan <code>#0ea5e9</code> chuyển dần sang Emerald <code>#10b981</code> mang lại sinh khí và độ tin cậy. Kết hợp hiệu ứng kính mờ <code>backdrop-filter: blur(16px)</code> tạo chiều sâu thị giác sang trọng.
+          </p>
+          <span class="ui-tag-pill">Glassmorphism Cao Cấp</span>
+        </div>
+
+        <!-- 3. MOBILE-FIRST & ZERO TEXT CLIPPING -->
+        <div class="ui-card">
+          <div class="ui-icon-wrap">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          </div>
+          <h3 class="ui-card-title">Mobile-First Không Khuất Chữ</h3>
+          <p class="ui-card-desc">
+            Tuân thủ nghiêm ngặt Quy tắc số 7: Tuyệt đối không khuất chữ tiêu đề trên màn hình nhỏ ($\ge 360\text{px}$), lưới chỉ số KPI tự động cân bằng 2 cột, 4 tab đối xứng và vùng an toàn (Safe Area) chống nút bấm che lấp.
+          </p>
+          <span class="ui-tag-pill">Quy Chuẩn Rule 7 Độc Quyền</span>
+        </div>
+
+        <!-- 4. REALTIME MARQUEE TICKER -->
+        <div class="ui-card">
+          <div class="ui-icon-wrap">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          </div>
+          <h3 class="ui-card-title">Bản Tin VMG Chạy Chữ Realtime</h3>
+          <p class="ui-card-desc">
+            Thanh tin tức chạy chữ mượt mà từ trái sang phải với huy hiệu <strong>[TIN VMG]</strong> sắc nét trên di động. Cơ chế tạm dừng thông minh khi rê chuột, chống đứng hình trên màn hình cảm ứng điện thoại.
+          </p>
+          <span class="ui-tag-pill">Chạy Trái ➔ Phải Chuẩn TV</span>
+        </div>
+
+        <!-- 5. WORK SMART AI ASSISTANT -->
+        <div class="ui-card">
+          <div class="ui-icon-wrap">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <h3 class="ui-card-title">Trợ Lý Ảo Work Smart AI</h3>
+          <p class="ui-card-desc">
+            Nút nổi thông minh góc dưới màn hình, tích hợp cơ sở tri thức đồ sộ về toàn bộ tính năng TaskFlow Pro. Giải đáp bằng ngôn ngữ tự nhiên và cung cấp các nút bấm chuyển view tức thì (Deep Link).
+          </p>
+          <span class="ui-tag-pill">Knowledge Engine AI 24/7</span>
+        </div>
+
+        <!-- 6. MICRO-INTERACTIONS & TOUCH ERGONOMICS -->
+        <div class="ui-card">
+          <div class="ui-icon-wrap">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+          </div>
+          <h3 class="ui-card-title">Micro-Interactions & Cảm Giác Chạm</h3>
+          <p class="ui-card-desc">
+            Mọi nút bấm đạt chuẩn tối thiểu $44\text{px} \times 44\text{px}$ cho ngón tay cái. Hiệu ứng rung lắc báo lỗi (Shake Animation), âm thanh xác nhận hoàn thành tinh tế và thông báo Toast không đè lên nút chức năng.
+          </p>
+          <span class="ui-tag-pill">Touch Targets $\ge 44\text{px}$</span>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE DEMO SIMULATOR -->
+      <div class="interactive-demo-card">
+        <div class="demo-header-label">
+          <span>●</span> Mô Phỏng Trải Nghiệm Bản Tin VMG Realtime Trên Web App:
+        </div>
+        <div class="mock-ticker-bar">
+          <div class="mock-badge">🔔 TIN NỘI BỘ VMG</div>
+          <div class="mock-marquee">
+            <div class="mock-track">
+              ⚡ [KHẨN CẤP] Nhắc nhở cập nhật 100% tiến độ nhiệm vụ trước 17h30 thứ Sáu hàng tuần ✦ 🏆 [VINH DANH] Chúc mừng Khối R&D nghiệm thu xuất sắc phiên bản TaskFlow Pro v3.5 Mobile-First ✦ 📢 [LỊCH HỌP] Họp giao ban định kỳ Ban Giám Đốc & Khối Vận Hành lúc 09h00 sáng Thứ Hai tại Phòng Hội Thảo Tầng 3 kết hợp Google Meet
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         PHẦN 3: CHIẾN LƯỢC QUY TRÌNH PHÒNG BAN & PLATFORM CHUNG
+         ======================================================== -->
+    <section class="section-wrap" id="platform-strategy">
+      <div class="section-header">
+        <span class="section-tag">Tầm Nhìn & Chiến Lược Chuyển Đổi Số</span>
+        <h2 class="section-title">3. Từ Quy Trình Phòng Ban Đến Platform Chung Toàn Doanh Nghiệp</h2>
+        <p class="section-desc">
+          Lộ trình chiến lược 3 giai đoạn chuyển đổi số toàn diện: Không chỉ là một phần mềm quản lý việc đơn lẻ, mà phát triển thành Xương Sống Vận Hành (Digital Operating Backbone) kết nối toàn bộ hệ sinh thái tổ chức.
+        </p>
+      </div>
+
+      <!-- 3-STAGE TIMELINE -->
+      <div class="timeline-container">
+        <!-- PHASE 1 -->
+        <div class="timeline-row">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <div class="timeline-phase">GIAI ĐOẠN 1 • NỀN TẢNG HIỆN HỮU (2026)</div>
+            <h3 class="timeline-title">Chuẩn Hóa & Số Hóa Quy Trình 16 Phòng Ban</h3>
+            <p class="timeline-desc">
+              Xây dựng không gian làm việc chuyên sâu cho từng bộ phận (Kỹ thuật, Marketing, Kinh doanh, Nhân sự, Vận hành, R&D,...). Thiết lập thời gian hoàn thành chuẩn (SLA), biểu mẫu đầu vào và tiêu chí nghiệm thu rõ ràng.
+            </p>
+            <div class="layer-tags">
+              <span class="layer-tag">16 Phòng Ban Riêng Biệt</span>
+              <span class="layer-tag">Kanban Theo Đơn Vị</span>
+              <span class="layer-tag">KPI Theo Vai Trò</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHASE 2 -->
+        <div class="timeline-row inverted">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <div class="timeline-phase">GIAI ĐOẠN 2 • TỰ ĐỘNG HÓA LIÊN THÔNG (2026 - 2027)</div>
+            <h3 class="timeline-title">Điều Phối & Tự Động Hóa Xuyên Phòng Ban (Cross-Department)</h3>
+            <p class="timeline-desc">
+              Xóa bỏ hoàn toàn "ốc đảo thông tin" (Silo Trap). Áp dụng Động cơ Tự động hóa Workflow Automation để kết nối liên hoàn: Ví dụ: Khi Kinh doanh ký hợp đồng ➔ Tự động tạo việc cho Kỹ thuật triển khai ➔ Kế toán xuất hóa đơn ➔ Nhân sự tính hoa hồng.
+            </p>
+            <div class="layer-tags">
+              <span class="layer-tag">Workflow Automation Khi-Thì</span>
+              <span class="layer-tag">Luồng Phê Duyệt Liên Hoàn</span>
+              <span class="layer-tag">SLA Đo Lường Xuyên Suốt</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHASE 3 -->
+        <div class="timeline-row">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <div class="timeline-phase">GIAI ĐOẠN 3 • PLATFORM HỢP NHẤT TOÀN DOANH NGHIỆP</div>
+            <h3 class="timeline-title">Hệ Sinh Thái Nền Tảng Hợp Nhất (Unified Enterprise Platform)</h3>
+            <p class="timeline-desc">
+              TaskFlow Pro trở thành Trục Điều Hành Trung Tâm (Central Enterprise Operating Hub): Tích hợp cổng kết nối mở Open API & Webhook với ERP, CRM, HRM, Kho dữ liệu tập trung (Data Warehouse) và Hệ thống Đăng nhập một lần (Enterprise SSO).
+            </p>
+            <div class="layer-tags">
+              <span class="layer-tag">Open API & Webhooks</span>
+              <span class="layer-tag">Enterprise SSO (@vmg.edu.vn)</span>
+              <span class="layer-tag">Business Intelligence (BI)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         PHẦN 4: KIẾN TRÚC KỸ THUẬT NỀN TẢNG (ARCHITECTURE)
+         ======================================================== -->
+    <section class="section-wrap" id="architecture">
+      <div class="section-header">
+        <span class="section-tag">Kiến Trúc Hệ Thống Cấp Doanh Nghiệp</span>
+        <h2 class="section-title">4. Mô Hình Kiến Trúc Phân Tầng Nền Tảng (Layered Architecture)</h2>
+        <p class="section-desc">
+          Được thiết kế theo nguyên lý Mô-đun hóa cao (High Modularity), bảo đảm an toàn dữ liệu, tốc độ phản hồi tính bằng mili-giây và khả năng mở rộng không giới hạn quy mô.
+        </p>
+      </div>
+
+      <div class="arch-stack">
+        <!-- LAYER 5 -->
+        <div class="arch-layer">
+          <div class="layer-level">L5</div>
+          <div class="layer-info">
+            <h4 class="layer-title">Tầng Trải Nghiệm Đa Kênh & Trợ Lý AI (Experience & AI Layer)</h4>
+            <p class="layer-desc">Giao diện Web App Responsive (Desktop, Tablet, Mobile), Bàn điều hành Lãnh đạo Executive Desk, Work Smart AI Widget, Bản tin Ticker Marquee.</p>
+          </div>
+          <div class="layer-tags">
+            <span class="layer-tag">Vanilla JS / ES6+</span>
+            <span class="layer-tag">Mobile Touch PWA</span>
+            <span class="layer-tag">Work Smart AI</span>
+          </div>
+        </div>
+
+        <!-- LAYER 4 -->
+        <div class="arch-layer">
+          <div class="layer-level">L4</div>
+          <div class="layer-info">
+            <h4 class="layer-title">Tầng Không Gian Làm Việc Nghiệp Vụ (Department Workspaces Layer)</h4>
+            <p class="layer-desc">Không gian chuyên biệt cho 16 phòng ban, Bảng điều khiển Kanban kéo thả, Lịch đa chế độ (Ngày/Tuần/Tháng), Bộ lọc thời gian thực.</p>
+          </div>
+          <div class="layer-tags">
+            <span class="layer-tag">16 Departments</span>
+            <span class="layer-tag">Interactive Drag&Drop</span>
+            <span class="layer-tag">Calendar Engine</span>
+          </div>
+        </div>
+
+        <!-- LAYER 3 -->
+        <div class="arch-layer">
+          <div class="layer-level">L3</div>
+          <div class="layer-info">
+            <h4 class="layer-title">Tầng Động Cơ Điều Phối & Tự Động Hóa (Core Engine & Automation)</h4>
+            <p class="layer-desc">Động cơ WebSocket Realtime Broadcast, Workflow Automation Engine (KHI -> THÌ), Bộ quét cảnh báo quá hạn 60s, Audit Logging Stream.</p>
+          </div>
+          <div class="layer-tags">
+            <span class="layer-tag">WebSocket (ws)</span>
+            <span class="layer-tag">Automation Core</span>
+            <span class="layer-tag">Overdue Scanner</span>
+          </div>
+        </div>
+
+        <!-- LAYER 2 -->
+        <div class="arch-layer">
+          <div class="layer-level">L2</div>
+          <div class="layer-info">
+            <h4 class="layer-title">Tầng Bảo Mật & Cổng Tích Hợp (Security & Integration Hub)</h4>
+            <p class="layer-desc">Cơ chế phân quyền đa tầng RBAC 4 vai trò, Xác thực bảo mật bcrypt, Cổng SSO Google Workspace (@vmg.edu.vn), Xuất iCal/WebCal.</p>
+          </div>
+          <div class="layer-tags">
+            <span class="layer-tag">RBAC Security</span>
+            <span class="layer-tag">Google SSO</span>
+            <span class="layer-tag">iCal Export</span>
+          </div>
+        </div>
+
+        <!-- LAYER 1 -->
+        <div class="arch-layer">
+          <div class="layer-level">L1</div>
+          <div class="layer-info">
+            <h4 class="layer-title">Tầng Lưu Trữ & Hạ Tầng Máy Chủ (Infrastructure & Storage Layer)</h4>
+            <p class="layer-desc">Máy chủ hiệu năng cao Node.js Express, Hệ thống cơ sở dữ liệu tối ưu với cơ chế sao lưu tự động, Lưu trữ đa phiên bản (Versioned Storage).</p>
+          </div>
+          <div class="layer-tags">
+            <span class="layer-tag">Node.js Express</span>
+            <span class="layer-tag">JSON/SQL Engine</span>
+            <span class="layer-tag">Daily Backup</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         EXECUTIVE SUMMARY & ACTIONABLE CTA
+         ======================================================== -->
+    <section class="cta-card">
+      <h2 class="cta-title">Sẵn Sàng Chuyển Đổi Số Vận Hành Cùng TaskFlow Pro</h2>
+      <p class="cta-desc">
+        Hệ thống đã hoàn thiện phiên bản mới nhất v3.5.0, tích hợp trọn vẹn lý thuyết quản trị PDCA & POLC, tối ưu trải nghiệm không góc chết trên điện thoại di động và sẵn sàng triển khai thực chiến tại toàn bộ các phòng ban.
+      </p>
+      <div class="cta-buttons">
+        <a href="/" target="_blank" class="btn-launch-app" style="font-size: 15px; padding: 14px 30px;">
+          <span>Trải Nghiệm Hệ Thống Ngay</span>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        <button type="button" class="btn-secondary" onclick="window.print()">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          <span>In / Xuất Báo Cáo PDF</span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <p>© 2026 <strong>TaskFlow Pro Platform</strong> - Khối Nghiên Cứu & Phát Triển Công Nghệ (R&D) VMG.</p>
+      <p style="margin-top: 6px;">Chuẩn hóa quản trị vận hành theo tiêu chuẩn Quốc tế: PDCA • POLC • Agile Kanban • Mobile-First Protection.</p>
+    </div>
+  </footer>
+
+  <!-- INTERACTIVE JAVASCRIPT -->
+  <script>
+    // THEME TOGGLE
+    const themeBtn = document.getElementById('btnThemeToggle');
+    const htmlEl = document.documentElement;
+
+    function applyTheme(theme) {
+      htmlEl.setAttribute('data-theme', theme);
+      localStorage.setItem('taskflow_presentation_theme', theme);
+      if (theme === 'light') {
+        themeBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        `;
+      } else {
+        themeBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        `;
+      }
+    }
+
+    const savedTheme = localStorage.getItem('taskflow_presentation_theme') || 'dark';
+    applyTheme(savedTheme);
+
+    themeBtn.addEventListener('click', () => {
+      const current = htmlEl.getAttribute('data-theme');
+      applyTheme(current === 'dark' ? 'light' : 'dark');
+    });
+
+    // PDCA vs POLC SWITCHER
+    function switchMatrix(type) {
+      const btnPdca = document.getElementById('tabBtnPdca');
+      const btnPolc = document.getElementById('tabBtnPolc');
+      const pdcaContent = document.getElementById('contentPdca');
+      const polcContent = document.getElementById('contentPolc');
+
+      if (type === 'pdca') {
+        btnPdca.classList.add('active');
+        btnPolc.classList.remove('active');
+        pdcaContent.style.display = 'grid';
+        polcContent.style.display = 'none';
+      } else {
+        btnPolc.classList.add('active');
+        btnPdca.classList.remove('active');
+        pdcaContent.style.display = 'none';
+        polcContent.style.display = 'grid';
+      }
+    }
+
+    // SMOOTH SCROLL ACTIVE HIGHLIGHT
+    const sections = document.querySelectorAll('section[id]');
+    const navAnchors = document.querySelectorAll('.nav-links a');
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop - 120;
+        if (pageYOffset >= sectionTop) {
+          current = section.getAttribute('id');
+        }
+      });
+      navAnchors.forEach(a => {
+        a.classList.remove('active');
+        if (a.getAttribute('href') === `#${current}`) {
+          a.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
