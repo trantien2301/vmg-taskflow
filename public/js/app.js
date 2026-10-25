@@ -204,6 +204,18 @@ const App = {
       if (loginContainer) loginContainer.style.display = 'none';
       if (registerContainer) registerContainer.style.display = 'block';
       if (forgotContainer) forgotContainer.style.display = 'none';
+
+      // Ensure departments in registration form match loaded departments
+      if (this.state.departments && this.state.departments.length > 0) {
+        const regDeptSelect = document.getElementById('regDept');
+        if (regDeptSelect) {
+          const currentVal = regDeptSelect.value;
+          regDeptSelect.innerHTML = this.state.departments.map(d => `<option value="${d.name}">${d.name}</option>`).join('');
+          if (currentVal && this.state.departments.some(d => d.name === currentVal)) {
+            regDeptSelect.value = currentVal;
+          }
+        }
+      }
     } else if (tab === 'forgot') {
       if (tabLogin) tabLogin.classList.remove('active');
       if (tabRegister) tabRegister.classList.remove('active');
@@ -232,6 +244,17 @@ const App = {
       void wrapper.offsetWidth;
       wrapper.classList.add('shake-error');
       setTimeout(() => wrapper.classList.remove('shake-error'), 500);
+    }
+  },
+
+  autoFillResetOtp() {
+    const code = document.getElementById('displayOtpCode')?.innerText?.trim();
+    const otpInput = document.getElementById('resetOtp');
+    if (code && code !== '------' && otpInput) {
+      otpInput.value = code;
+      otpInput.focus();
+      this.showToast(`Đã tự động điền mã xác minh: ${code}`, 'success');
+      this.playSound('success');
     }
   },
 
@@ -362,12 +385,26 @@ const App = {
   },
 
   updateThemeButtonIcon(theme) {
+    const isDark = theme === 'dark';
     const btn = document.getElementById('themeToggleBtn');
     if (btn) {
       btn.innerHTML = typeof TFIcons !== 'undefined'
-        ? (theme === 'dark' ? TFIcons.sun : TFIcons.moon)
-        : (theme === 'dark' ? '☀️' : '🌙');
-      btn.title = theme === 'dark' ? 'Chuyển sang giao diện Sáng' : 'Chuyển sang giao diện Tối';
+        ? (isDark ? TFIcons.sun : TFIcons.moon)
+        : (isDark ? '☀️' : '🌙');
+      btn.title = isDark ? 'Chuyển sang giao diện Sáng' : 'Chuyển sang giao diện Tối';
+    }
+
+    const loginThemeBtn = document.getElementById('loginThemeToggleBtn');
+    if (loginThemeBtn) {
+      const iconHtml = typeof TFIcons !== 'undefined'
+        ? (isDark ? TFIcons.sun : TFIcons.moon)
+        : (isDark ? '☀️' : '🌙');
+      const labelText = isDark ? 'Chế độ Sáng' : 'Chế độ Tối';
+      loginThemeBtn.innerHTML = `
+        <span class="theme-icon">${iconHtml}</span>
+        <span class="theme-label" id="loginThemeLabelText">${labelText}</span>
+      `;
+      loginThemeBtn.title = isDark ? 'Chuyển sang Chế độ Sáng (Light Mode)' : 'Chuyển sang Chế độ Tối (Dark Mode)';
     }
   },
 
@@ -903,20 +940,31 @@ const App = {
       });
     }
 
-    // Toggle password visibility
-    const togglePwdBtn = document.getElementById('togglePasswordBtn');
-    const pwdInput = document.getElementById('loginPassword');
-    if (togglePwdBtn && pwdInput) {
-      togglePwdBtn.addEventListener('click', () => {
-        if (pwdInput.type === 'password') {
-          pwdInput.type = 'text';
-          togglePwdBtn.innerHTML = typeof TFIcons !== 'undefined' ? TFIcons.eyeOff : '🙈';
-        } else {
-          pwdInput.type = 'password';
-          togglePwdBtn.innerHTML = typeof TFIcons !== 'undefined' ? TFIcons.eye : '👁️';
-        }
-      });
-    }
+    // Toggle password visibility for all authentication password fields
+    const passwordToggles = [
+      { btnId: 'togglePasswordBtn', inputId: 'loginPassword' },
+      { btnId: 'toggleRegPasswordBtn', inputId: 'regPassword' },
+      { btnId: 'toggleRegConfirmPasswordBtn', inputId: 'regConfirmPassword' },
+      { btnId: 'toggleResetNewPassBtn', inputId: 'resetNewPass' },
+      { btnId: 'toggleResetConfirmPassBtn', inputId: 'resetConfirmPass' }
+    ];
+
+    passwordToggles.forEach(({ btnId, inputId }) => {
+      const btn = document.getElementById(btnId);
+      const input = document.getElementById(inputId);
+      if (btn && input) {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (input.type === 'password') {
+            input.type = 'text';
+            btn.innerHTML = typeof TFIcons !== 'undefined' ? TFIcons.eyeOff : '🙈';
+          } else {
+            input.type = 'password';
+            btn.innerHTML = typeof TFIcons !== 'undefined' ? TFIcons.eye : '👁️';
+          }
+        });
+      }
+    });
 
     // ========================================================
     // FORGOT & RESET PASSWORD LISTENERS

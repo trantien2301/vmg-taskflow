@@ -324,6 +324,52 @@ body, .sidebar, .top-header, .kpi-card, .kanban-col, .task-card, .table-card, .m
   overflow-x: hidden;
 }
 
+/* Quick Theme Switcher on Login Screen */
+.login-theme-toggle-wrapper {
+  position: absolute;
+  top: 22px;
+  right: 28px;
+  z-index: 20;
+}
+
+.btn-login-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.btn-login-theme-toggle:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.28);
+  color: var(--primary);
+}
+
+.btn-login-theme-toggle .theme-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+}
+
+.btn-login-theme-toggle .theme-label {
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
 /* Floating Aurora Orbs (Concept 1: Aurora Glow) */
 .login-aurora-bg {
   position: absolute;
@@ -2897,6 +2943,17 @@ body, .sidebar, .top-header, .kpi-card, .kanban-col, .task-card, .table-card, .m
   }
 
   /* Login & Auth Cards */
+  .login-theme-toggle-wrapper {
+    top: 14px;
+    right: 14px;
+  }
+  .btn-login-theme-toggle {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+  .btn-login-theme-toggle .theme-label {
+    display: none;
+  }
   .login-screen {
     padding: 12px;
   }
